@@ -1,0 +1,7 @@
+# Git関連ファイルを除外
+.git
+.gitignore
+
+# README.mdを除外
+README.md
+
