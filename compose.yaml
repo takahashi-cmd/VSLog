@@ -1,0 +1,30 @@
+# db(MySQL),app(Flask)のコンテナを作成
+services:
+  db:
+    # コンテナ名をMySQLに指定
+    container_name: MYSQL
+    # MySQLのDockerfileをビルドする。コンテキストはカレントディレクトリ
+    build:
+      context: .
+      dockerfile: Docker/MySQL/Dockerfile
+    # M1チップでも動くように
+    # Intel Macの場合あってもなくても動く
+    platform: linux/x86_64
+    # ホストとコンテナのポート番号を指定
+    ports:
+      - "3306:3306"
+    # ボリュームmysql_dataとコンテナの/var/lib/mysqlをボリュームマウントする
+    volumes:
+      - mysql_data:/var/lib/mysql
+    # コンテナの環境変数を設定
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    # .envファイルから環境変数を読み込む
+    env_file:
+      - .env
+
+volumes:
+  mysql_data:
