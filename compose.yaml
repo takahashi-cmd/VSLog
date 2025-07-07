@@ -1,8 +1,10 @@
 # db(MySQL),app(Flask)のコンテナを作成
 services:
+
+# MySQL
   db:
     # コンテナ名をMySQLに指定
-    container_name: MYSQL
+    container_name: MySQL
     # MySQLのDockerfileをビルドする。コンテキストはカレントディレクトリ
     build:
       context: .
@@ -13,7 +15,7 @@ services:
     # ホストとコンテナのポート番号を指定
     ports:
       - "3306:3306"
-    # ボリュームmysql_dataとコンテナの/var/lib/mysqlをボリュームマウントする
+    # ボリュームmysql_dataをコンテナの/var/lib/mysqlにボリュームマウントする
     volumes:
       - mysql_data:/var/lib/mysql
     # コンテナの環境変数を設定
@@ -25,6 +27,36 @@ services:
     # .envファイルから環境変数を読み込む
     env_file:
       - .env
+    healthcheck:
+      # mysqladmin(MySQLの管理を行うクライアントを使ってDBコンテナ自身（localhost:127.0.0.1)にpingを送ってヘルスチェックを行う)
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
+      # ヘルスチェックのインターバルは10秒
+      interval: 10s
+      # タイムアウト時間は10秒
+      timeout: 10s
+      # リトライ回数は3回
+      retries: 3
+      # ヘルスチェックが失敗しても無視する時間は30秒
+      start_period: 30s
+
+# Flask
+  app:
+    # コンテナ名をFlaskに変更
+    container_name: Flask
+    # FlaskのDockerfileをビルドする。コンテキストはカレントディレクトリ
+    build:
+      context: .
+      dockerfile: Docker/Flask/Dockerfile
+    # ローカルのmyapp配下のデータをコンテナの/codeにバインドマウントする
+    volumes:
+      - ./myapp:/code
+    # ホストとコンテナのポート番号を指定
+    ports:
+      - "5000:5000"
+    # dbサービスがhealthyになるまで待機
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   mysql_data:
