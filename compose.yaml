@@ -14,7 +14,7 @@ services:
     platform: linux/x86_64
     # ホストとコンテナのポート番号を指定
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT}:3306"
     # ボリュームmysql_dataをコンテナの/var/lib/mysqlにボリュームマウントする
     volumes:
       - mysql_data:/var/lib/mysql
@@ -52,11 +52,14 @@ services:
       - ./myapp:/code
     # ホストとコンテナのポート番号を指定
     ports:
-      - "5000:5000"
+      - "${FLASK_PORT}:5000"
     # dbサービスがhealthyになるまで待機
     depends_on:
       db:
         condition: service_healthy
+    # .envファイルから環境変数を読み込む
+    env_file:
+      - .env
 
 volumes:
   mysql_data:
