@@ -24,10 +24,9 @@ db = SQLAlchemy(app)
 # migrateにapp,dbをバインド
 migrate = Migrate(app, db)
 
+# FlaskアプリとDBオブジェクトが完全に初期化されたあとにモデルを読み込む(循環参照を回避)
+from myapp import models
+
 @app.route('/')
 def hello_world():
     return '<p>Hello World!</p>'
-
-if __name__ == '__main__':
-    print('Starting Flask application...')
-    app.run(host='0.0.0.0', debug=True)
