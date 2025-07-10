@@ -17,5 +17,11 @@ COPY requirements.txt .
 RUN pip install -U pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Flaskのアプリケーションを実行
-CMD [ "python", "__init__.py" ]
+# entrypoint.shをコンテナ内にコピー
+COPY entrypoint.sh .
+
+# 実行権限付与
+RUN chmod +x /code/entrypoint.sh
+
+# Flaskのアプリケーションをentrypoint.shで起動
+ENTRYPOINT [ "/code/entrypoint.sh" ]
