@@ -25,8 +25,5 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 # FlaskアプリとDBオブジェクトが完全に初期化されたあとにモデルを読み込む(循環参照を回避)
-from myapp import models
-
-@app.route('/')
-def hello_world():
-    return '<p>Hello World!</p>'
+# viewsのインポート
+from myapp import models, views
