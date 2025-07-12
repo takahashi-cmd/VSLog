@@ -1,6 +1,9 @@
-from myapp import db
+from .app import db
 from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text, DECIMAL, TIMESTAMP
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+from flask_bcrypt import generate_password_hash, check_password_hash
+from datetime import datetime
 
 # テーブル・カラム作成
 class User(db.Model):
@@ -10,11 +13,23 @@ class User(db.Model):
     username = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, server_default=func.now())
 
     # study_logsに紐づけし、双方向でアクセス
     study_logs = relationship('StudyLog', back_populates='users')
 
+    def __init__(self, user_id, username, email, password):
+        self.user_id = user_id
+        self.username = username
+        self.email = email
+        self.password = generate_password_hash(password)
+    
+    def validate_password(self, password):
+        return check_password_hash(self.password, password)
+    
+    @classmethod
+    def select_by_email(cls, email):
+        return cls.query.filter_by(email=email).first()
 
 class Field(db.Model):
     __tablename__ = 'fields'
@@ -22,7 +37,7 @@ class Field(db.Model):
     field_id = Column(Integer, primary_key=True)
     fieldname = Column(String(20), nullable=False)
     color_code = Column(String(7), nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, server_default=func.now())
 
     # study_logsに紐づけし、双方向でアクセス
     study_logs = relationship('StudyLog', back_populates='fields')

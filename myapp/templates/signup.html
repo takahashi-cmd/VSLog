@@ -1,5 +1,36 @@
 {% extends "base.html" %}
 
-{% block title %} 新規登録画面 {% endblock %}
+{% block title %} 新規登録 {% endblock %}
 
-{% block content %} <h1>新規登録画面</h1> {% endblock %}
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flashes">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <h1>新規登録画面</h1><br>
+    <div>
+        <form action="{{ url_for('signup_process') }}" method="post">
+            <label for="username">氏名：</label>
+            <input placeholder="氏名" type="text" id="username" name="username"><br>
+
+            <label for="email">メールアドレス：</label>
+            <input placeholder="メールアドレス" type="email" id="email" name="email"><br>
+
+            <label for="パスワード1">パスワード：</label>
+            <input placeholder="パスワード" type="password" id="password1" name="password1"><br>
+
+            <label for="パスワード2">パスワード（確認用）：</label>
+            <input placeholder="パスワード（確認用）" type="password" id="password2" name="password2"><br>
+
+            <div>
+                <button class="signup-button" type="submit">新規登録</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
