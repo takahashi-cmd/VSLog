@@ -12,18 +12,43 @@ EMAIL_PATTERN = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9.]+$'
 PASSWORD_PATTERN = r'^.{8,16}$'
 
 # ルーティング
-# ログイン画面
+# ログイン画面表示
 @app.route('/login', methods=['GET'])
 def login_view():
     return render_template('login.html')
 
-# def login_process():
+# ログイン処理
+@app.route('/login', methods=['POST'])
+def login_process():
+    email = request.form.get('email')
+    password = request.form.get('password')
 
-# 新規登録画面
+    if email == '' or password == '':
+        flash('空のフォームがあります')
+    elif re.match(EMAIL_PATTERN, email) is None:
+        flash('メールアドレスの形式になっていません')
+    elif re.match(PASSWORD_PATTERN, password) is None:
+        flash('パスワードは8文字以上16文字以内で入力してください')
+    else:
+        user = User.select_by_email(email)
+        if user is None:
+            flash('登録されていないメールアドレスです')
+            return redirect(url_for('login_view'))
+        else:
+            if check_password_hash(user.password, password):
+                flash('ログインに成功しました')
+                login_user(user)
+                return redirect(url_for('index_view'))
+            else:
+                flash('異なるパスワードです')
+                return redirect(url_for('login_view'))
+
+# 新規登録画面表示
 @app.route('/signup', methods=['GET'])
 def signup_view():
     return render_template('signup.html')
 
+# 新規登録処理
 @app.route('/signup', methods=['POST'])
 def signup_process():
     username = request.form.get('username')
@@ -51,7 +76,6 @@ def signup_process():
         DBuser = User.select_by_email(email)
         if DBuser != None:
             flash('登録済みのユーザーです') 
-        
         else:
             try:
                 db.session.add(user)
@@ -64,11 +88,12 @@ def signup_process():
             return redirect(url_for('login_view'))
     return redirect(url_for('signup_view'))
 
-# パスワード再設定
+# パスワード再設定画面表示
 @app.route('/password-reset', methods=['GET'])
 def password_reset_view():
     return render_template('password_reset.html')
 
+# パスワード再設定処理
 @app.route('/password-reset', methods=['POST'])
 def password_reset_process():
     email = request.form.get('email')
@@ -98,3 +123,8 @@ def password_reset_process():
                 db.session.close()
             return redirect(url_for('login_view'))
     return redirect(url_for('password_reset_view'))
+
+# ホーム画面表示
+@app.route('/index', methods=['GET'])
+def index_view():
+    print('hello world')

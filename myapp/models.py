@@ -3,10 +3,11 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text, DECIMAL,
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from flask_bcrypt import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 from datetime import datetime
 
 # テーブル・カラム作成
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
 
     user_id = Column(String(36), primary_key=True)
