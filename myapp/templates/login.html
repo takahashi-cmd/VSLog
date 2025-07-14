@@ -2,5 +2,29 @@
 
 {% block title %} ログイン {% endblock %}
 
-{% block content %} <h1>ログイン画面</h1> {% endblock %}
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flashes">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <h1>ログイン画面</h1> 
+    <div>
+        <form action="{{ url_for('login_process') }}" method="post">
+            <label for="email">メールアドレス：</label>
+            <input placeholder="メールアドレス" type="email" id="email" name="email"><br>
+
+            <label for="password">パスワード：</label>
+            <input placeholder="パスワード" type="password" id="password" name="password"><br>
+
+            <div>
+                <button class="login" type="submit">ログイン</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
 

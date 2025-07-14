@@ -25,10 +25,13 @@ db = SQLAlchemy(app)
 # migrateにapp,dbをバインド
 migrate = Migrate(app, db)
 
-# LoginManagerのインスタンス化
-login_manager = LoginManager()
+# FlaskアプリとDBオブジェクトが完全に初期化されたあとにmodelsを読み込む(循環参照を回避)
+# viewsのインポート
+from . import models, views
+from .models import User
 
-# LoginManagerとFlaskの紐づけ
+# LoginManagerのインスタンス化、Flaskとの紐づけ
+login_manager = LoginManager()
 login_manager.init_app(app)
 
 # 未認証のユーザーがリダイレクトされるビュー関数とメッセージを設定
@@ -38,11 +41,5 @@ login_manager.login_message = 'ログインが必要です。先にログイン�
 # ユーザー情報を読み込む関数load_userをFlask_loginに登録
 @login_manager.user_loader
 def load_user(user_id):
-    # 循環参照を避けるため、関数内で遅延インポートする
-    from .models import User
-    return User.query.get(str(user_id))
-
-# FlaskアプリとDBオブジェクトが完全に初期化されたあとにmodelsを読み込む(循環参照を回避)
-# viewsのインポート
-from . import models, views
+    return User.query.get(user_id)
 

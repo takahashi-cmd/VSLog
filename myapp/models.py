@@ -25,6 +25,10 @@ class User(UserMixin, db.Model):
         self.email = email
         self.password = generate_password_hash(password)
     
+    # get_idをオーバーライドして、login_user()を使用できるようにする
+    def get_id(self):
+        return self.user_id
+
     def validate_password(self, password):
         return check_password_hash(self.password, password)
     

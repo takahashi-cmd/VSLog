@@ -36,12 +36,12 @@ def login_process():
             return redirect(url_for('login_view'))
         else:
             if check_password_hash(user.password, password):
-                flash('ログインに成功しました')
                 login_user(user)
                 return redirect(url_for('index_view'))
             else:
                 flash('異なるパスワードです')
                 return redirect(url_for('login_view'))
+    return redirect(url_for('login_view'))
 
 # 新規登録画面表示
 @app.route('/signup', methods=['GET'])
@@ -127,4 +127,4 @@ def password_reset_process():
 # ホーム画面表示
 @app.route('/index', methods=['GET'])
 def index_view():
-    print('hello world')
+    return "<p>Hello, World!</p>"
