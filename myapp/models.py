@@ -3,10 +3,11 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text, DECIMAL,
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from flask_bcrypt import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 from datetime import datetime
 
 # テーブル・カラム作成
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
 
     user_id = Column(String(36), primary_key=True)
@@ -24,6 +25,10 @@ class User(db.Model):
         self.email = email
         self.password = generate_password_hash(password)
     
+    # get_idをオーバーライドして、login_user()を使用できるようにする
+    def get_id(self):
+        return self.user_id
+
     def validate_password(self, password):
         return check_password_hash(self.password, password)
     
