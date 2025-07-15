@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %} ホーム画面 {% endblock %}
+
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flashes">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <h1>ホーム画面</h1>
+    <div>
+        <form action="{{ url_for('logout') }}" method="get">
+            <label for="logout"></label>
+            <div>
+                <button class="logout" type="submit">ログアウト</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
