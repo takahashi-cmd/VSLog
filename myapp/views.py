@@ -37,10 +37,17 @@ def login_process():
         else:
             if check_password_hash(user.password, password):
                 login_user(user)
-                return redirect(url_for('index_view'))
+                return redirect(url_for('index_view', user_id = user.user_id))
             else:
                 flash('異なるパスワードです')
                 return redirect(url_for('login_view'))
+    return redirect(url_for('login_view'))
+
+# ログアウト
+@app.route('/logout', methods=['GET'])
+def logout():
+    logout_user()
+    flash('ログアウトしました')
     return redirect(url_for('login_view'))
 
 # 新規登録画面表示
@@ -125,6 +132,7 @@ def password_reset_process():
     return redirect(url_for('password_reset_view'))
 
 # ホーム画面表示
-@app.route('/index', methods=['GET'])
-def index_view():
-    return "<p>Hello, World!</p>"
+@app.route('/index/<user_id>', methods=['GET'])
+@login_required
+def index_view(user_id):
+    return render_template('index.html')
