@@ -13,7 +13,7 @@
         {% endif %}
     {% endwith %}
 
-    <h1>ホーム画面</h1>
+    <h1>{{ current_user.username }}さんのホーム画面</h1>
     <div>
         <form action="{{ url_for('logout') }}" method="get">
             <label for="logout"></label>
@@ -21,5 +21,17 @@
                 <button class="logout" type="submit">ログアウト</button>
             </div>
         </form>
+    </div>
+    <div class="mypage">
+        <a href="{{ url_for('mypage_view', user_id=current_user.user_id) }}">マイページ</a>
+    </div>
+    <div class="study_logs">
+        <a href="{{ url_for('study_logs_view', user_id=current_user.user_id) }}">学習登録</a>
+    </div>
+    <div class="study_fields">
+        <a href="{{ url_for('study_fields_view', user_id=current_user.user_id) }}">学習分野</a>
+    </div>
+    <div class="study_logs_list">
+        <a href="{{ url_for('study_logs_list', user_id=current_user.user_id) }}">学習履歴一覧</a>
     </div>
 {% endblock %}

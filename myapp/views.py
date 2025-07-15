@@ -37,7 +37,7 @@ def login_process():
         else:
             if check_password_hash(user.password, password):
                 login_user(user)
-                return redirect(url_for('index_view', user_id = user.user_id))
+                return redirect(url_for('index_view', user_id=user.user_id))
             else:
                 flash('異なるパスワードです')
                 return redirect(url_for('login_view'))
@@ -131,8 +131,40 @@ def password_reset_process():
             return redirect(url_for('login_view'))
     return redirect(url_for('password_reset_view'))
 
+# ーーーーーーーーーーーーーーーーーーー以降認証後画面ーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+
 # ホーム画面表示
 @app.route('/index/<user_id>', methods=['GET'])
 @login_required
 def index_view(user_id):
     return render_template('index.html')
+
+# マイページ画面表示
+@app.route('/mypage/<user_id>', methods=['GET'])
+@login_required
+def mypage_view(user_id):
+    return render_template('mypage.html')
+
+# マイページ編集画面表示
+@app.route('/mypage-edit/<user_id>', methods=['GET'])
+@login_required
+def mypage_edit_view(user_id):
+    return render_template('mypage_edit.html')
+
+# 学習登録画面表示
+@app.route('/study-logs/<user_id>', methods=['GET'])
+@login_required
+def study_logs_view(user_id):
+    return render_template('study_logs.html')
+
+# 学習分野画面表示
+@app.route('/study-fields/<user_id>', methods=['GET'])
+@login_required
+def study_fields_view(user_id):
+    return render_template('study_fields.html')
+
+# 学習履歴一覧画面表示
+@app.route('/study-logs-list/<user_id>', methods=['GET'])
+@login_required
+def study_logs_list(user_id):
+    return render_template('study_logs_list.html')

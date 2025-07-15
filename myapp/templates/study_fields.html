@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %} 学習分野 {% endblock %}
+
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flashes">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <h1>{{ current_user.username }}さんの学習分野</h1>
+
+{% endblock %}
