@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %} プロフィール編集 {% endblock %}
+
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flashes">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <h1>プロフィール編集画面</h1>
+    <div class="profile_edit">
+        <form action="{{ url_for('profile_edit_process', user_id=current_user.user_id) }}" method="post">
+            <label for="new_username">ユーザー名：</label>
+            <input type="text" id="new_username" name="new_username" value="{{ current_user.username }}">
+
+            <label for="new_email">メールアドレス：</label>
+            <input type="email" id="new_email" name="new_email" value="{{ current_user.email }}">
+
+            <div>
+                <button class="profile_edit" type="submit">プロフィール更新</button>
+            </div>
+        </form>
+        <div class="mypage">
+            <a href="{{ url_for('mypage_view', user_id=current_user.user_id) }}">マイページ</a>
+        </div>
+        <div class="index">
+            <a href="{{ url_for('index_view', user_id=current_user.user_id) }}">ホーム</a>
+        </div>
+    </div>
+{% endblock %}
