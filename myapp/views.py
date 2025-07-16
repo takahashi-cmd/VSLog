@@ -145,11 +145,71 @@ def index_view(user_id):
 def mypage_view(user_id):
     return render_template('mypage.html')
 
-# マイページ編集画面表示
-@app.route('/mypage-edit/<user_id>', methods=['GET'])
+# プロフィール編集画面表示
+@app.route('/profile-edit/<user_id>', methods=['GET'])
 @login_required
-def mypage_edit_view(user_id):
-    return render_template('mypage_edit.html')
+def profile_edit_view(user_id):
+    return render_template('profile_edit.html')
+
+# プロフィール編集
+@app.route('/profile-edit/<user_id>', methods=['POST'])
+@login_required
+def profile_edit_process(user_id):
+    new_username = request.form.get('new_username')
+    new_email = request.form.get('new_email')
+
+    if new_username == '' or new_email == '':
+        flash('空のフォームがあります')
+    elif re.match(EMAIL_PATTERN, new_email) is None:
+        flash('メールアドレスの形式になっていません')
+    else:
+        try:
+            current_user.username = new_username
+            current_user.email = new_email
+            db.session.commit()
+            flash('プロフィール編集が完了しました')
+        except:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.close()
+        return redirect(url_for('profile_edit_view', user_id=user_id))
+    return redirect(url_for('profile_edit_view', user_id=user_id))
+
+# パスワード変更画面表示
+@app.route('/password-update/<user_id>', methods=['GET'])
+@login_required
+def password_update_view(user_id):
+    return render_template('password_update.html')
+
+# パスワード変更
+@app.route('/password-update/<user_id>', methods=['POST'])
+@login_required
+def password_update_process(user_id):
+    current_password = request.form.get('current_password')
+    new_password1 = request.form.get('new_password1')
+    new_password2 = request.form.get('new_password2')
+
+    if current_password == '' or new_password1 == '' or new_password2 == '':
+        flash('空のフォームがあります')
+    elif generate_password_hash(current_password) == current_user.password:
+        flash('現在のパスワードが正しくありません')
+    elif new_password1 != new_password2:
+        flash('新しいパスワードと新しいパスワード（確認用）が一致しません')
+    elif re.match(PASSWORD_PATTERN, new_password1) is None:
+        flash('パスワードは8文字以上16文字以内で入力してください')
+    else:
+        try:
+            current_user.password = generate_password_hash(new_password1)
+            db.session.commit()
+            flash('パスワード変更が完了しました')
+        except:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.close()
+        return redirect(url_for('password_update_view', user_id=user_id))
+    return redirect(url_for('password_update_view', user_id=user_id))
 
 # 学習登録画面表示
 @app.route('/study-logs/<user_id>', methods=['GET'])
