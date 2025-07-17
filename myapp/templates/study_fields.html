@@ -14,5 +14,11 @@
     {% endwith %}
 
     <h1>{{ current_user.username }}さんの学習分野</h1>
-
+    <form action="{{ url_for('study_fields_process', user_id=current_user.user_id) }}" method="post">
+        <div>
+            <input type="text" name="fieldname[]" placeholder="分野名">
+            <input type="color" name="color_code[]" value="#ff0000">
+        </div>
+        <button type="submit">登録</button>
+    </form>
 {% endblock %}

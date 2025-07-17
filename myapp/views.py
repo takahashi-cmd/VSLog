@@ -1,6 +1,7 @@
 from flask import request, render_template, redirect, url_for, flash
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_bcrypt import generate_password_hash, check_password_hash
+from sqlalchemy.exc import IntegrityError
 from .app import app, db
 from .models import User, Field, StudyLog
 from datetime import datetime, date
@@ -223,34 +224,49 @@ def study_logs_view(user_id):
 def study_fields_view(user_id):
     return render_template('study_fields.html')
 
-# 学習分野
+# 学習分野登録
 @app.route('/study-fields/<user_id>', methods=['POST'])
 @login_required
 def study_fields_process(user_id):
-    fieldnames = request.form.get('fieldnames[]')
-    color_codes = request.form.get('color_codes[]')
+    fieldnames = request.form.getlist('fieldname[]')
+    color_codes = request.form.getlist('color_code[]')
 
-    for fieldname, color_code in zip(fieldnames, color_codes):
-        if fieldname.strip():
-            try:
-                field = Field(
-                    user_id = user_id,
-                    fieldname = fieldname,
-                    color_code = color_code
-                )
-                db.session.add(field)
-                db.session.commit()
-                flash('学習分野の登録が完了しました')
-            except:
-                db.session.rollback()
-                raise
-            finally:
-                db.session.close()
-            return render_template('study_fields.html')
-        else:
-            flash('空白の分野名があります')
+    has_blank = False
+    registered = False
+    DBfields = Field.get_fields_all(user_id)
+    existing_names = [f.fieldname.lower() for f in DBfields]
+
+    try:
+        for fieldname, color_code in zip(fieldnames, color_codes):
+            if fieldname.strip():
+                if fieldname in existing_names:
+                    flash(f'{fieldname}は既に登録されています')
+                else:
+                    field = Field(
+                        user_id = user_id,
+                        fieldname = fieldname,
+                        color_code = color_code
+                    )
+                    db.session.add(field)
+                    registered = True
+            else:
+                has_blank = True
+        db.session.commit()
+        if registered:
+            flash('学習分野の登録に成功しました')
+    except IntegrityError as e:
+        db.session.rollback()
+        flash('データベースに登録できませんでした（重複または制約違反）')
+    except Exception as e:
+        db.session.rollback()
+        flash('予期しないエラーが発生しました')
+    finally:
+        db.session.close()
+
+    if has_blank:
+        flash('空白の分野名があります')
+
     return redirect(url_for('study_fields_view', user_id=user_id))
-
 
 # 学習履歴一覧画面表示
 @app.route('/study-logs-list/<user_id>', methods=['GET'])

@@ -42,7 +42,7 @@ class Field(db.Model):
 
     field_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(String(36), ForeignKey('users.user_id'), nullable=False)
-    fieldname = Column(String(20), unique=True, nullable=False)
+    fieldname = Column(String(20, collation='utf8mb4_general_ci'), nullable=False)
     color_code = Column(String(7), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, server_default=func.now())
 
@@ -57,7 +57,7 @@ class Field(db.Model):
     
     @classmethod
     def get_fields_all(cls, user_id):
-        return cls.query.filter_by(user_id).all()
+        return cls.query.filter_by(user_id=user_id).all()
 
 class StudyLog(db.Model):
     __tablename__ = 'study_logs'
