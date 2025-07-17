@@ -223,6 +223,35 @@ def study_logs_view(user_id):
 def study_fields_view(user_id):
     return render_template('study_fields.html')
 
+# 学習分野
+@app.route('/study-fields/<user_id>', methods=['POST'])
+@login_required
+def study_fields_process(user_id):
+    fieldnames = request.form.get('fieldnames[]')
+    color_codes = request.form.get('color_codes[]')
+
+    for fieldname, color_code in zip(fieldnames, color_codes):
+        if fieldname.strip():
+            try:
+                field = Field(
+                    user_id = user_id,
+                    fieldname = fieldname,
+                    color_code = color_code
+                )
+                db.session.add(field)
+                db.session.commit()
+                flash('学習分野の登録が完了しました')
+            except:
+                db.session.rollback()
+                raise
+            finally:
+                db.session.close()
+            return render_template('study_fields.html')
+        else:
+            flash('空白の分野名があります')
+    return redirect(url_for('study_fields_view', user_id=user_id))
+
+
 # 学習履歴一覧画面表示
 @app.route('/study-logs-list/<user_id>', methods=['GET'])
 @login_required
