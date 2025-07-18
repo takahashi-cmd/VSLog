@@ -224,21 +224,23 @@ def study_logs_view(user_id):
 def study_fields_view(user_id):
     return render_template('study_fields.html')
 
-# 学習分野登録
-@app.route('/study-fields/<user_id>', methods=['POST'])
+# 学習分野登録・編集・削除
+@app.route('/study-fields/<user_id>/', methods=['POST'])
 @login_required
 def study_fields_process(user_id):
     fieldnames = request.form.getlist('fieldname[]')
     color_codes = request.form.getlist('color_code[]')
+    field_ids = request.form.getlist('field_id[]')
+    row_actions = request.form.getlist('row_action[]')
 
-    has_blank = False
     registered = False
     DBfields = Field.get_fields_all(user_id)
     existing_names = [f.fieldname.lower() for f in DBfields]
 
     try:
-        for fieldname, color_code in zip(fieldnames, color_codes):
-            if fieldname.strip():
+        for fieldname, color_code, field_id, row_action in zip(fieldnames, color_codes, field_ids, row_actions):
+            # 登録
+            if row_action == 'new' and fieldname.strip():
                 if fieldname in existing_names:
                     flash(f'{fieldname}は既に登録されています')
                 else:
@@ -249,11 +251,21 @@ def study_fields_process(user_id):
                     )
                     db.session.add(field)
                     registered = True
-            else:
-                has_blank = True
+            # 編集
+            elif row_action == 'update' and fieldname.strip() and field_id:
+                field = Field.query.get(field_id)
+                if field and field.user_id == user_id:
+                    field.fieldname = fieldname
+                    field.color_code = color_code
+                    registered = True
+            # 削除
+            elif row_action == 'delete' and field_id:
+                field = Field.query.get(field_id)
+                if field and field.user_id == user_id:
+                    db.session.delete(field)
         db.session.commit()
         if registered:
-            flash('学習分野の登録に成功しました')
+            flash('学習分野の更新に成功しました')
     except IntegrityError as e:
         db.session.rollback()
         flash('データベースに登録できませんでした（重複または制約違反）')
@@ -262,9 +274,6 @@ def study_fields_process(user_id):
         flash('予期しないエラーが発生しました')
     finally:
         db.session.close()
-
-    if has_blank:
-        flash('空白の分野名があります')
 
     return redirect(url_for('study_fields_view', user_id=user_id))
 

@@ -14,11 +14,56 @@
     {% endwith %}
 
     <h1>{{ current_user.username }}さんの学習分野</h1>
-    <form action="{{ url_for('study_fields_process', user_id=current_user.user_id) }}" method="post">
-        <div>
-            <input type="text" name="fieldname[]" placeholder="分野名">
-            <input type="color" name="color_code[]" value="#ff0000">
-        </div>
-        <button type="submit">登録</button>
+    <form class="study_fields_process" action="{{ url_for('study_fields_process', user_id=current_user.user_id) }}" method="post">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>分野名</th>
+                    <th>カラー</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="field-rows">
+                {% for field in current_user.fields %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td><input type="text" name="fieldname[]" value="{{ field.fieldname }}"></td>
+                    <td><input type="color" name="color_code[]" value="{{ field.color_code }}"></td>
+                    <td><input type="hidden" name="field_id[]" value="{{ field.field_id }}">
+                        <input type="hidden" name="row_action[]" value="update">
+                        <button type="button" onclick="markDeleted(this)">🗑️</button>
+                    </td>
+                </tr>
+                {% endfor %}
+
+                <!-- 記入欄の追加 -->
+                 {% for i in range(5 - current_user.fields|length) %}
+                 <tr>
+                    <td>{{ current_user.fields|length + i + 1 }}</td>
+                    <td><input type="text" name="fieldname[]" value=""></td>
+                    <td><input type="color" name="color_code[]" value="#000000"></td>
+                    <td>
+                        <input type="hidden" name="field_id[]" value="">
+                        <input type="hidden" name="row_action[]" value="new">
+                        <button type="button" onclick="removeRow(this)">🗑️</button>
+                    </td>
+                 </tr>
+                 {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit">更新</button>
+        <button type="button" onclick="addRow()">記入欄を追加する</button>
     </form>
+
+    <script>
+        function markDeleted(btn) {
+            const row = btn.closest('tr');
+            row.querySelector('input[name="row_action[]"]').value = 'delete';
+            row.style.opacity = 0.5;
+        };
+        function removeRow(btn) {
+            btn.closest('tr').remove();
+        }
+    </script>
 {% endblock %}
