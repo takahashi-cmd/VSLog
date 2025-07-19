@@ -58,6 +58,11 @@ class Field(db.Model):
     @classmethod
     def get_fields_all(cls, user_id):
         return cls.query.filter_by(user_id=user_id).all()
+    
+    @classmethod
+    def get_field_id(cls, user_id, fieldname):
+        field = cls.query.filter_by(user_id=user_id, fieldname=fieldname).first()
+        return field.field_id if field else None
 
 class StudyLog(db.Model):
     __tablename__ = 'study_logs'
@@ -66,9 +71,20 @@ class StudyLog(db.Model):
     user_id = Column(String(36), ForeignKey('users.user_id'), nullable=False)
     field_id = Column(Integer, ForeignKey('fields.field_id'), nullable=False)
     study_date = Column(Date, nullable=False)
-    hours = Column(DECIMAL(6,1), nullable=False)
+    hour = Column(DECIMAL(6,1), nullable=False)
     content = Column(Text, nullable=False)
 
     # users,fieldsに紐づけし、双方向でアクセス
     users = relationship('User', back_populates='study_logs')
     fields = relationship('Field', back_populates='study_logs')
+
+    def __init__(self, user_id, field_id, study_date, hour, content):
+        self.user_id = user_id
+        self.field_id = field_id
+        self.study_date =study_date
+        self.hour = hour
+        self.content = content
+
+    @classmethod
+    def get_study_logs_all(cls, user_id):
+        return cls.query.filter_by(user_id=user_id).all()
