@@ -218,6 +218,44 @@ def password_update_process(user_id):
 def study_logs_view(user_id):
     return render_template('study_logs.html')
 
+# 学習登録
+@app.route('/study-logs/<user_id>', methods=['POST'])
+@login_required
+def study_logs_process(user_id):
+    study_dates = request.form.getlist('study_dates[]')
+    hours = request.form.getlist('hours[]')
+    fieldnames = request.form.getlist('fieldname[]')
+    contents = request.form.getlist('contents[]')
+
+    registered = False
+
+    try:
+        for study_date, hour, fieldname, content in zip(study_dates, hours, fieldnames, contents):
+            # 登録
+            if study_date and hour and fieldname:
+                study_log = StudyLog(
+                    user_id = user_id,
+                    field_id = Field.get_field_id(user_id, fieldname),
+                    study_date = study_date,
+                    hour = hour,
+                    content = content
+                )
+                db.session.add(study_log)
+                registered = True
+        db.session.commit()
+        if registered:
+            flash('学習記録の登録が完了しました')
+    except:
+        db.session.rollback()
+        raise
+    finally:
+        db.session.close()
+    
+    return redirect(url_for('study_logs_view', user_id=user_id))
+
+
+
+
 # 学習分野画面表示
 @app.route('/study-fields/<user_id>', methods=['GET'])
 @login_required
@@ -282,3 +320,4 @@ def study_fields_process(user_id):
 @login_required
 def study_logs_list(user_id):
     return render_template('study_logs_list.html')
+
