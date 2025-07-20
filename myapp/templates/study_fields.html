@@ -55,6 +55,10 @@
         <button type="submit">更新</button>
         <button type="button" onclick="addRow()">記入欄を追加する</button>
     </form>
+    
+    <div class="index">
+        <a href="{{ url_for('index_view', user_id=current_user.user_id) }}">ホーム</a>
+    </div>
 
     <script>
         function markDeleted(btn) {

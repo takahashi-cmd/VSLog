@@ -47,8 +47,9 @@ class Field(db.Model):
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, server_default=func.now())
 
     # users,study_logsに紐づけし、双方向でアクセス
+    # study_logsとはcascade設定をし、fieldが削除されれば、関連するstudy_logsも削除するよう設定
     users = relationship('User', back_populates='fields')
-    study_logs = relationship('StudyLog', back_populates='fields')
+    study_logs = relationship('StudyLog', back_populates='fields', cascade='all, delete-orphan')
 
     def __init__(self, user_id, fieldname, color_code):
         self.user_id = user_id

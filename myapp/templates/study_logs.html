@@ -41,6 +41,11 @@
                             </datalist>
                         </td>
                         <td><textarea name="contents[]">{{ study_log.content or '' }}</textarea></td>
+                        <td>
+                            <input type="hidden" name="study_log_id[]" value="{{ study_log.study_log_id }}">
+                            <input type="hidden" name="row_action[]" value="update">
+                            <button type="button" onclick="markDeleted(this)">🗑️</button>
+                        </td>
                     </tr>
                 {% endfor %}
 
@@ -59,10 +64,31 @@
                         </datalist>
                     </td>
                     <td><textarea name="contents[]"></textarea></td>
+                    <td>
+                        <input type="hidden" name="study_log_id[]" value="">
+                        <input type="hidden" name="row_action[]" value="new">
+                        <button type="button" onclick="removeRow(this)">🗑️</button>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         <button type="submit">更新</button>
+        <button type="button" onclick="addRow()">記入欄を追加する</button>
     </form>
+    
+    <div class="index">
+        <a href="{{ url_for('index_view', user_id=current_user.user_id) }}">ホーム</a>
+    </div>
+
+    <script>
+        function markDeleted(btn) {
+            const row = btn.closest('tr');
+            row.querySelector('input[name="row_action[]"]').value = 'delete';
+            row.style.opacity = 0.5;
+        };
+        function removeRow(btn) {
+            btn.closest('tr').remove();
+        }
+    </script>
 {% endblock %}

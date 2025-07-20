@@ -218,7 +218,7 @@ def password_update_process(user_id):
 def study_logs_view(user_id):
     return render_template('study_logs.html')
 
-# 学習登録
+# 学習登録・編集・削除
 @app.route('/study-logs/<user_id>', methods=['POST'])
 @login_required
 def study_logs_process(user_id):
@@ -226,13 +226,17 @@ def study_logs_process(user_id):
     hours = request.form.getlist('hours[]')
     fieldnames = request.form.getlist('fieldname[]')
     contents = request.form.getlist('contents[]')
+    study_log_ids = request.form.getlist('study_log_id[]')
+    row_actions = request.form.getlist('row_action[]')
 
     registered = False
 
     try:
-        for study_date, hour, fieldname, content in zip(study_dates, hours, fieldnames, contents):
+        for study_date, hour, fieldname, content, study_log_id, row_action in zip(study_dates, hours, fieldnames, contents, study_log_ids, row_actions):
             # 登録
-            if study_date and hour and fieldname:
+            if fieldname.strip() and fieldname.strip() not in [f.fieldname for f in current_user.fields]:
+                flash(f'{fieldname.strip()}が登録されていません。先に学習分野で登録をお願いします。')
+            elif row_action == 'new' and study_date and hour and fieldname.strip():
                 study_log = StudyLog(
                     user_id = user_id,
                     field_id = Field.get_field_id(user_id, fieldname),
@@ -242,19 +246,34 @@ def study_logs_process(user_id):
                 )
                 db.session.add(study_log)
                 registered = True
+            # 編集
+            elif row_action == 'update' and study_log_id:
+                study_log = StudyLog.query.get(study_log_id)
+                if study_log and study_log.user_id == user_id:
+                    study_log.field_id = Field.get_field_id(user_id, fieldname)
+                    study_log.study_date = study_date
+                    study_log.hour = hour
+                    study_log.content = content
+                    registered = True
+            # 削除
+            elif row_action == 'delete' and study_log_id:
+                study_log = StudyLog.query.get(study_log_id)
+                if study_log and study_log.user_id == user_id:
+                    db.session.delete(study_log)
+                    registered = True
         db.session.commit()
         if registered:
-            flash('学習記録の登録が完了しました')
-    except:
+            flash('学習記録の更新が完了しました')
+    except IntegrityError as e:
         db.session.rollback()
-        raise
+        flash('学習記録の更新ができませんでした（重複または制約違反）')
+    except Exception as e:
+        db.session.rollback()
+        flash('予期しないエラーが発生しました')
     finally:
         db.session.close()
     
     return redirect(url_for('study_logs_view', user_id=user_id))
-
-
-
 
 # 学習分野画面表示
 @app.route('/study-fields/<user_id>', methods=['GET'])
@@ -306,7 +325,7 @@ def study_fields_process(user_id):
             flash('学習分野の更新に成功しました')
     except IntegrityError as e:
         db.session.rollback()
-        flash('データベースに登録できませんでした（重複または制約違反）')
+        flash('学習分野の更新ができませんでした（重複または制約違反）')
     except Exception as e:
         db.session.rollback()
         flash('予期しないエラーが発生しました')
