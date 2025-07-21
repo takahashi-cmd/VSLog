@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 # テーブル・カラム作成
 class User(UserMixin, db.Model):
@@ -86,6 +86,63 @@ class StudyLog(db.Model):
         self.hour = hour
         self.content = content
 
+    # ユーザー毎の全学習履歴取得
     @classmethod
     def get_study_logs_all(cls, user_id):
         return cls.query.filter_by(user_id=user_id).all()
+
+    # 学習総時間取得
+    @classmethod
+    def get_total_hour(cls, user_id):
+        total_hour = db.session.query(func.sum(cls.hour)).filter_by(user_id=user_id).scalar()
+        return float(total_hour or 0.0)
+    
+    # 学習総日数取得
+    @classmethod
+    def get_total_day(cls, user_id):
+        total_day = db.session.query(func.count(cls.study_date)).filter_by(user_id=user_id).scalar()
+        return int(total_day or 0)
+    
+    # 今週の学習時間（合計、平均）、学習日数の取得
+    @classmethod
+    def get_this_week_stats(cls, user_id):
+        today = date.today()
+        # 今週の月曜日を計算（週の開始）
+        start_of_week = today - timedelta(days=today.weekday())
+        # 今週の日曜日を計算（週の終わり）
+        end_of_week = start_of_week + timedelta(days=6)
+
+        # 今週の学習時間の合計
+        total_hours = (
+            db.session.query(func.sum(cls.hour))
+            .filter(
+                cls.user_id == user_id,
+                cls.study_date >= start_of_week,
+                cls.study_date <= end_of_week
+            )
+            .scalar()
+
+        )
+        total_hours = float(total_hours or 0.0)
+
+        # 今週の学習日数
+        study_days = (
+            db.session.query(func.count(func.distinct(cls.study_date)))
+            .filter(
+                cls.user_id == user_id,
+                cls.study_date >= start_of_week,
+                cls.study_date <= end_of_week
+            )
+            .scalar()
+        )
+
+        # 今週の学習時間の平均（時間/週）
+        average_per_day = total_hours / study_days if study_days else 0.0
+
+        return {
+            'start_date': start_of_week,
+            'end_date': end_of_week,
+            'total_hours': total_hours,
+            'study_days': study_days,
+            'average_per_day': round(average_per_day, 2)
+        }
