@@ -144,14 +144,15 @@ def index_view(user_id):
     total_day = StudyLog.get_total_day(user_id)
     # 今週の学習時間（合計、平均）、学習日数の取得
     this_week_stats = StudyLog.get_this_week_stats(user_id)
-    # 今週の学習グラフ
-    
+    # 今週の学習グラフの取得
+    this_week_graph = StudyLog.get_this_week_graph(user_id)
 
     return render_template(
         'index.html',
         total_hour = total_hour,
         total_day = total_day,
-        this_week_stats = this_week_stats
+        this_week_stats = this_week_stats,
+        this_week_graph = this_week_graph
     )
 
 # マイページ画面表示
