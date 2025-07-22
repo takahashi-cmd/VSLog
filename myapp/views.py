@@ -138,7 +138,21 @@ def password_reset_process():
 @app.route('/index/<user_id>', methods=['GET'])
 @login_required
 def index_view(user_id):
-    return render_template('index.html')
+    # 学習総時間の取得
+    total_hour = StudyLog.get_total_hour(user_id)
+    # 学習総日数取得
+    total_day = StudyLog.get_total_day(user_id)
+    # 今週の学習時間（合計、平均）、学習日数の取得
+    this_week_stats = StudyLog.get_this_week_stats(user_id)
+    # 今週の学習グラフ
+    
+
+    return render_template(
+        'index.html',
+        total_hour = total_hour,
+        total_day = total_day,
+        this_week_stats = this_week_stats
+    )
 
 # マイページ画面表示
 @app.route('/mypage/<user_id>', methods=['GET'])
