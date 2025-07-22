@@ -54,18 +54,9 @@
             <p>今週の平均学習時間：{{ this_week_stats['average_per_day'] }}時間／日</p>
         </div>
         <div class="main-stats-graph">
-            {% if this_week_graph %}
-                <img src="data:image/svg+xml;base64,{{ this_week_graph }}" alt="学習グラフ">
-            {% else %}
-                <p>今週の学習記録がありません</p>
-            {% endif %}
+            <iframe src="{{ url_for('graph_svg', user_id=current_user.user_id) }}" width="100%" height="400" frameborder="0"></iframe>
         </div>
     </div>
-
-
-
-
-
 </main>
 
 {% endblock %}

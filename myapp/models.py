@@ -13,12 +13,12 @@ import base64
 import platform
 
 # matplotlibのフォント定義
-# font_path = '/usr/share/fonts/truetype/fonts-japanese-gothic.ttf'
-# font_prop = font_manager.FontProperties(fname=font_path)
-# plt.rcParams['font.family'] = font_prop.get_name()
+font_path = '/usr/share/fonts/truetype/fonts-japanese-gothic.ttf'
+font_prop = font_manager.FontProperties(fname=font_path)
+plt.rcParams['font.family'] = font_prop.get_name()
 
 # SVGグラフのフォントにテキストを埋め込み
-# plt.rcParams['svg.fonttype'] = 'none'
+plt.rcParams['svg.fonttype'] = 'none'
 
 # テーブル・カラム作成
 class User(UserMixin, db.Model):
@@ -210,12 +210,11 @@ class StudyLog(db.Model):
         ax.set_ylim(0, max(sum(zip(*data.values()), ())) + 1)
         ax.legend()
 
-        # 画像をbase64エンコードしてテンプレートに渡す
+        # 画像をsvg形式で生成する
         buf = io.BytesIO()
         plt.savefig(buf, format='svg')
-        buf.seek(0)
-        encoded = base64.b64encode(buf.read()).decode('utf-8')
+        svg_data = buf.getvalue()
         plt.close(fig)
 
-        return encoded
+        return svg_data
 

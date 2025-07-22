@@ -1,4 +1,4 @@
-from flask import request, render_template, redirect, url_for, flash
+from flask import request, render_template, redirect, url_for, flash, Response
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_bcrypt import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
@@ -152,8 +152,14 @@ def index_view(user_id):
         total_hour = total_hour,
         total_day = total_day,
         this_week_stats = this_week_stats,
-        this_week_graph = this_week_graph
     )
+
+@app.route('/graph/<user_id>', methods=['GET'])
+def graph_svg(user_id):
+    svg = StudyLog.get_this_week_graph(user_id)
+    if svg:
+        return Response(svg, mimetype='image/svg+xml')
+    return Response(status=204)
 
 # マイページ画面表示
 @app.route('/mypage/<user_id>', methods=['GET'])
