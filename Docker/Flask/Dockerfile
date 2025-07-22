@@ -8,6 +8,12 @@ ENV PYTHONUNBUFFERED=1
 # コンテナ内のワーキングディレクトリを指定
 WORKDIR /code
 
+# matplotlibの日本語対応のフォントパッケージを先にインストール
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    fonts-ipaexfont \
+    && rm -rf /var/lib/apt/lists/*
+
 # カレントディレクトリのrequirements.txtをワーキングディレクトリ直下にコピー
 # 依存関係ファイルのみ先にコピー（キャッシュ効率化のため）
 COPY requirements.txt .

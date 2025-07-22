@@ -4,7 +4,21 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from matplotlib import font_manager
+import matplotlib.pyplot as plt
 from datetime import datetime, date, timedelta
+from collections import defaultdict
+import io
+import base64
+import platform
+
+# matplotlibのフォント定義
+font_path = '/usr/share/fonts/truetype/fonts-japanese-gothic.ttf'
+font_prop = font_manager.FontProperties(fname=font_path)
+plt.rcParams['font.family'] = font_prop.get_name()
+
+# SVGグラフのフォントにテキストを埋め込み
+plt.rcParams['svg.fonttype'] = 'none'
 
 # テーブル・カラム作成
 class User(UserMixin, db.Model):
@@ -146,3 +160,61 @@ class StudyLog(db.Model):
             'study_days': study_days,
             'average_per_day': round(average_per_day, 2)
         }
+    
+    # 今週の学習時間のグラフ作成
+    @classmethod
+    def get_this_week_graph(cls, user_id):
+        today = date.today()
+        start_of_week = today - timedelta(days=today.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
+
+        # 今週の学習ログを取得
+        logs = (
+            db.session.query(cls.study_date, Field.fieldname.label('fieldname'), func.sum(cls.hour))
+            .join(Field, cls.field_id == Field.field_id)
+            .filter(
+                cls.user_id == user_id,
+                cls.study_date >= start_of_week,
+                cls.study_date <= end_of_week
+            )
+            .group_by(cls.study_date, Field.fieldname)
+            .all()
+        )
+
+        if not logs:
+            return None
+
+        # 日付リスト（月～日）
+        week_days = [start_of_week + timedelta(days=i) for i in range(7)]
+        date_format = '%#m/%#d(%a)' if platform.system() == 'Windows' else '%-m/%-d(%a)'
+        data_labels = [d.strftime(date_format) for d in week_days]
+
+        # 分野名のセット
+        fieldnames = sorted(set(log[1] for log in logs))
+
+        # 積み上げ用のデータ準備
+        data = {field: [0] * 7 for field in fieldnames}
+        for study_date, fieldname, hour in logs:
+            index = (study_date - start_of_week).days
+            data[fieldname][index] = float(hour)
+        
+        # グラフ描画
+        fig, ax = plt.subplots(figsize=(10, 4))
+        bottom = [0] * 7
+        for fieldname in sorted(data.keys()):
+            ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname)
+            bottom = [b + h for b, h in zip(bottom, data[fieldname])]
+        
+        ax.set_title(f'{start_of_week.strftime(date_format)}～の学習履歴')
+        ax.set_ylabel('学習時間（時間）')
+        ax.set_ylim(0, max(sum(zip(*data.values()), ())) + 1)
+        ax.legend()
+
+        # 画像をsvg形式で生成する
+        buf = io.BytesIO()
+        plt.savefig(buf, format='svg')
+        svg_data = buf.getvalue()
+        plt.close(fig)
+
+        return svg_data
+

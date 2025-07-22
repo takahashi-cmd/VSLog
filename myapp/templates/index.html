@@ -13,6 +13,7 @@
         {% endif %}
     {% endwith %}
 
+<header>
     <h1>{{ current_user.username }}さんのホーム画面</h1>
     <div>
         <form action="{{ url_for('logout') }}" method="get">
@@ -34,4 +35,28 @@
     <div class="study_logs_list">
         <a href="{{ url_for('study_logs_list', user_id=current_user.user_id) }}">学習履歴一覧</a>
     </div>
+</header>
+
+<main>
+    <div class="head-stats">
+        <div class="head-stats-totalhour">
+            <p>学習総時間</p>
+            <p>{{ total_hour }}時間</p>
+        </div>
+        <div class="head-stats-totalday">
+            <p>学習総日数</p>
+            <p>{{ total_day }}日</p>
+        </div>
+    </div>
+    <div class="main-stats">
+        <div class="main-stats-hour">
+            <p>今週の合計学習時間：{{ this_week_stats['total_hours'] }}時間／週</p>
+            <p>今週の平均学習時間：{{ this_week_stats['average_per_day'] }}時間／日</p>
+        </div>
+        <div class="main-stats-graph">
+            <iframe src="{{ url_for('graph_svg', user_id=current_user.user_id) }}" width="100%" height="400" frameborder="0"></iframe>
+        </div>
+    </div>
+</main>
+
 {% endblock %}
