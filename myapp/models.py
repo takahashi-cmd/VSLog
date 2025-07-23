@@ -1,5 +1,5 @@
 from .app import db
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text, DECIMAL, TIMESTAMP
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text, DECIMAL, TIMESTAMP, extract
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from flask_bcrypt import generate_password_hash, check_password_hash
@@ -172,14 +172,14 @@ class StudyLog(db.Model):
 
         # 今週の学習ログを取得
         logs = (
-            db.session.query(cls.study_date, Field.fieldname.label('fieldname'), func.sum(cls.hour))
+            db.session.query(cls.study_date, Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour))
             .join(Field, cls.field_id == Field.field_id)
             .filter(
                 cls.user_id == user_id,
                 cls.study_date >= start_of_week,
                 cls.study_date <= end_of_week
             )
-            .group_by(cls.study_date, Field.fieldname)
+            .group_by(cls.study_date, Field.fieldname, Field.color_code)
             .all()
         )
 
@@ -196,7 +196,9 @@ class StudyLog(db.Model):
 
         # 積み上げ用のデータ準備
         data = {field: [0] * 7 for field in fieldnames}
-        for study_date, fieldname, hour in logs:
+        color_map = {}
+        for study_date, fieldname, color_code, hour in logs:
+            color_map[fieldname] = color_code
             index = (study_date - start_of_week).days
             data[fieldname][index] = float(hour)
         
@@ -204,18 +206,20 @@ class StudyLog(db.Model):
         fig, ax = plt.subplots(figsize=(10, 4))
         bottom = [0] * 7
         for fieldname in sorted(data.keys()):
-            ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname)
+            ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
             bottom = [b + h for b, h in zip(bottom, data[fieldname])]
         
         ax.set_title(f'{start_of_week.strftime(date_format)}～の学習履歴')
+        ax.grid(True)
         ax.set_ylabel('学習時間（時間）')
         column_totals = [sum(day) for day in zip(*data.values())]
-        ymax = max(column_totals) + 1
+        ymax = max(column_totals) + 1 if column_totals else 1
         ax.set_ylim(0, ymax)
-        ax.legend()
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
 
         # 画像をsvg形式で生成する
         buf = io.BytesIO()
+        plt.tight_layout()
         plt.savefig(buf, format='svg')
         svg_data = buf.getvalue()
         plt.close(fig)
@@ -231,14 +235,14 @@ class StudyLog(db.Model):
         last_day = date(year, month, month_num)
 
         logs = (
-            db.session.query(cls.study_date, Field.fieldname.label('fieldname'), func.sum(cls.hour))
+            db.session.query(cls.study_date, Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour))
         .join(Field, cls.field_id == Field.field_id)
         .filter(
             cls.user_id == user_id,
             cls.study_date >= first_day,
             cls.study_date <= last_day
         )
-        .group_by(cls.study_date, Field.fieldname)
+        .group_by(cls.study_date, Field.fieldname, Field.color_code)
         .all()
         )
 
@@ -252,25 +256,29 @@ class StudyLog(db.Model):
         fieldnames = sorted(set(log[1] for log in logs))
 
         data = {field: [0] * month_num for field in fieldnames}
-        for study_date, fieldname, hour in logs:
+        color_map = {}
+        for study_date, fieldname, color_code, hour in logs:
+            color_map[fieldname] = color_code
             index = (study_date - first_day).days
             data[fieldname][index] = float(hour)
         
         fig, ax = plt.subplots(figsize=(10, 4))
         bottom = [0] * month_num
         for fieldname in sorted(data.keys()):
-            ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname)
+            ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
             bottom = [b + h for b, h in zip(bottom, data[fieldname])]
         
         ax.set_title(f'{year}/{month}の学習履歴')
+        ax.grid(True)
         ax.set_ylabel('学習時間（時間）')
         column_totals = [sum(day) for day in zip(*data.values())]
-        ymax = max(column_totals) + 1
+        ymax = max(column_totals) + 1 if column_totals else 1
         ax.set_ylim(0, ymax)
-        ax.legend()
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
 
         # 画像をsvg形式で生成する
         buf = io.BytesIO()
+        plt.tight_layout()
         plt.savefig(buf, format='svg')
         svg_data = buf.getvalue()
         plt.close(fig)
@@ -283,48 +291,56 @@ class StudyLog(db.Model):
         year = int(year_str)
         first_day = date(year, 1, 1)
         last_day= date(year, 12, 31)
-        year_num = 12
 
         logs = (
-            db.session.query(cls.study_date, Field.fieldname, func.sum(cls.hour))
+            db.session.query(cls.study_date, Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour))
             .join(Field, cls.field_id == Field.field_id)
             .filter(
                 cls.user_id == user_id,
                 cls.study_date >= first_day,
                 cls.study_date <= last_day
             )
-            .group_by(cls.study_date, Field.fieldname)
+            .group_by(extract('month', cls.study_date), Field.fieldname, Field.color_code)
             .all()
         )
 
         if not logs:
             return None
         
-        data_labels = []
         date_format = '%#Y/%#m' if platform.system() == 'Windows' else '%Y/%-m'
-        for i in range(year_num):
-            current = first_day + relativedelta(months=i)
-            data_labels.append(current.strftime(date_format))
+        data_labels = [
+            date(year, int(month), 1).strftime(date_format)
+            for month in range(1, 13)
+        ]
         
         fieldnames = sorted(set(log[1] for log in logs))
 
-        data = {field: [0] * year_num for field in fieldnames}
-        for study_date, fieldname, hour in logs:
-            index = study_date.month - 1
+        data = {field: [0] * 12 for field in fieldnames}
+        color_map = {}
+        for month, fieldname, color_code, hour in logs:
+            color_map[fieldname] = color_code
+            index = int(month) - 1
             data[fieldname][index] = float(hour)
         
         fig, ax = plt.subplots(figsize=(10, 4))
-        bottom = [0] * year_num
+        bottom = [0] * 12
         for fieldname in sorted(data.keys()):
-            ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname)
+            ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
             bottom = [b + h for b, h in zip(bottom, data[fieldname])]
         
         ax.set_title(f'{year}年の学習履歴')
+        ax.grid(True)
         ax.set_ylabel('学習時間（時間）')
         column_totals = [sum(day) for day in zip(*data.values())]
-        ymax = max(column_totals) + 1
+        ymax = max(column_totals) + 1 if column_totals else 1
         ax.set_ylim(0, ymax)
-        ax.legend()
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
 
+        buf = io.BytesIO()
+        plt.tight_layout()
+        plt.savefig(buf, format='svg')
+        svg_data = buf.getvalue()
+        plt.close(fig)
 
+        return svg_data
 
