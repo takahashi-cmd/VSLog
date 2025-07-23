@@ -7,6 +7,8 @@ from flask_login import UserMixin
 from matplotlib import font_manager
 import matplotlib.pyplot as plt
 from datetime import datetime, date, timedelta
+from dateutil.relativedelta import relativedelta
+import calendar
 from collections import defaultdict
 import io
 import base64
@@ -207,7 +209,9 @@ class StudyLog(db.Model):
         
         ax.set_title(f'{start_of_week.strftime(date_format)}～の学習履歴')
         ax.set_ylabel('学習時間（時間）')
-        ax.set_ylim(0, max(sum(zip(*data.values()), ())) + 1)
+        column_totals = [sum(day) for day in zip(*data.values())]
+        ymax = max(column_totals) + 1
+        ax.set_ylim(0, ymax)
         ax.legend()
 
         # 画像をsvg形式で生成する
@@ -217,4 +221,110 @@ class StudyLog(db.Model):
         plt.close(fig)
 
         return svg_data
+
+    # 月間グラフ作成
+    @classmethod
+    def get_month_graph(cls, user_id, month_str):
+        year, month = map(int, month_str.split('-'))
+        first_day = date(year, month, 1)
+        month_num = calendar.monthrange(year, month)[1]
+        last_day = date(year, month, month_num)
+
+        logs = (
+            db.session.query(cls.study_date, Field.fieldname.label('fieldname'), func.sum(cls.hour))
+        .join(Field, cls.field_id == Field.field_id)
+        .filter(
+            cls.user_id == user_id,
+            cls.study_date >= first_day,
+            cls.study_date <= last_day
+        )
+        .group_by(cls.study_date, Field.fieldname)
+        .all()
+        )
+
+        if not logs:
+            return None
+
+        month_days = [first_day + timedelta(days=i) for i in range(month_num)]
+        date_format = '%#m/%#d(%a)' if platform.system() == 'Windows' else '%-m/%-d(%a)'
+        data_labels = [d.strftime(date_format) for d in month_days]
+
+        fieldnames = sorted(set(log[1] for log in logs))
+
+        data = {field: [0] * month_num for field in fieldnames}
+        for study_date, fieldname, hour in logs:
+            index = (study_date - first_day).days
+            data[fieldname][index] = float(hour)
+        
+        fig, ax = plt.subplots(figsize=(10, 4))
+        bottom = [0] * month_num
+        for fieldname in sorted(data.keys()):
+            ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname)
+            bottom = [b + h for b, h in zip(bottom, data[fieldname])]
+        
+        ax.set_title(f'{year}/{month}の学習履歴')
+        ax.set_ylabel('学習時間（時間）')
+        column_totals = [sum(day) for day in zip(*data.values())]
+        ymax = max(column_totals) + 1
+        ax.set_ylim(0, ymax)
+        ax.legend()
+
+        # 画像をsvg形式で生成する
+        buf = io.BytesIO()
+        plt.savefig(buf, format='svg')
+        svg_data = buf.getvalue()
+        plt.close(fig)
+
+        return svg_data
+    
+    # 年間グラフの作成
+    @classmethod
+    def get_year_graph(cls, user_id, year_str):
+        year = int(year_str)
+        first_day = date(year, 1, 1)
+        last_day= date(year, 12, 31)
+        year_num = 12
+
+        logs = (
+            db.session.query(cls.study_date, Field.fieldname, func.sum(cls.hour))
+            .join(Field, cls.field_id == Field.field_id)
+            .filter(
+                cls.user_id == user_id,
+                cls.study_date >= first_day,
+                cls.study_date <= last_day
+            )
+            .group_by(cls.study_date, Field.fieldname)
+            .all()
+        )
+
+        if not logs:
+            return None
+        
+        data_labels = []
+        date_format = '%#Y/%#m' if platform.system() == 'Windows' else '%Y/%-m'
+        for i in range(year_num):
+            current = first_day + relativedelta(months=i)
+            data_labels.append(current.strftime(date_format))
+        
+        fieldnames = sorted(set(log[1] for log in logs))
+
+        data = {field: [0] * year_num for field in fieldnames}
+        for study_date, fieldname, hour in logs:
+            index = study_date.month - 1
+            data[fieldname][index] = float(hour)
+        
+        fig, ax = plt.subplots(figsize=(10, 4))
+        bottom = [0] * year_num
+        for fieldname in sorted(data.keys()):
+            ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname)
+            bottom = [b + h for b, h in zip(bottom, data[fieldname])]
+        
+        ax.set_title(f'{year}年の学習履歴')
+        ax.set_ylabel('学習時間（時間）')
+        column_totals = [sum(day) for day in zip(*data.values())]
+        ymax = max(column_totals) + 1
+        ax.set_ylim(0, ymax)
+        ax.legend()
+
+
 
