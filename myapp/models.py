@@ -1,5 +1,5 @@
 from .app import db
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text, DECIMAL, TIMESTAMP, extract
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text, DECIMAL, TIMESTAMP, extract, desc
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from flask_bcrypt import generate_password_hash, check_password_hash
@@ -344,3 +344,36 @@ class StudyLog(db.Model):
 
         return svg_data
 
+    # 分野別全期間グラフの作成
+    @classmethod
+    def get_all_time_graph_by_field(cls, user_id):
+        logs = (
+            db.session.query(Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour))
+            .join(Field, cls.field_id == Field.field_id)
+            .filter(cls.user_id == user_id)
+            .group_by(Field.fieldname, Field.color_code)
+            .order_by(func.sum(cls.hour).desc())
+            .all()
+        )
+
+        if not logs:
+            return None
+
+        data = {fieldname: float(hour) for fieldname, _, hour in logs}
+        color_map = {fieldname: color_code for fieldname, color_code, _ in logs}
+
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.bar(data.keys(), data.values(), color=[color_map[f] for f in data.keys()])
+        
+        ax.set_title('分野別全期間の学習履歴')
+        ax.grid(True)
+        ax.set_ylabel('学習時間（時間）')
+        ax.set_ylim(0, max(data.values()) + 1)
+
+        buf = io.BytesIO()
+        plt.tight_layout()
+        plt.savefig(buf, format='svg')
+        svg_data = buf.getvalue()
+        plt.close(fig)
+
+        return svg_data
