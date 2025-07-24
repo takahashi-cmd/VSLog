@@ -138,27 +138,41 @@ def password_reset_process():
 @app.route('/index/<user_id>', methods=['GET'])
 @login_required
 def index_view(user_id):
-    # 学習総時間の取得
-    total_hour = StudyLog.get_total_hour(user_id)
-    # 学習総日数取得
+    # 学習日数取得
     total_day = StudyLog.get_total_day(user_id)
-    # 今週の学習時間（合計、平均）、学習日数の取得
-    this_week_stats = StudyLog.get_this_week_stats(user_id)
-    # 今週の学習グラフの取得
-    this_week_graph = StudyLog.get_this_week_graph(user_id)
+    # 学習時間（合計）の取得
+    total_hour = StudyLog.get_total_hour(user_id)
+    # 学習時間（平均）の取得
+    avg_hour = round(total_hour / total_day, 1)
 
     return render_template(
         'index.html',
-        total_hour = total_hour,
         total_day = total_day,
-        this_week_stats = this_week_stats,
+        total_hour = total_hour,
+        avg_hour = avg_hour
     )
 
-@app.route('/graph/<user_id>', methods=['GET'])
+@app.route('/graph/<user_id>', methods=['GET', 'POST'])
 def graph_svg(user_id):
-    svg = StudyLog.get_this_week_graph(user_id)
-    if svg:
-        return Response(svg, mimetype='image/svg+xml')
+    # 今週の学習グラフの取得（積み上げ縦棒）
+    this_week_graph = StudyLog.get_this_week_graph(user_id)
+    # 月間グラフの取得（積み上げ縦棒）
+
+    # 年間グラフの取得（積み上げ縦棒）
+
+    # 分野別全期間グラフの取得
+    all_time_graph_by_field = StudyLog.get_all_time_graph_by_field(user_id)
+
+    # 分野別年間グラフの取得
+
+    # 分野別月間グラフの取得
+
+
+    # if this_week_graph:
+    #     return Response(this_week_graph, mimetype='image/svg+xml')
+    if all_time_graph_by_field:
+        return Response(all_time_graph_by_field, mimetype='image/svg+xml')
+
     return Response(status=204)
 
 # マイページ画面表示
