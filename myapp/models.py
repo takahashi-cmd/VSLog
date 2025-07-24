@@ -368,7 +368,90 @@ class StudyLog(db.Model):
         ax.set_title('分野別全期間の学習履歴')
         ax.grid(True)
         ax.set_ylabel('学習時間（時間）')
-        ax.set_ylim(0, max(data.values()) + 1)
+        max_hour = max(data.values()) if data else 0
+        ax.set_ylim(0, max_hour + 1)
+        plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
+
+        buf = io.BytesIO()
+        plt.tight_layout()
+        plt.savefig(buf, format='svg')
+        svg_data = buf.getvalue()
+        plt.close(fig)
+
+        return svg_data
+
+    # 分野別年間グラフ作成
+    @classmethod
+    def get_year_graph_by_field(cls, user_id, year_str):
+        year = int(year_str)
+        first_day = date(year, 1, 1)
+        last_day = date(year, 12, 31)
+
+        logs = (
+            db.session.query(Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour))
+            .join(Field, cls.field_id == Field.field_id)
+            .filter(cls.user_id == user_id,
+                    cls.study_date >= first_day,
+                    cls.study_date <= last_day
+            )
+            .group_by(Field.fieldname, Field.color_code)
+            .order_by(func.sum(cls.hour).desc())
+            .all()
+        )
+
+        data = {fieldname: float(hour) for fieldname, _, hour in logs}
+        color_map = {fieldname: color_code for fieldname, color_code, _ in logs}
+
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.bar(data.keys(), data.values(), color=[color_map[f] for f in data.keys()])
+        
+        ax.set_title(f'{year}年の分野別学習履歴')
+        ax.grid(True)
+        ax.set_ylabel('学習時間（時間）')
+        max_hour = max(data.values()) if data else 0
+        ax.set_ylim(0, max_hour + 1)
+        plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
+
+        buf = io.BytesIO()
+        plt.tight_layout()
+        plt.savefig(buf, format='svg')
+        svg_data = buf.getvalue()
+        plt.close(fig)
+
+        return svg_data
+
+    # 分野別月間グラフ作成
+    @classmethod
+    def get_month_graph_by_field(cls, user_id, month_str):
+        year, month = map(int, month_str.split('-'))
+        first_day = date(year, month, 1)
+        month_num = calendar.monthrange(year, month)[1]
+        last_day = date(year, month, month_num)
+
+        logs = (
+            db.session.query(Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour))
+            .join(Field, cls.field_id == Field.field_id)
+            .filter(cls.user_id == user_id,
+                    cls.study_date >= first_day,
+                    cls.study_date <= last_day
+            )
+            .group_by(Field.fieldname, Field.color_code)
+            .order_by(func.sum(cls.hour).desc())
+            .all()
+        )
+
+        data = {fieldname: float(hour) for fieldname, _, hour in logs}
+        color_map = {fieldname: color_code for fieldname, color_code, _ in logs}
+
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.bar(data.keys(), data.values(), color=[color_map[f] for f in data.keys()])
+        
+        ax.set_title(f'{year}年{month}月の分野別学習履歴')
+        ax.grid(True)
+        ax.set_ylabel('学習時間（時間）')
+        max_hour = max(data.values()) if data else 0
+        ax.set_ylim(0, max_hour + 1)
+        plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
 
         buf = io.BytesIO()
         plt.tight_layout()
