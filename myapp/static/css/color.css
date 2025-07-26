@@ -1,8 +1,8 @@
 /* 使用する色のスキーム定義 */
 :root {
-    --white:#ffffff;
-    --black:#000000;
-    --light_gray:#e8e8e8;
-    --blue:#0067c0;
-    --red:#ed1a3d;
+    --base-bg-color:#f4f4f4;
+    --base-text-color:#333333;
+    --contents-bg-color:#ffffff;
+    --main-color:#0067c0;
+    --error-text-color:#ed1a3d;
 }
