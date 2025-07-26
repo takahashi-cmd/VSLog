@@ -1,1 +1,50 @@
 /* ページ幅、ヘッダー、フォント、レイアウト等の基本CSS */
+
+* {
+    box-sizing: border-box;
+}
+
+html, body, ul, ol, li, h1, h2, h3, h4, h5, h6, p, div{
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    background-color: var(--base-bg-color);
+    font-family: "IPAexGothic", "IPAexゴシック", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+    line-height: 1.6;
+    color: var(--base-text-color);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+}
+
+p {
+    font-weight: normal;
+}
+
+li {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+.container {
+    max-width: 1120px;
+    margin: auto;
+    padding: 0, 24px;
+    width: 100%;
+}
+
+header {
+    height: 80px; /* PCデフォルト */
+    display: flex;
+    background-color: var(--contents-bg-color);
+}
