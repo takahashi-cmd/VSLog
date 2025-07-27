@@ -4,9 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/color.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='image/favicon.png') }}">
     <title>{% block title %} タイトル {% endblock %}</title>
 </head>
 <body>
-    {% block content %} 内容 {% endblock %}
+    <!-- 共通ヘッダー -->
+    <header>
+        <div class="header-logo">
+            <img src="{{ url_for('static', filename='image/logo.png') }}" alt="ロゴ画像">
+            <p>学習記録</p>
+        </div>
+    </header>
+
+    <!-- コンテンツ -->
+    <main>
+        {% block content %} 内容 {% endblock %}
+    </main>
+
+    <!-- 共通フッダー -->
+     <footer>
+        <p>©Copyright 2025 by 学習記録</p>
+     </footer>
 </body>
 </html>

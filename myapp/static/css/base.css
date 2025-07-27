@@ -36,6 +36,12 @@ a {
     text-decoration: none;
 }
 
+img {
+    height: 100%;
+    width: auto;
+    display: block;
+}
+
 .container {
     max-width: 1120px;
     margin: auto;
@@ -47,4 +53,33 @@ header {
     height: 80px; /* PCデフォルト */
     display: flex;
     background-color: var(--contents-bg-color);
+    width: 100%;
+    align-items: center;
+}
+
+.header-logo {
+    padding: 0 24px;
+}
+
+.header-logo img {
+    height: 80px;
+    width: auto;
+}
+
+.header-logo p {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+footer {
+    height: 80px; /* PCデフォルト */
+    display: flex;
+    background-color: var(--contents-bg-color);
+    width: 100%;
+    align-items: center;
+}
+
+footer p {
+    text-align: left;
+    padding: 0px 24px;
 }
