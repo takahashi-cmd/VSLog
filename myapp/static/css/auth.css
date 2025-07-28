@@ -37,6 +37,9 @@
 }
 
 .auth-link {
+    width: 100%;
+    height: auto;
+    padding: 0 24px;
     text-align: left;
 }
 
@@ -44,4 +47,5 @@
     text-decoration: underline;
     display: block;
     margin-bottom: 16px;
+    font-size: 14px;
 }

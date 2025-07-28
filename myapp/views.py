@@ -93,6 +93,7 @@ def signup_process():
                 raise
             finally:
                 db.session.close()
+            flash('新規登録が完了しました')
             return redirect(url_for('login_view'))
     return redirect(url_for('signup_view'))
 
@@ -129,6 +130,7 @@ def password_reset_process():
                 raise
             finally:
                 db.session.close()
+            flash('パスワード再設定が完了しました')
             return redirect(url_for('login_view'))
     return redirect(url_for('password_reset_view'))
 
