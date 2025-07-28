@@ -177,12 +177,6 @@ def graph_svg(user_id):
 
     return Response(status=204)
 
-# マイページ画面表示
-@app.route('/mypage/<user_id>', methods=['GET'])
-@login_required
-def mypage_view(user_id):
-    return render_template('mypage.html')
-
 # プロフィール編集画面表示
 @app.route('/profile-edit/<user_id>', methods=['GET'])
 @login_required

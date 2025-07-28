@@ -49,3 +49,42 @@
     margin-bottom: 16px;
     font-size: 14px;
 }
+
+.auth-form label {
+    color: var(--form-color);
+    text-align: left;
+    display: block;
+    padding-bottom: 8px;
+}
+
+.auth-section {
+    max-width: 332px;
+    height: auto;
+    background-color: var(--contents-bg-color);
+    margin: 100px auto 24px auto;
+}
+
+.auth-href {
+    padding: 12px 24px;
+
+}
+
+.auth-href a {
+    display: block;
+    line-height: ;
+    padding: 12px 24px;
+    color: var(--form-color);
+    transition: all 0.5s;
+}
+
+.auth-href a:hover {
+    background-color: var(--hover-color);
+    border-radius: 10px;
+}
+
+.auth-area {
+    max-width: 332px;
+    height: auto;
+    background-color: var(--contents-bg-color);
+    margin: 0px auto 100px auto;
+}
