@@ -1,37 +1,51 @@
 {% extends "base.html" %}
+{% block head_link %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
 
 {% block title %} ログイン {% endblock %}
 
+{% block header %}
+<div class="header-nav">
+    <a href="{{ url_for('signup_view') }}">新規登録はこちら</a>
+    <a href="{{ url_for('password_reset_view') }}">パスワードをお忘れの方はこちら</a>
+</div>
+{% endblock %}
+
 {% block content %}
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="flashes">
-                {% for message in messages %}
-                    <p>{{ message }}</p>
-                {% endfor %}
+<div class="flash-messsage">
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="flashes">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endwith %}
+
+<div class="main-container">
+    <div class="auth-inner">
+        <div class="auth-content">
+            <h1>ログイン</h1>
+            <div class="auth-form">
+                <form action="{{ url_for('login_process') }}" method="post">
+                    <div class="auth-input">
+                        <input placeholder="メールアドレス" type="email" id="email" name="email"><br>
+                        <input placeholder="パスワード" type="password" id="password" name="password"><br>
+                    </div>
+                    <div class="auth-button">
+                        <button class="login" type="submit">ログイン</button>
+                    </div>
+                </form>
             </div>
-        {% endif %}
-    {% endwith %}
-    <h1>ログイン画面</h1> 
-    <div>
-        <form action="{{ url_for('login_process') }}" method="post">
-            <label for="email">メールアドレス：</label>
-            <input placeholder="メールアドレス" type="email" id="email" name="email"><br>
-
-            <label for="password">パスワード：</label>
-            <input placeholder="パスワード" type="password" id="password" name="password"><br>
-
-            <div>
-                <button class="login" type="submit">ログイン</button>
+            <div class="auth-link">
+                <a href="{{ url_for('signup_view') }}">新規登録はこちら</a>
+                <a href="{{ url_for('password_reset_view') }}">パスワードをお忘れの方はこちら</a>
             </div>
-        </form>
+        </div>
     </div>
-    <div class="signup">
-        <a href="{{ url_for('signup_view') }}">新規登録はこちら</a>
-    </div>
-    <div class="password_reset">
-        <a href="{{ url_for('password_reset_view') }}">パスワードをお忘れの方はこちら</a>
-    </div>
-
+</div>
 {% endblock %}
 

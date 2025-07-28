@@ -4,9 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/color.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+    <!-- favicon読み込み あらゆるブラウザや端末で対応（https://realfavicongenerator.net/） -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='image/favicon/favicon-96x96.png') }}" sizes="96x96">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='image/favicon/favicon.svg') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='image/favicon/favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='image/favicon/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='image/favicon/site.webmanifest') }}">
+    {% block head_link %}{% endblock %}
     <title>{% block title %} タイトル {% endblock %}</title>
 </head>
 <body>
-    {% block content %} 内容 {% endblock %}
+    <!-- 共通ヘッダー -->
+    <header>
+        <div class="header-container">
+            <div class="header-inner">
+                <div class="header-logo">
+                    <img src="{{ url_for('static', filename='image/logo.png') }}" alt="ロゴ画像">
+                    <p>VSLog</p>
+                </div>
+                {% block header %}{% endblock %}
+            </div>
+        </div>
+    </header>
+
+    <!-- コンテンツ -->
+    <main>
+        {% block content %} 内容 {% endblock %}
+    </main>
+
+    <!-- 共通フッダー -->
+     <footer>
+        <div class="footer-container">
+            <div class="footer-inner">
+                <p>©Copyright 2025 by VSLog</p>
+            </div>
+        </div>
+     </footer>
 </body>
 </html>
