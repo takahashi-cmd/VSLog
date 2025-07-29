@@ -1,36 +1,60 @@
 {% extends "base.html" %}
+{% block head_link %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
 
-{% block title %} プロフィール編集 {% endblock %}
+{% block title %} プロフィール {% endblock %}
+
+{% block header %}
+<div class="header-nav">
+    <a href="{{ url_for('index_view', user_id=current_user.user_id) }}">ホーム</a>
+    <a href="{{ url_for('profile_edit_view', user_id=current_user.user_id) }}">プロフィール</a>
+    <a href="{{ url_for('study_logs_view', user_id=current_user.user_id) }}">学習記録の登録・編集</a>
+    <a href="{{ url_for('study_fields_view', user_id=current_user.user_id) }}">学習分野の登録・編集</a>
+    <a href="{{ url_for('study_logs_list', user_id=current_user.user_id) }}">学習履歴の一覧</a>
+    <form action="{{ url_for('logout') }}" method="get">
+        <button class="logout" type="submit">ログアウト</button>
+    </form>
+</div>
+{% endblock %}
 
 {% block content %}
+<div class="flash-messsage">
     {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="flashes">
-                {% for message in messages %}
-                    <p>{{ message }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
+    {% if messages %}
+    <div class="flashes">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
+</div>
 
-    <h1>プロフィール編集画面</h1>
-    <div class="profile_edit">
-        <form action="{{ url_for('profile_edit_process', user_id=current_user.user_id) }}" method="post">
-            <label for="new_username">ユーザー名：</label>
-            <input type="text" id="new_username" name="new_username" value="{{ current_user.username }}">
-
-            <label for="new_email">メールアドレス：</label>
-            <input type="email" id="new_email" name="new_email" value="{{ current_user.email }}">
-
-            <div>
-                <button class="profile_edit" type="submit">プロフィール更新</button>
-            </div>
-        </form>
-        <div class="mypage">
-            <a href="{{ url_for('mypage_view', user_id=current_user.user_id) }}">マイページ</a>
-        </div>
-        <div class="index">
-            <a href="{{ url_for('index_view', user_id=current_user.user_id) }}">ホーム</a>
+<div class="main-container">
+    <div class="auth-section">
+        <div class="auth-href">
+            <a href="{{ url_for('profile_edit_view', user_id=current_user.user_id) }}">プロフィール</a>
+            <a href="{{ url_for('password_update_view', user_id=current_user.user_id) }}">パスワード変更</a>
         </div>
     </div>
+    <div class="auth-area">
+        <div class="auth-content">
+            <h1>プロフィール</h1>
+            <div class="auth-form">
+                <form action="{{ url_for('profile_edit_process', user_id=current_user.user_id) }}" method="post">
+                    <div class="auth-input">
+                        <label for="new_username">ユーザー名</label>
+                        <input type="text" id="new_username" name="new_username" value="{{ current_user.username }}">
+                        <label for="new_email">メールアドレス</label>
+                        <input type="email" id="new_email" name="new_email" value="{{ current_user.email }}">
+                    </div>
+                    <div class="auth-button">
+                        <button type="submit">更新</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
