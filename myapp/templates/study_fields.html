@@ -1,17 +1,32 @@
 {% extends "base.html" %}
 
-{% block title %} 学習分野 {% endblock %}
+{% block title %} 学習分野の登録・編集 {% endblock %}
+
+{% block header %}
+<div class="header-nav">
+    <a href="{{ url_for('index_view', user_id=current_user.user_id) }}">ホーム</a>
+    <a href="{{ url_for('profile_edit_view', user_id=current_user.user_id) }}">プロフィール</a>
+    <a href="{{ url_for('study_logs_view', user_id=current_user.user_id) }}">学習記録の登録・編集</a>
+    <a href="{{ url_for('study_fields_view', user_id=current_user.user_id) }}">学習分野の登録・編集</a>
+    <a href="{{ url_for('study_logs_list', user_id=current_user.user_id) }}">学習履歴の一覧</a>
+    <form action="{{ url_for('logout') }}" method="get">
+        <button class="logout" type="submit">ログアウト</button>
+    </form>
+</div>
+{% endblock %}
 
 {% block content %}
+<div class="flash-messsage">
     {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="flashes">
-                {% for message in messages %}
-                    <p>{{ message }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
+    {% if messages %}
+    <div class="flashes">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
+</div>
 
     <h1>{{ current_user.username }}さんの学習分野</h1>
     <form class="study_fields_process" action="{{ url_for('study_fields_process', user_id=current_user.user_id) }}" method="post">
@@ -55,10 +70,6 @@
         <button type="submit">更新</button>
         <button type="button" onclick="addRow()">記入欄を追加する</button>
     </form>
-    
-    <div class="index">
-        <a href="{{ url_for('index_view', user_id=current_user.user_id) }}">ホーム</a>
-    </div>
 
     <script>
         function markDeleted(btn) {

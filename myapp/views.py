@@ -145,7 +145,7 @@ def index_view(user_id):
     # 学習時間（合計）の取得
     total_hour = StudyLog.get_total_hour(user_id)
     # 学習時間（平均）の取得
-    avg_hour = round(total_hour / total_day, 1)
+    avg_hour = round(total_hour / total_day, 1) if total_day else 0.0
 
     return render_template(
         'index.html',
