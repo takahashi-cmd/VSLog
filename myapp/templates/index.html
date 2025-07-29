@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block head_link %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
 
 {% block title %} ホーム画面 {% endblock %}
 
@@ -30,25 +33,42 @@
 </div>
 
 <div class="main-container">
-    <div class="head-stats">
-        <div class="head-stats-totalday">
-            <p>学習日数</p>
-            <p>{{ total_day }}日</p>
+    <div class="home-inner">
+        <div class="home-head">
+            <h1>{{ current_user.username }}さんの学習履歴</h1>
         </div>
-        <div class="head-stats-totalhour">
-            <p>学習時間（合計）</p>
-            <p>{{ total_hour }}時間</p>
+        <div class="home-format">
+            <p>表示期間：</p>
+            <p>横軸表示形式：</p>
+            <p>縦軸表示形式：</p>
         </div>
-        <div class="head-stats-avghour">
-            <p>学習時間（平均）</p>
-            <p>{{ avg_hour }}時間/日</p>
+        <div class="home-format">
+            <div class="home-stats">
+                <img src="{{ url_for('static', filename='image/days.png') }}" alt="学習日数">
+                <div class="home-stats-area">
+                    <p>学習日数</p>
+                    <section><p>{{ total_day }}日</p></section>
+                </div>
+            </div>
+            <div class="home-stats">
+                <img src="{{ url_for('static', filename='image/total.png') }}" alt="学習時間（合計）">
+                <div class="home-stats-area">
+                    <p>学習時間（合計）</p>
+                    <section><p>{{ total_hour }}時間</p></section>
+                </div>
+            </div>
+            <div class="home-stats">
+                <img src="{{ url_for('static', filename='image/average.png') }}" alt="学習時間（平均）">
+                <div class="home-stats-area">
+                    <p>学習時間（平均）</p>
+                    <section><p>{{ avg_hour }}時間/日</p></section>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="main-stats">
-        <div class="main-stats-graph">
+        <div class="home-graph">
             <iframe src="{{ url_for('graph_svg', user_id=current_user.user_id) }}" width="100%" height="400" frameborder="0"></iframe>
         </div>
-    </div>
+    <div>
 </div>
 
 {% endblock %}
