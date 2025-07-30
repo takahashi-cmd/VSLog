@@ -156,24 +156,30 @@ def index_view(user_id):
 
 @app.route('/graph/<user_id>', methods=['GET', 'POST'])
 def graph_svg(user_id):
-    # 今週の学習グラフの取得（積み上げ縦棒）
-    this_week_graph = StudyLog.get_this_week_graph(user_id)
-    # 月間グラフの取得（積み上げ縦棒）
-
-    # 年間グラフの取得（積み上げ縦棒）
+    period = request.form.get('period')
+    horizontalAxis = request.form.get('horizontalAxis')
+    verticalAxis = request.form.get('verticalAxis')
 
     # 分野別全期間グラフの取得
-    all_time_graph_by_field = StudyLog.get_all_time_graph_by_field(user_id)
+    if period == 'all' and horizontalAxis == 'fields' and verticalAxis == 'time':
+        all_time_graph_by_field = StudyLog.get_all_time_graph_by_field(user_id)
+        if all_time_graph_by_field:
+            return Response(all_time_graph_by_field, mimetype='image/svg+xml')
 
     # 分野別年間グラフの取得
 
     # 分野別月間グラフの取得
 
+    # 月間グラフの取得（積み上げ縦棒）
+
+    # 年間グラフの取得（積み上げ縦棒）
+
+    # 今週の学習グラフの取得（積み上げ縦棒）
+    this_week_graph = StudyLog.get_this_week_graph(user_id)
+
 
     # if this_week_graph:
     #     return Response(this_week_graph, mimetype='image/svg+xml')
-    if all_time_graph_by_field:
-        return Response(all_time_graph_by_field, mimetype='image/svg+xml')
 
     return Response(status=204)
 
