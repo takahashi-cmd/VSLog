@@ -228,8 +228,9 @@ class StudyLog(db.Model):
 
     # 月間学習日数、学習時間（合計）、学習時間（平均）の取得
     @classmethod
-    def get_month_stats(cls, user_id, month_str):
-        year, month = map(int, month_str.split('-'))
+    def get_month_stats(cls, user_id, month_year_str, month_str):
+        year = int(month_year_str)
+        month = int(month_str)
         first_day = date(year, month, 1)
         month_num = calendar.monthrange(year, month)[1]
         last_day = date(year, month, month_num)
@@ -264,8 +265,9 @@ class StudyLog(db.Model):
 
     # 月間グラフ作成
     @classmethod
-    def get_month_graph(cls, user_id, month_str):
-        year, month = map(int, month_str.split('-'))
+    def get_month_graph(cls, user_id, month_year_str, month_str):
+        year = int(month_year_str)
+        month = int(month_str)
         first_day = date(year, month, 1)
         month_num = calendar.monthrange(year, month)[1]
         last_day = date(year, month, month_num)
@@ -492,8 +494,9 @@ class StudyLog(db.Model):
 
     # 分野別月間グラフ作成
     @classmethod
-    def get_month_graph_by_field(cls, user_id, month_str):
-        year, month = map(int, month_str.split('-'))
+    def get_month_graph_by_field(cls, user_id, month_year_str, month_str):
+        year = int(month_year_str)
+        month = int(month_str)
         first_day = date(year, month, 1)
         month_num = calendar.monthrange(year, month)[1]
         last_day = date(year, month, month_num)

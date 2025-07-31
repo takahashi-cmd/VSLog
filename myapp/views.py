@@ -140,48 +140,85 @@ def password_reset_process():
 @app.route('/index/<user_id>', methods=['GET'])
 @login_required
 def index_view(user_id):
-    # 学習日数取得
-    total_day = StudyLog.get_total_day(user_id)
-    # 学習時間（合計）の取得
-    total_hour = StudyLog.get_total_hour(user_id)
-    # 学習時間（平均）の取得
-    avg_hour = round(total_hour / total_day, 1) if total_day else 0.0
+    return render_template('index.html')
 
-    return render_template(
-        'index.html',
-        total_day = total_day,
-        total_hour = total_hour,
-        avg_hour = avg_hour
-    )
+@app.route('/graph/<user_id>', methods=['POST'])
+def get_graph_stats(user_id):
+    period = request.form.get('period', 'all')
+    year_str = request.form.get('year')
+    month_year_str = request.form.get('month-year')
+    month_str = request.form.get('month')
+    horizontalAxis = request.form.get('horizontalAxis', 'fields')
+    verticalAxis = request.form.get('verticalAxis', 'time')
 
-@app.route('/graph/<user_id>', methods=['GET', 'POST'])
-def graph_svg(user_id):
-    period = request.form.get('period')
-    horizontalAxis = request.form.get('horizontalAxis')
-    verticalAxis = request.form.get('verticalAxis')
+    svg = None
+    total_day = 0
+    total_hour = 0.0
+    avg_hour = 0.0
 
-    # 分野別全期間グラフの取得
+    # 分野別全期間グラフ、学習日数、時間の取得
     if period == 'all' and horizontalAxis == 'fields' and verticalAxis == 'time':
-        all_time_graph_by_field = StudyLog.get_all_time_graph_by_field(user_id)
-        if all_time_graph_by_field:
-            return Response(all_time_graph_by_field, mimetype='image/svg+xml')
+        svg = StudyLog.get_all_time_graph_by_field(user_id)
+        total_day = StudyLog.get_total_day(user_id)
+        total_hour = StudyLog.get_total_hour(user_id)
+        avg_hour = round(total_hour / total_day, 1) if total_day else 0.0
 
-    # 分野別年間グラフの取得
+    # 分野別年間グラフ、学習日数、時間の取得
+    elif period == 'year' and horizontalAxis == 'fields' and verticalAxis =='time':
+        svg = StudyLog.get_year_graph_by_field(user_id, year_str)
+        year_stats = StudyLog.get_year_stats(user_id, year_str)
+        total_day = year_stats['study_days']
+        total_hour = year_stats['total_hours']
+        avg_hour = year_stats['average_per_day']
 
-    # 分野別月間グラフの取得
+    # 年間グラフ、学習日数、時間の取得（積み上げ縦棒）
+    elif period == 'year' and horizontalAxis == 'days' and verticalAxis == 'time':
+        svg = StudyLog.get_year_graph(user_id, year_str)
+        year_stats = StudyLog.get_year_stats(user_id, year_str)
+        total_day = year_stats['study_days']
+        total_hour = year_stats['total_hours']
+        avg_hour = year_stats['average_per_day']
 
-    # 月間グラフの取得（積み上げ縦棒）
+    # 分野別月間グラフ、学習日数、時間の取得
+    elif period == 'month' and horizontalAxis == 'fields' and verticalAxis == 'time':
+        svg = StudyLog.get_month_graph_by_field(user_id, month_year_str, month_str)
+        month_stats = StudyLog.get_month_stats(user_id, month_year_str, month_str)
+        total_day = month_stats['study_days']
+        total_hour = month_stats['total_hours']
+        avg_hour = month_stats['average_per_day']
 
-    # 年間グラフの取得（積み上げ縦棒）
+    # 月間グラフ、学習日数、時間の取得（積み上げ縦棒）
+    elif period == 'month' and horizontalAxis == 'days' and verticalAxis == 'time':
+        svg = StudyLog.get_month_graph(user_id, month_year_str, month_str)
+        month_stats = StudyLog.get_month_stats(user_id, month_year_str, month_str)
+        total_day = month_stats['study_days']
+        total_hour = month_stats['total_hours']
+        avg_hour = month_stats['average_per_day']
 
-    # 今週の学習グラフの取得（積み上げ縦棒）
-    this_week_graph = StudyLog.get_this_week_graph(user_id)
+    # 今週の学習グラフ、学習日数、時間の取得（積み上げ縦棒）
+    elif period == 'this_week' and horizontalAxis == 'days' and verticalAxis == 'time':
+        svg = StudyLog.get_this_week_graph(user_id)
+        this_week_stats = StudyLog.get_this_week_stats(user_id)
+        total_day = this_week_stats['study_days']
+        total_hour = this_week_stats['total_hours']
+        avg_hour = this_week_stats['average_per_day']
+
+    if svg:
+        return jsonify({
+        "svg": svg,
+        "total_day": total_day,
+        "total_hour": total_hour,
+        "avg_hour": avg_hour
+        })
+    else:
+        return jsonify({
+        "svg": "<p style='color:var(--base-text-color);'>学習記録がありません。</p>",
+        "total_day": total_day,
+        "total_hour": total_hour,
+        "avg_hour": avg_hour
+        })
 
 
-    # if this_week_graph:
-    #     return Response(this_week_graph, mimetype='image/svg+xml')
-
-    return Response(status=204)
 
 # プロフィール編集画面表示
 @app.route('/profile-edit/<user_id>', methods=['GET'])

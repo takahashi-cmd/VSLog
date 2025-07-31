@@ -23,6 +23,14 @@
     gap: 24px;
 }
 
+.home-format form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    flex: 1;
+}
+
 .home-stats {
     display: flex;
     justify-content: center;
@@ -31,6 +39,7 @@
     background-color: var(--contents-bg-color);
     flex: 1;
 }
+
 
 .home-stats img {
     width: 100px;
@@ -55,4 +64,8 @@
 
 .home-graph {
     background-color: var(--contents-bg-color);
+}
+
+.hidden {
+    display: none;
 }
