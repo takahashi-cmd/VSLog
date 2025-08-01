@@ -1,0 +1,71 @@
+/* ホーム画面(index.htmlのcss） */
+
+.home-inner {
+    max-width: 1120px;
+    height: auto;
+    margin: 100px auto 100px auto;
+}
+
+.home-head {
+    margin-bottom: 24px;
+}
+
+.home-head h1 {
+    text-align: center;
+    font-size: 24px;
+}
+
+.home-format {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 24px;
+}
+
+.home-format form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    flex: 1;
+}
+
+.home-stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    background-color: var(--contents-bg-color);
+    flex: 1;
+}
+
+
+.home-stats img {
+    width: 100px;
+    height: 100px;
+}
+
+.home-stats-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.home-stats-area p {
+    text-align: center;
+}
+
+.home-stats-area section p {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.home-graph {
+    background-color: var(--contents-bg-color);
+}
+
+.hidden {
+    display: none;
+}
