@@ -1,4 +1,4 @@
-// study_fields（学習分野の登録・編集画面）の動作
+// study_fields, study_logsの共通動作
 
 function markDeleted(btn) {
     const row = btn.closest('tr');
