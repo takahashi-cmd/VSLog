@@ -75,7 +75,7 @@
                             </tr>
                         {% endfor %}
 
-                        <!-- 新規入力用の行 -->
+                        <!-- 空行の記入欄の表示（デフォルトでは5行表示） -->
                         {% for i in range(3) %}
                         <tr>
                             <td class="table-num">{{ current_user.study_logs|length + i + 1 }}</td>
@@ -102,7 +102,7 @@
                 </div>
                 <div class="study-button">
                     <button type="submit">更新</button>
-                    <button type="button" onclick="addRow()">記入欄を追加する</button>
+                    <button type="button" onclick="addRowLogs(this)">記入欄を追加する</button>
                 </div>
             </form>
         </div>
