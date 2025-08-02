@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block head_link %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/study.css') }}">
-    <script src="{{ url_for('static', filename='js/study_fields.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/study_edit.js') }}"></script>
 {% endblock %}
 
 {% block title %} 学習分野の登録・編集 {% endblock %}
@@ -40,7 +40,7 @@
         <div class="study-form">
             <form action="{{ url_for('study_fields_process', user_id=current_user.user_id) }}" method="post">
                 <div class="study-table">
-                <table>
+                <table id="study-fields">
                     <thead>
                         <tr>
                             <th>No.</th>
@@ -63,7 +63,7 @@
                         </tr>
                         {% endfor %}
 
-                        <!-- 記入欄の追加 -->
+                        <!-- 空行の記入欄の表示（デフォルトでは5行表示） -->
                         {% for i in range(5 - current_user.fields|length) %}
                         <tr>
                             <td class="table-num">{{ current_user.fields|length + i + 1 }}</td>
@@ -81,7 +81,7 @@
                 </div>
                 <div class="study-button">
                     <button type="submit">更新</button>
-                    <button type="button" onclick="addRow()">記入欄を追加する</button>
+                    <button type="button" onclick="addRowFields(this)">記入欄を追加する</button>
                 </div>
             </form>
         </div>

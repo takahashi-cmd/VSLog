@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{% block head_link %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/study.css') }}">
+    <script src="{{ url_for('static', filename='js/study_edit.js') }}"></script>
+{% endblock %}
 
 {% block title %} 学習記録の登録・編集 {% endblock %}
 
@@ -15,7 +19,6 @@
 </div>
 {% endblock %}
 
-
 {% block content %}
 <div class="flash-messsage">
     {% with messages = get_flashed_messages() %}
@@ -29,82 +32,80 @@
     {% endwith %}
 </div>
 
-    <h1>{{ current_user.username }}さんの学習登録</h1>
-    <form class="study_logs_process" action="{{ url_for('study_logs_process', user_id=current_user.user_id) }}" method="post">
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>日付</th>
-                    <th>学習時間</th>
-                    <th>学習分野</th>
-                    <th>学習内容</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- 学習ログがある場合はループで表示 -->
-                {% for study_log in current_user.study_logs %}
-                    <tr>
-                        <td>{{ loop.index }}</td>
-                        <td><input type="date" name="study_dates[]" value="{{ study_log.study_date or '' }}"></td>
-                        <td><input type="number" step="0.1" min="0" max="24" name="hours[]" value="{{ study_log.hour or '' }}"></td>
-                        <td>
-                            <input type="text" name="fieldname[]" value="{{ study_log.fields.fieldname }}" list="field_list">
-                            <datalist id="field_list">
-                                {% for field in current_user.fields %}
-                                <option value="{{ field.fieldname }}"></option>
-                                {% endfor %}
-                            </datalist>
-                        </td>
-                        <td><textarea name="contents[]">{{ study_log.content or '' }}</textarea></td>
-                        <td>
-                            <input type="hidden" name="study_log_id[]" value="{{ study_log.study_log_id }}">
-                            <input type="hidden" name="row_action[]" value="update">
-                            <button type="button" onclick="markDeleted(this)">🗑️</button>
-                        </td>
-                    </tr>
-                {% endfor %}
+<div class="main-container">
+    <div class="study-inner">
+        <div class="study-head">
+            <h1>学習記録の登録・編集</h1>
+        </div>
+        <div class="study-form">
+            <form class="study_logs_process" action="{{ url_for('study_logs_process', user_id=current_user.user_id) }}" method="post">
+                <div class="study-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>日付</th>
+                            <th>学習時間</th>
+                            <th>分野名</th>
+                            <th>内容</th>
+                            <th>削除</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 学習ログがある場合はループで表示 -->
+                        {% for study_log in current_user.study_logs %}
+                            <tr>
+                                <td class="table-num">{{ loop.index }}</td>
+                                <td><input type="date" name="study_dates[]" value="{{ study_log.study_date or '' }}"></td>
+                                <td><input type="number" step="0.1" min="0" max="24" name="hours[]" value="{{ study_log.hour or '' }}"></td>
+                                <td>
+                                    <input type="text" name="fieldname[]" value="{{ study_log.fields.fieldname }}" list="field_list">
+                                    <datalist id="field_list">
+                                        {% for field in current_user.fields %}
+                                        <option value="{{ field.fieldname }}"></option>
+                                        {% endfor %}
+                                    </datalist>
+                                </td>
+                                <td><textarea name="contents[]">{{ study_log.content or '' }}</textarea></td>
+                                <td>
+                                    <input type="hidden" name="study_log_id[]" value="{{ study_log.study_log_id }}">
+                                    <input type="hidden" name="row_action[]" value="update">
+                                    <button class="delete-button" type="button" onclick="markDeleted(this)">🗑️</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
 
-                <!-- 新規入力用の行 -->
-                {% for i in range(3) %}
-                <tr>
-                    <td>{{ current_user.study_logs|length + i + 1 }}</td>
-                    <td><input type="date" name="study_dates[]" value=""></td>
-                    <td><input type="number" step="0.1" min="0" max="24" name="hours[]" value=""></td>
-                    <td>
-                        <input type="text" name="fieldname[]" value="" list="field_list2">
-                        <datalist id="field_list2">
-                            {% for field in current_user.fields %}
-                            <option value="{{ field.fieldname }}"></option>
-                            {% endfor %}
-                        </datalist>
-                    </td>
-                    <td><textarea name="contents[]"></textarea></td>
-                    <td>
-                        <input type="hidden" name="study_log_id[]" value="">
-                        <input type="hidden" name="row_action[]" value="new">
-                        <button type="button" onclick="removeRow(this)">🗑️</button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <button type="submit">更新</button>
-        <button type="button" onclick="addRow()">記入欄を追加する</button>
-    </form>
-    
-    <div class="index">
-        <a href="{{ url_for('index_view', user_id=current_user.user_id) }}">ホーム</a>
+                        <!-- 空行の記入欄の表示（デフォルトでは5行表示） -->
+                        {% for i in range(3) %}
+                        <tr>
+                            <td class="table-num">{{ current_user.study_logs|length + i + 1 }}</td>
+                            <td><input type="date" name="study_dates[]" value=""></td>
+                            <td><input type="number" step="0.1" min="0" max="24" name="hours[]" value=""></td>
+                            <td>
+                                <input type="text" name="fieldname[]" value="" list="field_list2">
+                                <datalist id="field_list2">
+                                    {% for field in current_user.fields %}
+                                    <option value="{{ field.fieldname }}"></option>
+                                    {% endfor %}
+                                </datalist>
+                            </td>
+                            <td><textarea name="contents[]"></textarea></td>
+                            <td>
+                                <input type="hidden" name="study_log_id[]" value="">
+                                <input type="hidden" name="row_action[]" value="new">
+                                <button class="delete-button" type="button" onclick="removeRow(this)">🗑️</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                <div class="study-button">
+                    <button type="submit">更新</button>
+                    <button type="button" onclick="addRowLogs(this)">記入欄を追加する</button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <script>
-        function markDeleted(btn) {
-            const row = btn.closest('tr');
-            row.querySelector('input[name="row_action[]"]').value = 'delete';
-            row.style.opacity = 0.5;
-        };
-        function removeRow(btn) {
-            btn.closest('tr').remove();
-        }
-    </script>
+</div>
 {% endblock %}
