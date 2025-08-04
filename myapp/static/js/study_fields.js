@@ -1,16 +1,4 @@
-// study_fields, study_logsの共通動作
-
-// 既存行の削除
-const markDeleted = (btn) => {
-    const row = btn.closest('tr');
-    row.querySelector('input[name="row_action[]"]').value = 'delete';
-    row.style.opacity = 0.5;
-};
-
-// 空白行の削除
-const removeRow = (btn) => {
-    btn.closest('tr').remove();
-}
+// study_fieldsの動作
 
 // 学習分野の新しい行の追加
 const addRowFields = (btn) => {
@@ -25,11 +13,6 @@ const addRowFields = (btn) => {
     <input type="hidden" name="field_id[]" value="">
     <input type="hidden" name="row_action[]" value="new">
     <button class="delete-button" type="button" onclick="removeRow(this)">🗑️</button>
-    </td>`
+    </td>`;
     table.appendChild(newRow);
-}
-
-// 学習記録の新しい行の追加
-const addRowLogs = (btn) >= {
-    
 }

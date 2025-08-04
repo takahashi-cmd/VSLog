@@ -287,13 +287,16 @@ def password_update_process(user_id):
     return redirect(url_for('password_update_view', user_id=user_id))
 
 # 学習登録画面表示
-@app.route('/study-logs/<user_id>', methods=['GET'])
+@app.route('/study-logs/<user_id>', methods=['GET', 'POST'])
 @login_required
 def study_logs_view(user_id):
-    return render_template('study_logs.html')
+    today = date.today().strftime('%Y-%m-%d')
+    date_str = request.form.get('study_date') or today
+    study_logs = StudyLog.get_study_logs_by_study_date(user_id, date_str)
+    return render_template('study_logs.html', study_logs=study_logs, selected_date=date_str)
 
-# 学習登録・編集・削除
-@app.route('/study-logs/<user_id>', methods=['POST'])
+# 学習記録登録・編集・削除
+@app.route('/study-logs_process/<user_id>', methods=['POST'])
 @login_required
 def study_logs_process(user_id):
     study_dates = request.form.getlist('study_dates[]')
@@ -303,13 +306,17 @@ def study_logs_process(user_id):
     study_log_ids = request.form.getlist('study_log_id[]')
     row_actions = request.form.getlist('row_action[]')
 
+    # print("DEBUG:", study_dates, hours, fieldnames, contents, study_log_ids, row_actions)
     registered = False
 
     try:
         for study_date, hour, fieldname, content, study_log_id, row_action in zip(study_dates, hours, fieldnames, contents, study_log_ids, row_actions):
+            study_date = datetime.strptime(study_date, "%Y-%m-%d").date() if study_date else None
+            # print("DEBUG:", study_date, hour, fieldname, study_log_id, row_action)
             # 登録
             if fieldname.strip() and fieldname.strip() not in [f.fieldname for f in current_user.fields]:
-                flash(f'{fieldname.strip()}が登録されていません。先に学習分野で登録をお願いします。')
+                flash(f'{fieldname.strip()}が登録されていません。先に学習分野の登録をお願いします。')
+                continue
             elif row_action == 'new' and study_date and hour and fieldname.strip():
                 study_log = StudyLog(
                     user_id = user_id,
