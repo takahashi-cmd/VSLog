@@ -107,6 +107,12 @@ class StudyLog(db.Model):
     def get_study_logs_all(cls, user_id):
         return cls.query.filter_by(user_id=user_id).all()
 
+    # 学習日に応じたユーザー毎の学習履歴取得
+    @classmethod
+    def get_study_logs_by_study_date(cls, user_id, date_str):
+        study_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        return cls.query.filter_by(user_id=user_id, study_date=study_date).all()
+
     # 学習総日数取得
     @classmethod
     def get_total_day(cls, user_id):
