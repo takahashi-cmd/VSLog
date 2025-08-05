@@ -102,7 +102,7 @@
             </div>
         </div>
         <div class="home-graph" id="home-graph">
-            <p></p>
+            <object data="{{ url_for('get_all_time_graph', user_id=current_user.user_id) }}" type="image/svg+xml"></object>
         </div>
     <div>
 </div>
