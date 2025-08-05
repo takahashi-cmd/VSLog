@@ -64,6 +64,7 @@
 
 .home-graph {
     background-color: var(--contents-bg-color);
+    text-align: center;
 }
 
 .hidden {
