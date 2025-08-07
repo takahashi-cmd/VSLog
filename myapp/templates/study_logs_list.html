@@ -29,5 +29,17 @@
 </div>
 
     <h1>{{ current_user.username }}さんの学習履歴一覧</h1>
-
+    {% for date, logs in study_dicts.items() %}
+        <p>{{ date }}</p>
+        <p>{{ logs }}</p>
+        {% for log in logs %}
+            <p>{{ log }}</p>
+            <ul>
+                <li>{{ log.study_log_id }}</li>
+                <li>{{ log.study_date }}</li>
+                <li>{{ log.content }}</li>
+                <li>{{ log.hour }}</li>
+            </ul>
+        {% endfor %}
+    {% endfor %}
 {% endblock %}

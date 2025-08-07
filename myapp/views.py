@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from .app import app, db
 from .models import User, Field, StudyLog
 from datetime import datetime, date
+from collections import defaultdict
 import re
 import uuid
 
@@ -434,5 +435,13 @@ def study_fields_process(user_id):
 @app.route('/study-logs-list/<user_id>', methods=['GET'])
 @login_required
 def study_logs_list(user_id):
-    return render_template('study_logs_list.html')
+    this_year = datetime.now().year
+    this_month = datetime.now().month
+    study_logs = StudyLog.get_study_logs_by_study_month(user_id, this_year, this_month)
+    study_dicts = defaultdict(list) # 辞書の初期化
+    for study_log in study_logs:
+        date = study_log.study_date.isoformat()
+        study_dicts[date].append(study_log)
+    print(study_dicts)
+    return render_template('study_logs_list.html', study_dicts=study_dicts)
 

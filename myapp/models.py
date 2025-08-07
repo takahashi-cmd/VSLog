@@ -112,6 +112,26 @@ class StudyLog(db.Model):
     def get_study_logs_by_study_date(cls, user_id, date_str):
         study_date = datetime.strptime(date_str, "%Y-%m-%d").date()
         return cls.query.filter_by(user_id=user_id, study_date=study_date).all()
+    
+    # 月に応じたユーザー毎の学習履歴取得
+    @classmethod
+    def get_study_logs_by_study_month(cls, user_id, month_year_str, month_str):
+        year = int(month_year_str)
+        month = int(month_str)
+        first_day = date(year, month, 1)
+        month_num = calendar.monthrange(year, month)[1]
+        last_day = date(year, month, month_num)
+
+        logs = (
+            db.session.query(cls)
+            .filter(
+            cls.user_id == user_id,
+            cls.study_date >= first_day,
+            cls.study_date <= last_day
+            )
+            .all()
+        )
+        return logs
 
     # 学習総日数取得
     @classmethod
