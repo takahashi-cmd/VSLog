@@ -123,7 +123,8 @@ class StudyLog(db.Model):
         last_day = date(year, month, month_num)
 
         logs = (
-            db.session.query(cls)
+            db.session.query(cls.study_log_id, cls.study_date, Field.fieldname.label('fieldname'), cls.content, cls.hour)
+            .join(Field, cls.field_id == Field.field_id)
             .filter(
             cls.user_id == user_id,
             cls.study_date >= first_day,

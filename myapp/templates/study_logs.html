@@ -37,10 +37,10 @@
     <div class="study-inner">
         <div class="study-head">
             <h1>学習記録の登録・編集</h1>
-            <p>{{ selected_date }}</p>
         </div>
         <!-- 画面表示時のフォーム -->
         <div class="study-date">
+            <p>{{ selected_date }}の学習記録</p>
             <form action="{{ url_for('study_logs_view', user_id=current_user.user_id) }}" method="post" id="study-date-form">
                 <label for="study_date">日付：</label>
                 <input type="date" name="study_date" id="study_date" value="{{ selected_date }}">

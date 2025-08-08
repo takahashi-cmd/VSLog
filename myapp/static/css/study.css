@@ -15,11 +15,31 @@
     font-size: 24px;
 }
 
+.study-date {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.study-date p, .study-date form {
+    background-color: var(--contents-bg-color);
+    border: 1px solid var(--base-text-color);
+    padding: 8px;
+}
+
+.study-form {
+    width: 100%;
+}
+
 .study-table {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-bottom: 24px;
+}
+
+.study-table table {
+    width: 100%;
 }
 
 .study-button {

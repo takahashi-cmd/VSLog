@@ -438,10 +438,19 @@ def study_logs_list(user_id):
     this_year = datetime.now().year
     this_month = datetime.now().month
     study_logs = StudyLog.get_study_logs_by_study_month(user_id, this_year, this_month)
+    print(study_logs)
     study_dicts = defaultdict(list) # 辞書の初期化
-    for study_log in study_logs:
-        date = study_log.study_date.isoformat()
-        study_dicts[date].append(study_log)
+    for row in study_logs:
+        d = row_to_dict(row)
+        study_dicts[d['study_date']].append(d)
     print(study_dicts)
     return render_template('study_logs_list.html', study_dicts=study_dicts)
 
+# DBから取得した列を辞書形式に変換
+def row_to_dict(row):
+    d = dict(row._mapping)
+    if d.get('study_date'):
+        d['study_date'] = d['study_date'].isoformat()
+    if d.get('hour') is not None:
+        d['hour'] = float(d['hour'])
+    return d
