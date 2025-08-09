@@ -1,4 +1,9 @@
 {% extends "base.html" %}
+{% block head_link %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/study.css') }}">
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+
+{% endblock %}
 
 {% block title %} 学習履歴一覧 {% endblock %}
 
@@ -27,7 +32,25 @@
     {% endif %}
     {% endwith %}
 </div>
-
-    <h1>{{ current_user.username }}さんの学習履歴一覧</h1>
-
+<div class="main-container">
+    <div class="study-inner">
+        <div class="study-head">
+            <h1>{{ current_user.username }}さんの学習履歴一覧</h1>
+        </div>
+    {% for date, logs in study_dicts.items() %}
+        <p>{{ date }}</p>
+        <p>{{ logs }}</p>
+        {% for log in logs %}
+            <p>{{ log }}</p>
+            <ul>
+                <li>{{ log.study_log_id }}</li>
+                <li>{{ log.study_date }}</li>
+                <li>{{ log.fieldname }}</li>
+                <li>{{ log.content }}</li>
+                <li>{{ log.hour }}</li>
+            </ul>
+        {% endfor %}
+    {% endfor %}
+    </div>
+</div>
 {% endblock %}

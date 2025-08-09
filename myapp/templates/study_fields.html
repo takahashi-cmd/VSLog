@@ -40,19 +40,19 @@
         </div>
         <div class="study-form">
             <form action="{{ url_for('study_fields_process', user_id=current_user.user_id) }}" method="post">
-                <div class="study-table">
-                <table id="study-fields">
+                <div class="study-table-container">
+                <table class="study-fields" id="study-fields">
                     <thead>
-                        <tr>
-                            <th>No.</th>
-                            <th>分野名</th>
-                            <th>凡例カラー</th>
-                            <th>削除</th>
+                        <tr class="study-tr fields">
+                            <th class="th-num">No.</th>
+                            <th class="th-fieldname">分野名</th>
+                            <th class="th-color">凡例カラー</th>
+                            <th class="th-delete">削除</th>
                         </tr>
                     </thead>
                     <tbody id="field-rows">
                         {% for field in current_user.fields %}
-                        <tr>
+                        <tr class="study-tr fields">
                             <td class="table-num">{{ loop.index }}</td>
                             <td><input type="text" name="fieldname[]" value="{{ field.fieldname }}"></td>
                             <td class="table-field-color"><input type="color" name="color_code[]" value="{{ field.color_code }}"></td>
@@ -66,7 +66,7 @@
 
                         <!-- 空行の記入欄の表示（デフォルトでは5行表示） -->
                         {% for i in range(5 - current_user.fields|length) %}
-                        <tr>
+                        <tr class="study-tr fields">
                             <td class="table-num">{{ current_user.fields|length + i + 1 }}</td>
                             <td><input type="text" name="fieldname[]" value=""></td>
                             <td class="table-field-color"><input type="color" name="color_code[]" value="#000000"></td>

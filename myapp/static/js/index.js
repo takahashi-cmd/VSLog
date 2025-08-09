@@ -4,45 +4,44 @@
 document.addEventListener('DOMContentLoaded', () => {
     const graphForm = document.getElementById('graphForm');
     const periodSelect = document.getElementById('period');
-    
+    const yearContainer= document.getElementById('year-container')
+    const monthContainer = document.getElementById('month-container')
+    const yearSelect = document.getElementById('year')
+    const monthYearSelect = document.getElementById('month-year')
+    const monthSelect = document.getElementById('month')
+    const horizontalAxisSelect = document.getElementById('horizontalAxis');
+    const verticalAxisSelect = document.getElementById('verticalAxis');
+
+    const startYear = 2020;
+    const endYear = 2040;
+
+    // 年リスト作成
+    for (let y = startYear; y <= endYear; y++) {
+        const option = new Option(y, y);
+        console.log(option);
+        yearSelect.add(option.cloneNode(true));
+        monthYearSelect.add(option);
+    };
+
+    // 月リスト作成
+    for (let m = 1; m <= 12; m++) {
+        const option = new Option(m, m);
+        console.log(option);
+        monthSelect.add(option);
+    };
+
     periodSelect.addEventListener('change', () => {
         console.log('form');
-        graphForm.submit();
+        const selected = periodSelect.value;
+
+        if (selected === 'year') {
+            yearContainer.classList.remove('hidden');
+        } else if (selected === 'month') {
+            monthContainer.classList.remove('hidden');
+        };
+        // graphForm.submit();
     });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -14,18 +14,19 @@ document.addEventListener('DOMContentLoaded', () => {
 const addRowLogs = (btn) => {
     const table = document.getElementById('study-logs');
     const newRow = document.createElement('tr');
+    newRow.className = 'study-tr logs';
     const rowNum = table.rows.length;
     const selected_date = document.getElementById('selected_date');
     const date = selected_date.dataset.selectedDate;
 
     newRow.innerHTML = `
     <td class="table-num">${rowNum}</td>
-    <td><input type="number" step="0.1" min="0" max="24" name="hours[]" value=""></td>
-    <td>
+    <td class="table-hour"><input type="number" step="0.1" min="0" max="24" name="hours[]" value=""></td>
+    <td class="table-fieldname">
         <input type="text" name="fieldname[]" value="" list="field_list2">
     </td>
-    <td><textarea name="contents[]"></textarea></td>
-    <td>
+    <td class="table-content"><textarea name="contents[]" rows="" cols=""></textarea></td>
+    <td class="table-delete">
         <input type="hidden" name="study_dates[]" value="${date}">
         <input type="hidden" name="study_log_id[]" value="">
         <input type="hidden" name="row_action[]" value="new">
