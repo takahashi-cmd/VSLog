@@ -8,6 +8,7 @@ from datetime import datetime, date
 from collections import defaultdict
 import re
 import uuid
+import base64
 
 # 定数定義
 EMAIL_PATTERN = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9.]+$'
@@ -160,59 +161,69 @@ def get_all_time_graph(user_id):
 
 @app.route('/graph/<user_id>', methods=['POST'])
 def get_graph_stats(user_id):
-    period = request.form.get('period', 'all')
-    year_str = request.form.get('year')
-    month_year_str = request.form.get('month-year')
-    month_str = request.form.get('month')
-    horizontalAxis = request.form.get('horizontalAxis', 'fields')
-    verticalAxis = request.form.get('verticalAxis', 'time')
+    data = request.get_json(silent=True) or {}
+    period = data.get('period')
+    year_str = data.get('year')
+    month_year_str = data.get('month-year')
+    month_str = data.get('month')
+    horizontalAxis = data.get('horizontalAxis')
+    verticalAxis = data.get('verticalAxis')
+
+    print(data, period, year_str, month_year_str, month_str, horizontalAxis, verticalAxis)
 
     svg = None
     total_day = 0
     total_hour = 0.0
     avg_hour = 0.0
 
-    # 分野別全期間グラフ、学習日数、時間の取得
+    # 全期間、分野別、時間
     if period == 'all' and horizontalAxis == 'fields' and verticalAxis == 'time':
         svg = StudyLog.get_all_time_graph_by_field(user_id)
         total_day = StudyLog.get_total_day(user_id)
         total_hour = StudyLog.get_total_hour(user_id)
         avg_hour = round(total_hour / total_day, 1) if total_day else 0.0
 
-    # 分野別年間グラフ、学習日数、時間の取得
-    elif period == 'year' and horizontalAxis == 'fields' and verticalAxis =='time':
-        svg = StudyLog.get_year_graph_by_field(user_id, year_str)
-        year_stats = StudyLog.get_year_stats(user_id, year_str)
-        total_day = year_stats['study_days']
-        total_hour = year_stats['total_hours']
-        avg_hour = year_stats['average_per_day']
+    # 全期間、日別、時間
+    # if period == 'all' and horizontalAxis == 'days' and verticalAxis == 'time':
+    #     svg = base64.b64encode(StudyLog.get_all_time_graph_by_field(user_id)).decode('utf-8')
+    #     total_day = StudyLog.get_total_day(user_id)
+    #     total_hour = StudyLog.get_total_hour(user_id)
+    #     avg_hour = round(total_hour / total_day, 1) if total_day else 0.0
 
-    # 年間グラフ、学習日数、時間の取得（積み上げ縦棒）
-    elif period == 'year' and horizontalAxis == 'days' and verticalAxis == 'time':
-        svg = StudyLog.get_year_graph(user_id, year_str)
-        year_stats = StudyLog.get_year_stats(user_id, year_str)
-        total_day = year_stats['study_days']
-        total_hour = year_stats['total_hours']
-        avg_hour = year_stats['average_per_day']
+    # # 分野別年間グラフ、学習日数、時間の取得
+    # elif period == 'year' and horizontalAxis == 'fields' and verticalAxis =='time':
+    #     svg = StudyLog.get_year_graph_by_field(user_id, year_str)
+    #     year_stats = StudyLog.get_year_stats(user_id, year_str)
+    #     total_day = year_stats['study_days']
+    #     total_hour = year_stats['total_hours']
+    #     avg_hour = year_stats['average_per_day']
 
-    # 分野別月間グラフ、学習日数、時間の取得
-    elif period == 'month' and horizontalAxis == 'fields' and verticalAxis == 'time':
-        svg = StudyLog.get_month_graph_by_field(user_id, month_year_str, month_str)
-        month_stats = StudyLog.get_month_stats(user_id, month_year_str, month_str)
-        total_day = month_stats['study_days']
-        total_hour = month_stats['total_hours']
-        avg_hour = month_stats['average_per_day']
+    # # 年間グラフ、学習日数、時間の取得（積み上げ縦棒）
+    # elif period == 'year' and horizontalAxis == 'days' and verticalAxis == 'time':
+    #     svg = StudyLog.get_year_graph(user_id, year_str)
+    #     year_stats = StudyLog.get_year_stats(user_id, year_str)
+    #     total_day = year_stats['study_days']
+    #     total_hour = year_stats['total_hours']
+    #     avg_hour = year_stats['average_per_day']
 
-    # 月間グラフ、学習日数、時間の取得（積み上げ縦棒）
-    elif period == 'month' and horizontalAxis == 'days' and verticalAxis == 'time':
-        svg = StudyLog.get_month_graph(user_id, month_year_str, month_str)
-        month_stats = StudyLog.get_month_stats(user_id, month_year_str, month_str)
-        total_day = month_stats['study_days']
-        total_hour = month_stats['total_hours']
-        avg_hour = month_stats['average_per_day']
+    # # 分野別月間グラフ、学習日数、時間の取得
+    # elif period == 'month' and horizontalAxis == 'fields' and verticalAxis == 'time':
+    #     svg = StudyLog.get_month_graph_by_field(user_id, month_year_str, month_str)
+    #     month_stats = StudyLog.get_month_stats(user_id, month_year_str, month_str)
+    #     total_day = month_stats['study_days']
+    #     total_hour = month_stats['total_hours']
+    #     avg_hour = month_stats['average_per_day']
+
+    # # 月間グラフ、学習日数、時間の取得（積み上げ縦棒）
+    # elif period == 'month' and horizontalAxis == 'days' and verticalAxis == 'time':
+    #     svg = StudyLog.get_month_graph(user_id, month_year_str, month_str)
+    #     month_stats = StudyLog.get_month_stats(user_id, month_year_str, month_str)
+    #     total_day = month_stats['study_days']
+    #     total_hour = month_stats['total_hours']
+    #     avg_hour = month_stats['average_per_day']
 
     # 今週の学習グラフ、学習日数、時間の取得（積み上げ縦棒）
-    elif period == 'this_week' and horizontalAxis == 'days' and verticalAxis == 'time':
+    if period == 'this_week' and horizontalAxis == 'days' and verticalAxis == 'time':
         svg = StudyLog.get_this_week_graph(user_id)
         this_week_stats = StudyLog.get_this_week_stats(user_id)
         total_day = this_week_stats['study_days']
@@ -220,6 +231,8 @@ def get_graph_stats(user_id):
         avg_hour = this_week_stats['average_per_day']
 
     if svg:
+        print(svg)
+        print('svgあり')
         return jsonify({
         "svg": svg,
         "total_day": total_day,
@@ -227,8 +240,10 @@ def get_graph_stats(user_id):
         "avg_hour": avg_hour
         })
     else:
+        print(svg)
+        print('svg無し')
         return jsonify({
-        "svg": "<p style='color:var(--base-text-color);'>学習記録がありません。</p>",
+        "svg": svg,
         "total_day": total_day,
         "total_hour": total_hour,
         "avg_hour": avg_hour

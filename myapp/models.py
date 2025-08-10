@@ -10,7 +10,7 @@ from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 import calendar
 from collections import defaultdict
-import io
+import io, re
 import base64
 import platform
 
@@ -236,7 +236,7 @@ class StudyLog(db.Model):
             ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
             bottom = [b + h for b, h in zip(bottom, data[fieldname])]
         
-        ax.set_title(f'{start_of_week.strftime(date_format)}～の学習履歴')
+        ax.set_title(f'{start_of_week.strftime(date_format)}～{end_of_week.strftime(date_format)}の学習履歴')
         ax.grid(True)
         ax.set_ylabel('学習時間（時間）')
         column_totals = [sum(day) for day in zip(*data.values())]
@@ -246,12 +246,13 @@ class StudyLog(db.Model):
 
         # 画像をsvg形式で生成する
         buf = io.BytesIO()
-        plt.tight_layout()
-        plt.savefig(buf, format='svg')
-        svg_data = buf.getvalue()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
         plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
 
-        return svg_data
+        return svg_b64
 
     # 月間学習日数、学習時間（合計）、学習時間（平均）の取得
     @classmethod
@@ -472,12 +473,13 @@ class StudyLog(db.Model):
         plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
 
         buf = io.BytesIO()
-        plt.tight_layout()
-        plt.savefig(buf, format='svg')
-        svg_data = buf.getvalue()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
         plt.close(fig)
+        svg_b64 = buf.getvalue()
+        buf.close()
 
-        return svg_data
+        return svg_b64
 
     # 分野別年間グラフ作成
     @classmethod
