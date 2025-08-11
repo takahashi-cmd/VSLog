@@ -34,6 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // プルダウンメニュー選択時に自動でformを送信
     periodSelect.addEventListener('change', () => {
         const selected = periodSelect.value;
+        yearContainer.classList.add('hidden');
+        monthContainer.classList.add('hidden');
     
         if (selected === 'year') {
             yearContainer.classList.remove('hidden');

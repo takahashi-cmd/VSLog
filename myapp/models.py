@@ -334,7 +334,7 @@ class StudyLog(db.Model):
             ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
             bottom = [b + h for b, h in zip(bottom, data[fieldname])]
         
-        ax.set_title(f'{year}/{month}の学習履歴')
+        ax.set_title(f'{year}年{month}月1日～{month}月{month_num}日の学習履歴')
         ax.grid(True)
         ax.set_ylabel('学習時間（時間）')
         column_totals = [sum(day) for day in zip(*data.values())]
@@ -343,12 +343,13 @@ class StudyLog(db.Model):
         ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
 
         buf = io.BytesIO()
-        plt.tight_layout()
-        plt.savefig(buf, format='svg')
-        svg_data = buf.getvalue()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
         plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
 
-        return svg_data
+        return svg_b64
 
     # 年間学習日数、学習時間（合計）、学習時間（平均）の取得
     @classmethod
@@ -437,12 +438,13 @@ class StudyLog(db.Model):
         ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
 
         buf = io.BytesIO()
-        plt.tight_layout()
-        plt.savefig(buf, format='svg')
-        svg_data = buf.getvalue()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
         plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
 
-        return svg_data
+        return svg_b64
 
     # 分野別全期間グラフの作成
     @classmethod
@@ -500,6 +502,9 @@ class StudyLog(db.Model):
             .all()
         )
 
+        if not logs:
+            return None
+
         data = {fieldname: float(hour) for fieldname, _, hour in logs}
         color_map = {fieldname: color_code for fieldname, color_code, _ in logs}
 
@@ -514,12 +519,13 @@ class StudyLog(db.Model):
         plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
 
         buf = io.BytesIO()
-        plt.tight_layout()
-        plt.savefig(buf, format='svg')
-        svg_data = buf.getvalue()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
         plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
 
-        return svg_data
+        return svg_b64
 
     # 分野別月間グラフ作成
     @classmethod
@@ -542,13 +548,16 @@ class StudyLog(db.Model):
             .all()
         )
 
+        if not logs:
+            return None
+
         data = {fieldname: float(hour) for fieldname, _, hour in logs}
         color_map = {fieldname: color_code for fieldname, color_code, _ in logs}
 
         fig, ax = plt.subplots(figsize=(10, 4))
         ax.bar(data.keys(), data.values(), color=[color_map[f] for f in data.keys()])
         
-        ax.set_title(f'{year}年{month}月の分野別学習履歴')
+        ax.set_title(f'{year}年{month}月1日～{month}月{month_num}日の分野別学習履歴')
         ax.grid(True)
         ax.set_ylabel('学習時間（時間）')
         max_hour = max(data.values()) if data else 0
@@ -556,9 +565,10 @@ class StudyLog(db.Model):
         plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
 
         buf = io.BytesIO()
-        plt.tight_layout()
-        plt.savefig(buf, format='svg')
-        svg_data = buf.getvalue()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
         plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
 
-        return svg_data
+        return svg_b64
