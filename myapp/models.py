@@ -291,7 +291,7 @@ class StudyLog(db.Model):
             'average_per_day': round(average_per_day, 1)
         }
 
-    # 月間グラフ作成
+    # 年月日別月間グラフ作成
     @classmethod
     def get_month_graph(cls, user_id, month_year_str, month_str):
         year = int(month_year_str)
@@ -386,7 +386,7 @@ class StudyLog(db.Model):
             'average_per_day': round(average_per_day, 1)
         }
 
-    # 年間グラフの作成
+    # 年月日別年間グラフの作成
     @classmethod
     def get_year_graph(cls, user_id, year_str):
         year = int(year_str)
@@ -434,6 +434,66 @@ class StudyLog(db.Model):
         
         date_format_head = '%#Y年%#m月' if platform.system() == 'Windows' else '%Y年%-m月'
         ax.set_title(f'{first_day.strftime(date_format_head)}～{last_day.strftime(date_format_head)}までの学習履歴')
+        ax.grid(True)
+        ax.set_ylabel('学習時間（時間）')
+        column_totals = [sum(day) for day in zip(*data.values())]
+        ymax = max(column_totals) + 1 if column_totals else 1
+        ax.set_ylim(0, ymax)
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+        buf = io.BytesIO()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
+        plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
+
+        return svg_b64
+
+    # 年月日別全期間グラフの作成
+    @classmethod
+    def get_all_time_graph_by_days(cls, user_id):
+        year = func.date_format(cls.study_date, '%Y').label('year')
+
+        logs = (
+            db.session.query(year, Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour).label('total_hour'))
+            .join(Field, cls.field_id == Field.field_id)
+            .filter(cls.user_id == user_id)
+            .group_by(year, Field.fieldname, Field.color_code)
+            .order_by(year, Field.fieldname)
+            .all()
+        )
+
+        if not logs:
+            return None
+
+        date_format = '%#Y' if platform.system() == 'Windows' else '%Y'
+        data_set = sorted(set(log[0] for log in logs))
+        data_labels = list(data_set)
+        print(data_labels)
+
+        fieldnames = sorted(set(log[1] for log in logs))
+
+        year_list = data_labels
+        year_num = len(year_list)
+        print(year_num)
+        data = {field: [0] * year_num for field in fieldnames}
+        print(data)
+        color_map = {}
+        for year, fieldname, color_code, hour in logs:
+            print(year, fieldname, color_code, hour)
+            color_map[fieldname] = color_code
+            index = year_list.index(year)
+            data[fieldname][index] = float(hour)
+        print(data)
+
+        fig, ax = plt.subplots(figsize=(10, 4))
+        bottom = [0] * year_num
+        for fieldname in sorted(data.keys()):
+            ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
+            bottom = [b + h for b, h in zip(bottom, data[fieldname])]
+
+        ax.set_title(f'年毎の全期間の学習履歴')
         ax.grid(True)
         ax.set_ylabel('学習時間（時間）')
         column_totals = [sum(day) for day in zip(*data.values())]

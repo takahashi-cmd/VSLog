@@ -183,6 +183,13 @@ def get_graph_stats(user_id):
         total_hour = StudyLog.get_total_hour(user_id)
         avg_hour = round(total_hour / total_day, 1) if total_day else 0.0
 
+    # 全期間、年月日別、時間
+    elif period == 'all' and horizontalAxis == 'days' and verticalAxis == 'time':
+        svg = StudyLog.get_all_time_graph_by_days(user_id)
+        total_day = StudyLog.get_total_day(user_id)
+        total_hour = StudyLog.get_total_hour(user_id)
+        avg_hour = round(total_hour / total_day, 1) if total_day else 0.0
+
     # 分野別年間グラフ、学習日数、時間の取得
     elif period == 'year' and year_str and horizontalAxis == 'fields' and verticalAxis =='time':
         svg = StudyLog.get_year_graph_by_field(user_id, year_str)
@@ -219,7 +226,7 @@ def get_graph_stats(user_id):
         avg_hour = month_stats['average_per_day']
 
     # 今週の学習グラフ、学習日数、時間の取得（積み上げ縦棒）
-    if period == 'this_week' and horizontalAxis == 'days' and verticalAxis == 'time':
+    elif period == 'this_week' and horizontalAxis == 'days' and verticalAxis == 'time':
         svg = StudyLog.get_this_week_graph(user_id)
         this_week_stats = StudyLog.get_this_week_stats(user_id)
         total_day = this_week_stats['study_days']
