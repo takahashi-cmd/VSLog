@@ -10,7 +10,7 @@ from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 import calendar
 from collections import defaultdict
-import io
+import io, re
 import base64
 import platform
 
@@ -190,9 +190,9 @@ class StudyLog(db.Model):
             'average_per_day': round(average_per_day, 2)
         }
     
-    # 今週の学習時間のグラフ作成
+    # 今週の学習時間のグラフ作成[年月日別]
     @classmethod
-    def get_this_week_graph(cls, user_id):
+    def get_this_week_graph_by_days(cls, user_id):
         today = date.today()
         start_of_week = today - timedelta(days=today.weekday())
         end_of_week = start_of_week + timedelta(days=6)
@@ -236,7 +236,7 @@ class StudyLog(db.Model):
             ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
             bottom = [b + h for b, h in zip(bottom, data[fieldname])]
         
-        ax.set_title(f'{start_of_week.strftime(date_format)}～の学習履歴')
+        ax.set_title(f'{start_of_week.strftime(date_format)}～{end_of_week.strftime(date_format)}の学習履歴')
         ax.grid(True)
         ax.set_ylabel('学習時間（時間）')
         column_totals = [sum(day) for day in zip(*data.values())]
@@ -246,12 +246,204 @@ class StudyLog(db.Model):
 
         # 画像をsvg形式で生成する
         buf = io.BytesIO()
-        plt.tight_layout()
-        plt.savefig(buf, format='svg')
-        svg_data = buf.getvalue()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
         plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
 
-        return svg_data
+        return svg_b64
+
+    # 今週の学習時間のグラフ作成[分野別]
+    @classmethod
+    def get_this_week_graph_by_fields(cls, user_id):
+        today = date.today()
+        start_of_week = today - timedelta(days=today.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
+
+        logs = (
+            db.session.query(Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour))
+            .join(Field, cls.field_id == Field.field_id)
+            .filter(
+                cls.user_id == user_id,
+                cls.study_date >= start_of_week,
+                cls.study_date <= end_of_week
+            )
+            .group_by(Field.fieldname, Field.color_code)
+            .order_by(func.sum(cls.hour).desc())
+            .all()
+        )
+
+        if not logs:
+            return None
+
+        date_format = '%#m/%#d(%a)' if platform.system() == 'Windows' else '%-m/%-d(%a)'
+
+        data = {fieldname: float(hour) for fieldname, _, hour in logs}
+        color_map = {fieldname: color_code for fieldname, color_code, _ in logs}
+        
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.bar(data.keys(), data.values(), color=[color_map[f] for f in data.keys()])
+
+        ax.set_title(f'{start_of_week.strftime(date_format)}～{end_of_week.strftime(date_format)}の学習履歴')
+        ax.grid(True)
+        ax.set_ylabel('学習時間（時間）')
+        max_hour = max(data.values()) if data else 0
+        ax.set_ylim(0, max_hour + 1)
+        plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
+
+        buf = io.BytesIO()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
+        plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
+
+        return svg_b64
+
+    # 先週の学習時間（合計、平均）、学習日数の取得
+    @classmethod
+    def get_last_week_stats(cls, user_id):
+        today = date.today()
+        start_of_week = today - timedelta(days=today.weekday() + 7)
+        end_of_week = start_of_week + timedelta(days=6)
+
+        total_hours = (
+            db.session.query(func.sum(cls.hour))
+            .filter(
+                cls.user_id == user_id,
+                cls.study_date >= start_of_week,
+                cls.study_date <= end_of_week
+            )
+            .scalar()
+
+        )
+        total_hours = float(total_hours or 0.0)
+
+        study_days = (
+            db.session.query(func.count(func.distinct(cls.study_date)))
+            .filter(
+                cls.user_id == user_id,
+                cls.study_date >= start_of_week,
+                cls.study_date <= end_of_week
+            )
+            .scalar()
+        )
+
+        average_per_day = total_hours / study_days if study_days else 0.0
+
+        return {
+            'start_date': start_of_week,
+            'end_date': end_of_week,
+            'total_hours': float(total_hours or 0.0),
+            'study_days': study_days,
+            'average_per_day': round(average_per_day, 2)
+        }
+
+    # 先週の学習時間のグラフ作成[年月日別]
+    @classmethod
+    def get_last_week_graph_by_days(cls, user_id):
+        today = date.today()
+        start_of_week = today - timedelta(days=today.weekday() + 7)
+        end_of_week = start_of_week + timedelta(days=6)
+
+        logs = (
+            db.session.query(cls.study_date, Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour))
+            .join(Field, cls.field_id == Field.field_id)
+            .filter(
+                cls.user_id == user_id,
+                cls.study_date >= start_of_week,
+                cls.study_date <= end_of_week
+            )
+            .group_by(cls.study_date, Field.fieldname, Field.color_code)
+            .all()
+        )
+
+        if not logs:
+            return None
+
+        week_days = [start_of_week + timedelta(days=i) for i in range(7)]
+        date_format = '%#m/%#d(%a)' if platform.system() == 'Windows' else '%-m/%-d(%a)'
+        data_labels = [d.strftime(date_format) for d in week_days]
+
+        fieldnames = sorted(set(log[1] for log in logs))
+
+        data = {field: [0] * 7 for field in fieldnames}
+        color_map = {}
+        for study_date, fieldname, color_code, hour in logs:
+            color_map[fieldname] = color_code
+            index = (study_date - start_of_week).days
+            data[fieldname][index] = float(hour)
+        
+        fig, ax = plt.subplots(figsize=(10, 4))
+        bottom = [0] * 7
+        for fieldname in sorted(data.keys()):
+            ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
+            bottom = [b + h for b, h in zip(bottom, data[fieldname])]
+        
+        ax.set_title(f'{start_of_week.strftime(date_format)}～{end_of_week.strftime(date_format)}の学習履歴')
+        ax.grid(True)
+        ax.set_ylabel('学習時間（時間）')
+        column_totals = [sum(day) for day in zip(*data.values())]
+        ymax = max(column_totals) + 1 if column_totals else 1
+        ax.set_ylim(0, ymax)
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+        buf = io.BytesIO()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
+        plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
+
+        return svg_b64
+
+    # 先週の学習時間のグラフ作成[分野別]
+    @classmethod
+    def get_last_week_graph_by_fields(cls, user_id):
+        today = date.today()
+        start_of_week = today - timedelta(days=today.weekday() + 7)
+        end_of_week = start_of_week + timedelta(days=6)
+
+        logs = (
+            db.session.query(Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour))
+            .join(Field, cls.field_id == Field.field_id)
+            .filter(
+                cls.user_id == user_id,
+                cls.study_date >= start_of_week,
+                cls.study_date <= end_of_week
+            )
+            .group_by(Field.fieldname, Field.color_code)
+            .order_by(func.sum(cls.hour).desc())
+            .all()
+        )
+
+        if not logs:
+            return None
+
+        date_format = '%#m/%#d(%a)' if platform.system() == 'Windows' else '%-m/%-d(%a)'
+
+        data = {fieldname: float(hour) for fieldname, _, hour in logs}
+        color_map = {fieldname: color_code for fieldname, color_code, _ in logs}
+        
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.bar(data.keys(), data.values(), color=[color_map[f] for f in data.keys()])
+
+        ax.set_title(f'{start_of_week.strftime(date_format)}～{end_of_week.strftime(date_format)}の学習履歴')
+        ax.grid(True)
+        ax.set_ylabel('学習時間（時間）')
+        max_hour = max(data.values()) if data else 0
+        ax.set_ylim(0, max_hour + 1)
+        plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
+
+        buf = io.BytesIO()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
+        plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
+
+        return svg_b64
 
     # 月間学習日数、学習時間（合計）、学習時間（平均）の取得
     @classmethod
@@ -290,7 +482,7 @@ class StudyLog(db.Model):
             'average_per_day': round(average_per_day, 1)
         }
 
-    # 月間グラフ作成
+    # 年月日別月間グラフ作成
     @classmethod
     def get_month_graph(cls, user_id, month_year_str, month_str):
         year = int(month_year_str)
@@ -333,7 +525,7 @@ class StudyLog(db.Model):
             ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
             bottom = [b + h for b, h in zip(bottom, data[fieldname])]
         
-        ax.set_title(f'{year}/{month}の学習履歴')
+        ax.set_title(f'{year}年{month}月1日～{month}月{month_num}日の学習履歴')
         ax.grid(True)
         ax.set_ylabel('学習時間（時間）')
         column_totals = [sum(day) for day in zip(*data.values())]
@@ -342,12 +534,13 @@ class StudyLog(db.Model):
         ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
 
         buf = io.BytesIO()
-        plt.tight_layout()
-        plt.savefig(buf, format='svg')
-        svg_data = buf.getvalue()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
         plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
 
-        return svg_data
+        return svg_b64
 
     # 年間学習日数、学習時間（合計）、学習時間（平均）の取得
     @classmethod
@@ -384,28 +577,31 @@ class StudyLog(db.Model):
             'average_per_day': round(average_per_day, 1)
         }
 
-    # 年間グラフの作成
+    # 年月日別年間グラフの作成
     @classmethod
     def get_year_graph(cls, user_id, year_str):
         year = int(year_str)
         first_day = date(year, 1, 1)
         last_day= date(year, 12, 31)
 
+        month = func.date_format(cls.study_date, '%m').label('month')
+
         logs = (
-            db.session.query(cls.study_date, Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour))
+            db.session.query(month, Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour).label('total_hour'))
             .join(Field, cls.field_id == Field.field_id)
             .filter(
                 cls.user_id == user_id,
                 cls.study_date >= first_day,
                 cls.study_date <= last_day
             )
-            .group_by(extract('month', cls.study_date), Field.fieldname, Field.color_code)
+            .group_by(month, Field.fieldname, Field.color_code)
+            .order_by(month, Field.fieldname)
             .all()
         )
 
         if not logs:
             return None
-        
+
         date_format = '%#Y/%#m' if platform.system() == 'Windows' else '%Y/%-m'
         data_labels = [
             date(year, int(month), 1).strftime(date_format)
@@ -427,7 +623,8 @@ class StudyLog(db.Model):
             ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
             bottom = [b + h for b, h in zip(bottom, data[fieldname])]
         
-        ax.set_title(f'{year}年の学習履歴')
+        date_format_head = '%#Y年%#m月' if platform.system() == 'Windows' else '%Y年%-m月'
+        ax.set_title(f'{first_day.strftime(date_format_head)}～{last_day.strftime(date_format_head)}までの学習履歴')
         ax.grid(True)
         ax.set_ylabel('学習時間（時間）')
         column_totals = [sum(day) for day in zip(*data.values())]
@@ -436,12 +633,73 @@ class StudyLog(db.Model):
         ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
 
         buf = io.BytesIO()
-        plt.tight_layout()
-        plt.savefig(buf, format='svg')
-        svg_data = buf.getvalue()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
         plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
 
-        return svg_data
+        return svg_b64
+
+    # 年月日別全期間グラフの作成
+    @classmethod
+    def get_all_time_graph_by_days(cls, user_id):
+        year = func.date_format(cls.study_date, '%Y').label('year')
+
+        logs = (
+            db.session.query(year, Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour).label('total_hour'))
+            .join(Field, cls.field_id == Field.field_id)
+            .filter(cls.user_id == user_id)
+            .group_by(year, Field.fieldname, Field.color_code)
+            .order_by(year, Field.fieldname)
+            .all()
+        )
+
+        if not logs:
+            return None
+
+        date_format = '%#Y' if platform.system() == 'Windows' else '%Y'
+        data_set = sorted(set(log[0] for log in logs))
+        data_labels = list(data_set)
+        print(data_labels)
+
+        fieldnames = sorted(set(log[1] for log in logs))
+
+        year_list = data_labels
+        year_num = len(year_list)
+        print(year_num)
+        data = {field: [0] * year_num for field in fieldnames}
+        print(data)
+        color_map = {}
+        for year, fieldname, color_code, hour in logs:
+            print(year, fieldname, color_code, hour)
+            color_map[fieldname] = color_code
+            index = year_list.index(year)
+            data[fieldname][index] = float(hour)
+        print(data)
+
+        fig, ax = plt.subplots(figsize=(10, 4))
+        bottom = [0] * year_num
+        for fieldname in sorted(data.keys()):
+            ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
+            bottom = [b + h for b, h in zip(bottom, data[fieldname])]
+
+        ax.set_title(f'年毎の全期間の学習履歴')
+        ax.grid(True)
+        ax.set_ylabel('学習時間（時間）')
+        column_totals = [sum(day) for day in zip(*data.values())]
+        ymax = max(column_totals) + 1 if column_totals else 1
+        ax.set_ylim(0, ymax)
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+        buf = io.BytesIO()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
+        plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
+
+        return svg_b64
 
     # 分野別全期間グラフの作成
     @classmethod
@@ -472,12 +730,13 @@ class StudyLog(db.Model):
         plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
 
         buf = io.BytesIO()
-        plt.tight_layout()
-        plt.savefig(buf, format='svg')
-        svg_data = buf.getvalue()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
         plt.close(fig)
+        svg_b64 = buf.getvalue()
+        buf.close()
 
-        return svg_data
+        return svg_b64
 
     # 分野別年間グラフ作成
     @classmethod
@@ -498,6 +757,9 @@ class StudyLog(db.Model):
             .all()
         )
 
+        if not logs:
+            return None
+
         data = {fieldname: float(hour) for fieldname, _, hour in logs}
         color_map = {fieldname: color_code for fieldname, color_code, _ in logs}
 
@@ -512,12 +774,13 @@ class StudyLog(db.Model):
         plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
 
         buf = io.BytesIO()
-        plt.tight_layout()
-        plt.savefig(buf, format='svg')
-        svg_data = buf.getvalue()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
         plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
 
-        return svg_data
+        return svg_b64
 
     # 分野別月間グラフ作成
     @classmethod
@@ -540,13 +803,16 @@ class StudyLog(db.Model):
             .all()
         )
 
+        if not logs:
+            return None
+
         data = {fieldname: float(hour) for fieldname, _, hour in logs}
         color_map = {fieldname: color_code for fieldname, color_code, _ in logs}
 
         fig, ax = plt.subplots(figsize=(10, 4))
         ax.bar(data.keys(), data.values(), color=[color_map[f] for f in data.keys()])
         
-        ax.set_title(f'{year}年{month}月の分野別学習履歴')
+        ax.set_title(f'{year}年{month}月1日～{month}月{month_num}日の分野別学習履歴')
         ax.grid(True)
         ax.set_ylabel('学習時間（時間）')
         max_hour = max(data.values()) if data else 0
@@ -554,9 +820,10 @@ class StudyLog(db.Model):
         plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
 
         buf = io.BytesIO()
-        plt.tight_layout()
-        plt.savefig(buf, format='svg')
-        svg_data = buf.getvalue()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
         plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
 
-        return svg_data
+        return svg_b64
