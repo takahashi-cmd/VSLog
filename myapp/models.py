@@ -190,9 +190,9 @@ class StudyLog(db.Model):
             'average_per_day': round(average_per_day, 2)
         }
     
-    # 今週の学習時間のグラフ作成
+    # 今週の学習時間のグラフ作成[年月日別]
     @classmethod
-    def get_this_week_graph(cls, user_id):
+    def get_this_week_graph_by_days(cls, user_id):
         today = date.today()
         start_of_week = today - timedelta(days=today.weekday())
         end_of_week = start_of_week + timedelta(days=6)
@@ -253,6 +253,54 @@ class StudyLog(db.Model):
         buf.close()
 
         return svg_b64
+
+    # 今週の学習時間のグラフ作成[分野別]
+    @classmethod
+    def get_this_week_graph_by_fields(cls, user_id):
+        today = date.today()
+        start_of_week = today - timedelta(days=today.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
+
+        logs = (
+            db.session.query(Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour))
+            .join(Field, cls.field_id == Field.field_id)
+            .filter(
+                cls.user_id == user_id,
+                cls.study_date >= start_of_week,
+                cls.study_date <= end_of_week
+            )
+            .group_by(Field.fieldname, Field.color_code)
+            .order_by(func.sum(cls.hour).desc())
+            .all()
+        )
+
+        if not logs:
+            return None
+
+        date_format = '%#m/%#d(%a)' if platform.system() == 'Windows' else '%-m/%-d(%a)'
+
+        data = {fieldname: float(hour) for fieldname, _, hour in logs}
+        color_map = {fieldname: color_code for fieldname, color_code, _ in logs}
+        
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.bar(data.keys(), data.values(), color=[color_map[f] for f in data.keys()])
+
+        ax.set_title(f'{start_of_week.strftime(date_format)}～{end_of_week.strftime(date_format)}の学習履歴')
+        ax.grid(True)
+        ax.set_ylabel('学習時間（時間）')
+        max_hour = max(data.values()) if data else 0
+        ax.set_ylim(0, max_hour + 1)
+        plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
+
+        buf = io.BytesIO()
+        fig.tight_layout()
+        plt.savefig(buf, format='svg', bbox_inches='tight')
+        plt.close(fig)
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
+
+        return svg_b64
+
 
     # 月間学習日数、学習時間（合計）、学習時間（平均）の取得
     @classmethod
