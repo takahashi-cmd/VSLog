@@ -393,21 +393,24 @@ class StudyLog(db.Model):
         first_day = date(year, 1, 1)
         last_day= date(year, 12, 31)
 
+        month = func.date_format(cls.study_date, '%m').label('month')
+
         logs = (
-            db.session.query(cls.study_date, Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour))
+            db.session.query(month, Field.fieldname.label('fieldname'), Field.color_code.label('color_code'), func.sum(cls.hour).label('total_hour'))
             .join(Field, cls.field_id == Field.field_id)
             .filter(
                 cls.user_id == user_id,
                 cls.study_date >= first_day,
                 cls.study_date <= last_day
             )
-            .group_by(extract('month', cls.study_date), Field.fieldname, Field.color_code)
+            .group_by(month, Field.fieldname, Field.color_code)
+            .order_by(month, Field.fieldname)
             .all()
         )
 
         if not logs:
             return None
-        
+
         date_format = '%#Y/%#m' if platform.system() == 'Windows' else '%Y/%-m'
         data_labels = [
             date(year, int(month), 1).strftime(date_format)
@@ -429,7 +432,8 @@ class StudyLog(db.Model):
             ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
             bottom = [b + h for b, h in zip(bottom, data[fieldname])]
         
-        ax.set_title(f'{year}年の学習履歴')
+        date_format_head = '%#Y年%#m月' if platform.system() == 'Windows' else '%Y年%-m月'
+        ax.set_title(f'{first_day.strftime(date_format_head)}～{last_day.strftime(date_format_head)}までの学習履歴')
         ax.grid(True)
         ax.set_ylabel('学習時間（時間）')
         column_totals = [sum(day) for day in zip(*data.values())]

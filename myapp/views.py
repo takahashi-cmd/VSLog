@@ -200,6 +200,7 @@ def get_graph_stats(user_id):
         total_day = year_stats['study_days']
         total_hour = year_stats['total_hours']
         avg_hour = year_stats['average_per_day']
+        print(year_stats, total_day, total_hour, avg_hour)
 
     # 分野別月間グラフ、学習日数、時間の取得
     elif period == 'month' and month_year_str and month_str and horizontalAxis == 'fields' and verticalAxis == 'time':
