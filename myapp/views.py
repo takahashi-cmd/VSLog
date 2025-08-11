@@ -241,6 +241,21 @@ def get_graph_stats(user_id):
         total_hour = this_week_stats['total_hours']
         avg_hour = this_week_stats['average_per_day']
 
+    # 先週の学習グラフ、学習日数、時間の取得（積み上げ縦棒）
+    elif period == 'last_week' and horizontalAxis == 'days' and verticalAxis == 'time':
+        svg = StudyLog.get_last_week_graph_by_days(user_id)
+        last_week_stats = StudyLog.get_last_week_stats(user_id)
+        total_day = last_week_stats['study_days']
+        total_hour = last_week_stats['total_hours']
+        avg_hour = last_week_stats['average_per_day']
+
+    # 先週の学習グラフ、学習日数、時間の取得（積み上げ縦棒）
+    elif period == 'last_week' and horizontalAxis == 'fields' and verticalAxis == 'time':
+        svg = StudyLog.get_last_week_graph_by_fields(user_id)
+        last_week_stats = StudyLog.get_last_week_stats(user_id)
+        total_day = last_week_stats['study_days']
+        total_hour = last_week_stats['total_hours']
+        avg_hour = last_week_stats['average_per_day']
 
     if svg:
         print('svgあり')
