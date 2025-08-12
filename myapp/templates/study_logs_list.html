@@ -37,6 +37,36 @@
         <div class="study-head">
             <h1>{{ current_user.username }}さんの学習履歴一覧</h1>
         </div>
+        <!-- 画面表示時のフォーム -->
+        <div class="study-date">
+            <p>{{ selected_date }}の学習履歴一覧</p>
+            <form action="{{ url_for('study_logs_list', user_id=current_user.user_id) }}" method="post" id="study-date-form">
+                <label for="study_date">日付：</label>
+                <input type="month" name="study_date" id="study_date" value="{{ selected_date }}">
+            </form>
+        </div>
+        <div class="study-logs-list">
+            <div class="study-logs-join">
+                <div class="study-logs-date">
+                    <p>日</p>
+                    <p>曜日</p>
+                </div>
+                <div class="study-logs-content">
+                    <p>学習時間：〇時間〇分</p>
+                    <p>学習分野：〇〇〇</p>
+                </div>
+            </div>
+            <div class="study-logs-join">
+                <div class="study-logs-date">
+                    <p>日</p>
+                    <p>曜日</p>
+                </div>
+                <div class="study-logs-content">
+                    <p>学習時間：〇時間〇分</p>
+                    <p>学習分野：〇〇〇</p>
+                </div>
+            </div>
+        </div>
     {% for date, logs in study_dicts.items() %}
         <p>{{ date }}</p>
         <p>{{ logs }}</p>

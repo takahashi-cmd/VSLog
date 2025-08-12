@@ -99,3 +99,26 @@
     resize: vertical;
 }
 
+.study-logs-list {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.study-logs-join {
+    display: flex;
+    background-color: var(--contents-bg-color);
+    border: 2px solid var(--form-color);
+}
+
+.study-logs-date {
+    border-right: 2px solid var(--form-color);
+    padding: 8px;
+    text-align: center;
+    width: 80px;
+}
+
+.study-logs-content {
+    padding: 8px;
+    width: 400px;
+}

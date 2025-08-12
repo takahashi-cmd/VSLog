@@ -470,7 +470,7 @@ def study_fields_process(user_id):
     return redirect(url_for('study_fields_view', user_id=user_id))
 
 # 学習履歴一覧画面表示
-@app.route('/study-logs-list/<user_id>', methods=['GET'])
+@app.route('/study-logs-list/<user_id>', methods=['GET', 'POST'])
 @login_required
 def study_logs_list(user_id):
     this_year = datetime.now().year
