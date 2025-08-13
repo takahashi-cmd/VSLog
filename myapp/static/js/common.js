@@ -11,3 +11,5 @@ const markDeleted = (btn) => {
 const removeRow = (btn) => {
     btn.closest('tr').remove();
 }
+
+

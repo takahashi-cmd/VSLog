@@ -470,19 +470,34 @@ def study_fields_process(user_id):
     return redirect(url_for('study_fields_view', user_id=user_id))
 
 # 学習履歴一覧画面表示
-@app.route('/study-logs-list/<user_id>', methods=['GET', 'POST'])
+@app.route('/study-logs-list/<user_id>', methods=['GET'])
 @login_required
-def study_logs_list(user_id):
+def study_logs_list_view(user_id):
     this_year = datetime.now().year
     this_month = datetime.now().month
-    study_logs = StudyLog.get_study_logs_by_study_month(user_id, this_year, this_month)
-    print(study_logs)
+    this_month_year = date(this_year, this_month, 1).strftime('%Y-%m')
+
+    return render_template('study_logs_list.html', this_year=this_year, this_month=this_month,selected_date=this_month_year)
+
+@app.route('/study-logs-list/<user_id>', methods=['POST'])
+@login_required
+def study_logs_list_process(user_id):
+    data = request.get_json(silent=True) or {}
+    print(data)
+    selected_date = data.get('study_date')
+    year_str, month_str = selected_date.split('-')
+    study_logs = StudyLog.get_study_logs_by_study_month(user_id, year_str, month_str)
     study_dicts = defaultdict(list) # 辞書の初期化
     for row in study_logs:
         d = row_to_dict(row)
         study_dicts[d['study_date']].append(d)
     print(study_dicts)
-    return render_template('study_logs_list.html', study_dicts=study_dicts)
+    return jsonify({
+        "selectedDate": selected_date,
+        "studyDicts": study_dicts
+    })
+
+
 
 # DBから取得した列を辞書形式に変換
 def row_to_dict(row):
