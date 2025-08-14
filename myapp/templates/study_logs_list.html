@@ -48,18 +48,19 @@
                 <input type="month" name="study_date" id="study_date" value="{{ selected_date }}">
             </form>
         </div>
-        <div class="study-logs-list" id="study-logs-list">
-            <div class="study-logs-join" id="study-logs-join">
-                <div class="study-logs-date" id="study-logs-date">
-                    <p>日付</p>
-                    <p>曜日</p>
+        <div class="study-logs-list" id="study-logs-list"></div>
+        <template id="study-logs-template">
+            <div class="study-logs-join">
+                <div class="study-logs-date">
+                    <p class="study-days">日付</p>
+                    <p class="day-of-week">曜日</p>
                 </div>
-                <div class="study-logs-content" id="study-logs-content">
-                    <p>学習時間：〇時間〇分</p>
-                    <p>学習分野：〇〇〇</p>
+                <div class="study-logs-content">
+                    <p class="total-hours">学習時間：〇時間〇分</p>
+                    <p class="fields">学習分野：〇〇〇</p>
                 </div>
             </div>
-        </div>
+        </template>
     </div>
 </div>
 {% endblock %}

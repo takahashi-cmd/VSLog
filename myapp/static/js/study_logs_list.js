@@ -35,24 +35,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 return getDays;
             };
             console.log(`year:${year},month:${month},totalDays:${totalDays(year, month)}`);
+            const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
             const studyLogsList = document.getElementById('study-logs-list');
-            const studyLogsJoin = document.getElementById('study-logs-join');
-            const originalContent = studyLogsJoin.cloneNode(true);
-            console.log(originalContent)
-            const studyLogsDate = document.getElementById('study-logs-date');
-            const studyLogsContent = document.getElementById('study-logs-content');
-            let result = '';
-            for (let i = 1; i < totalDays(year, month) + 1; i++) {
-                result += originalContent.outerHTML;
-                console.log(result)
+            const studyLogsTemplate = document.getElementById('study-logs-template');
+            studyLogsList.textContent = '';
+            const frag = document.createDocumentFragment();
+
+            for (let d = 1; d < totalDays(year, month) + 1; d++) {
+                const dateObj = new Date(year, month - 1, d);
+                const node = studyLogsTemplate.content.firstElementChild.cloneNode(true);
+                // 日付の取得
+                node.querySelector('.study-days').textContent = String(d);
+                // 曜日の取得
+                node.querySelector('.day-of-week').textContent = weekdays[dateObj.getDay()];
+                // 学習時間、学習分野の取得
+                const formatted = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const studyArray = data.studyDicts[formatted];
+                let totalHour = 0;
+                let fieldNames = [];
+                if (studyArray) {
+                    for (i = 0; i < studyArray.length; i++) {
+                        let hour = studyArray[i]['hour'];
+                        let fieldname = studyArray[i]['fieldname'];
+                        totalHour += hour;
+                        fieldNames.push(fieldname);
+                    }
+                } else {
+                    totalHour = 0;
+                    fieldNames = `なし`
+                }
+                node.querySelector('.total-hours').textContent = `学習時間：${totalHour}時間`;
+                node.querySelector('.fields').textContent = `学習分野：${fieldNames}`;
+                frag.appendChild(node);
             }
-            studyLogsList.innerHTML = result;
-            console.log(studyLogsJoin)
-
-
-
-
+            studyLogsList.appendChild(frag)
         });
     }
 });
