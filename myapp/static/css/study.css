@@ -121,5 +121,43 @@
 
 .study-logs-content {
     padding: 8px;
-    width: 440px;
+    width: 400px;
+}
+
+.study-logs-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    width: auto;
+}
+
+.open {
+    padding: 0px;
+    background-color: var(--contents-bg-color);
+    color: var(--base-text-color);
+    border-radius: 0px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.5s;
+}
+
+.open:hover {
+    background-color: var(--hover-color);
+    opacity: 0.8;
+}
+
+.modal-content {
+    background-color: var(--contents-bg-color);
+    display: none;
+    width: 390px;
+    padding: 24px;
+    border-radius: 4px;
+}
+
+.mask {
+    display: none;
+    opacity: 0;
+    background-color: var(--modal-color);
+
 }

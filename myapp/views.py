@@ -476,7 +476,6 @@ def study_logs_list_view(user_id):
     this_year = datetime.now().year
     this_month = datetime.now().month
     this_month_year = date(this_year, this_month, 1).strftime('%Y-%m')
-
     return render_template('study_logs_list.html', this_year=this_year, this_month=this_month,selected_date=this_month_year)
 
 @app.route('/study-logs-list/<user_id>', methods=['POST'])
@@ -496,8 +495,6 @@ def study_logs_list_process(user_id):
         "selectedDate": selected_date,
         "studyDicts": study_dicts
     })
-
-
 
 # DBから取得した列を辞書形式に変換
 def row_to_dict(row):

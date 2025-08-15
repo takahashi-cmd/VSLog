@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateInput = document.getElementById('study_date');
     const form = document.getElementById('study-date-form');
 
+    // 初回表示時にも実行（今月の一覧を描画）
+    submitForm();
+
     dateInput.addEventListener('change', () => {
         submitForm();
     })
@@ -27,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(data)
             console.log(data.selectedDate)
             const selectedDate = document.getElementById('selected_date');
-            const [year, month] = data.selectedDate.split('-0');
+            const [year, month] = data.selectedDate.split('-');
             selectedDate.innerHTML = `<p>${year}年${month}月の学習履歴一覧</p>`;
             
             const totalDays = (year, month) => {
@@ -55,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let totalHour = 0;
                 let fieldNames = [];
                 if (studyArray) {
-                    for (i = 0; i < studyArray.length; i++) {
+                    for (let i = 0; i < studyArray.length; i++) {
                         let hour = studyArray[i]['hour'];
                         let fieldname = studyArray[i]['fieldname'];
                         totalHour += hour;
@@ -72,5 +75,43 @@ document.addEventListener('DOMContentLoaded', () => {
             studyLogsList.appendChild(frag)
         });
     }
+
+    // モーダルウィンドウの設定
+    const open = document.querySelector('.open');
+    const close = document.querySelector('.close');
+    const modal = document.querySelector('.modal-content');
+    const mask = document.querySelector('.mask');
+    console.log(open, close, modal, mask);
+
+    const showKeyframes = {
+        opacity: [0, 1],
+        display: 'block'
+    };
+    const hideKeyframes = {
+        opacity: [1, 0],
+        display: 'none'
+    };
+    const options = {
+        duration: 800,
+        easing: 'ease',
+        fill: 'forwards'
+    };
+
+    // モーダルウィンドウを開く
+    open.addEventListener('click', () => {
+        modal.animate(showKeyframes, options);
+        mask.animate(showKeyframes, options);
+    });
+
+    // モーダルウィンドウを閉じる
+    close.addEventListener('click', () => {
+        modal.animate(hideKeyframes, options);
+        mask.animate(hideKeyframes, options);
+    });
+
+    // マスクをクリックしてモーダルウィンドウを閉じる
+    mask.addEventListener('click', () => {
+        close.click();
+    });
 });
 
