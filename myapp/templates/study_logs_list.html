@@ -2,6 +2,7 @@
 {% block head_link %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/study.css') }}">
     <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/study_logs_list.js') }}"></script>
 
 {% endblock %}
 
@@ -13,7 +14,7 @@
     <a href="{{ url_for('profile_edit_view', user_id=current_user.user_id) }}">プロフィール</a>
     <a href="{{ url_for('study_logs_view', user_id=current_user.user_id) }}">学習記録の登録・編集</a>
     <a href="{{ url_for('study_fields_view', user_id=current_user.user_id) }}">学習分野の登録・編集</a>
-    <a href="{{ url_for('study_logs_list', user_id=current_user.user_id) }}">学習履歴の一覧</a>
+    <a href="{{ url_for('study_logs_list_view', user_id=current_user.user_id) }}">学習履歴の一覧</a>
     <form action="{{ url_for('logout') }}" method="get">
         <button class="logout" type="submit">ログアウト</button>
     </form>
@@ -37,20 +38,43 @@
         <div class="study-head">
             <h1>{{ current_user.username }}さんの学習履歴一覧</h1>
         </div>
-    {% for date, logs in study_dicts.items() %}
-        <p>{{ date }}</p>
-        <p>{{ logs }}</p>
-        {% for log in logs %}
-            <p>{{ log }}</p>
-            <ul>
-                <li>{{ log.study_log_id }}</li>
-                <li>{{ log.study_date }}</li>
-                <li>{{ log.fieldname }}</li>
-                <li>{{ log.content }}</li>
-                <li>{{ log.hour }}</li>
-            </ul>
-        {% endfor %}
-    {% endfor %}
+        <!-- 画面表示時のフォーム -->
+        <div class="study-date">
+            <div id="selected_date">
+                <p>{{ this_year }}年{{ this_month }}月の学習履歴一覧</p>
+            </div>
+            <form action="{{ url_for('study_logs_list_process', user_id=current_user.user_id) }}" method="post" id="study-date-form">
+                <label for="study_date">日付：</label>
+                <input type="month" name="study_date" id="study_date" value="{{ selected_date }}">
+            </form>
+        </div>
+        <div class="study-logs-list" id="study-logs-list"></div>
+        <template id="study-logs-template">
+            <div class="study-logs-join">
+                <div class="study-logs-date">
+                    <p class="study-days">日付</p>
+                    <p class="day-of-week">曜日</p>
+                </div>
+                <div class="study-logs-content">
+                    <p class="total-hours">学習時間：〇時間</p>
+                    <p class="fields">学習分野：〇〇〇</p>
+                </div>
+                <div class="study-logs-modal">
+                    <button class="open">＞</button>
+                    <div class="modal-content">
+                        <div class="modal-date"></div>
+                        <div class="modal-head-h"><h2>学習時間（合計）</h2></div>
+                            <div class="modal-total-hour"></div>
+                        <div class="modal-head-f"><h2>学習分野</h2></div>
+                            <div class="modal-field-hour"></div>
+                        <div class="modal-head-c"><h2>学習内容</h2></div>
+                            <div class="modal-study-content"></div>
+                        <button class="close">閉じる</button>
+                    </div>
+                    <div class="mask"></div>
+                </div>
+            </div>
+        </template>
     </div>
 </div>
 {% endblock %}
