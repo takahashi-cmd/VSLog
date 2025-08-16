@@ -57,61 +57,95 @@ document.addEventListener('DOMContentLoaded', () => {
                 const studyArray = data.studyDicts[formatted];
                 let totalHour = 0;
                 let fieldNames = [];
+                let fieldHour = '';
+                let content = '';
                 if (studyArray) {
                     for (let i = 0; i < studyArray.length; i++) {
                         let hour = studyArray[i]['hour'];
                         let fieldname = studyArray[i]['fieldname'];
                         totalHour += hour;
                         fieldNames.push(fieldname);
+                        fieldHour +=
+                            `<p class="num">${[i + 1]}</p>
+                            <p class="fn">${fieldname}</p>
+                            <p class="hour">${hour}時間</p><br>`
+                        content +=
+                            `<div class="content-head">
+                            <p class="num">${[i + 1]}</p>
+                            <p class="c-fn">${fieldname}</p>
+                            </div>
+                            <div class="content">
+                            <p>${studyArray[i]['content']}</p>
+                            </div>`
                     }
                 } else {
                     totalHour = 0;
                     fieldNames = `なし`
+                    fieldHour = `<p class="hour">なし</p>`
+                    content = `<p class="n-content">なし</p>`
                 }
                 node.querySelector('.total-hours').textContent = `学習時間：${totalHour}時間`;
                 node.querySelector('.fields').textContent = `学習分野：${fieldNames}`;
+                node.querySelector('.modal-date').innerHTML = `<h1>${year}年${month}月${d}日</h1>`
+                node.querySelector('.modal-total-hour').innerHTML =
+                    `<p class="total-hour">${totalHour}時間</p>`
+                node.querySelector('.modal-field-hour').innerHTML =
+                    `${fieldHour}`
+                node.querySelector('.modal-study-content').innerHTML =
+                    `${content}`
                 frag.appendChild(node);
             }
             studyLogsList.appendChild(frag)
         });
     }
-
+    
     // モーダルウィンドウの設定
-    const open = document.querySelector('.open');
-    const close = document.querySelector('.close');
-    const modal = document.querySelector('.modal-content');
-    const mask = document.querySelector('.mask');
-    console.log(open, close, modal, mask);
-
-    const showKeyframes = {
-        opacity: [0, 1],
-        display: 'block'
-    };
-    const hideKeyframes = {
-        opacity: [1, 0],
-        display: 'none'
-    };
+    const studyLogsList = document.getElementById('study-logs-list');
     const options = {
-        duration: 800,
+        duration: 200,
         easing: 'ease',
         fill: 'forwards'
     };
 
-    // モーダルウィンドウを開く
-    open.addEventListener('click', () => {
-        modal.animate(showKeyframes, options);
-        mask.animate(showKeyframes, options);
-    });
+    function openModal(modal, mask) {
+        modal.classList.add('is-open');
+        mask.classList.add('is-open');
+        modal.animate({ opacity: [0, 1] }, options);
+        mask.animate({ opacity: [0, 1] }, options);
+    }
 
-    // モーダルウィンドウを閉じる
-    close.addEventListener('click', () => {
-        modal.animate(hideKeyframes, options);
-        mask.animate(hideKeyframes, options);
-    });
+    function closeModal(modal, mask) {
+        modal.animate({ opacity: [1, 0] }, options).onfinish = () => {
+            modal.classList.remove('is-open');
+        };
+        mask.animate({ opacity: [1, 0] }, options).onfinish = () => {
+            mask.classList.remove('is-open');
+        };
+    }
 
-    // マスクをクリックしてモーダルウィンドウを閉じる
-    mask.addEventListener('click', () => {
-        close.click();
-    });
+    studyLogsList.addEventListener('click', (e) => {
+        const openBtn = e.target.closest('.open');
+        if (openBtn) {
+            const card = openBtn.closest('.study-logs-join');
+            const modal = card.querySelector('.modal-content');
+            const mask = card.querySelector('.mask');
+            openModal(modal, mask);
+            return;
+        }
+        const closeBtn = e.target.closest('.close');
+        if (closeBtn) {
+            const card = closeBtn.closest('.study-logs-join');
+            const modal = card.querySelector('.modal-content');
+            const mask = card.querySelector('.mask');
+            closeModal(modal, mask);
+            return;
+        }
+
+        if (e.target.classList.contains('mask')) {
+            const card = e.target.closest('.study-logs-join');
+            const modal = card.querySelector('.modal-content');
+            closeModal(modal, e.target);
+        }
+    })
 });
 

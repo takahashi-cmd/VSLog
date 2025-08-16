@@ -147,17 +147,106 @@
     opacity: 0.8;
 }
 
-.modal-content {
-    background-color: var(--contents-bg-color);
+.study-logs-modal .modal-content {
     display: none;
+    background-color: var(--contents-bg-color);
     width: 390px;
     padding: 24px;
     border-radius: 4px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    overflow: scroll;
+    text-align: center;
+    z-index: 100;
+    max-height: 90vh;
 }
 
-.mask {
+.study-logs-modal .modal-content.is-open,
+.study-logs-modal .mask.is-open {
+    display: block;
+}
+
+.study-logs-modal .mask {
     display: none;
     opacity: 0;
-    background-color: var(--modal-color);
-
+    background-color: rgba(0, 0, 0, .6);
+    position: fixed;
+    inset: 0;
 }
+
+.modal-date {
+    margin-bottom: 16px;
+}
+
+.modal-date h1 {
+    font-size: 24px;
+}
+
+.modal-total-hour {
+    margin-bottom: 16px;
+}
+
+.modal-head-h h2,
+.modal-head-f h2,
+.modal-head-c h2 {
+    font-size: 18px;
+    margin-bottom: 16px;
+}
+
+.modal-content p {
+    font-size: 16px;
+    border: solid 1px var(--base-text-color);
+    display: inline-block;
+    padding: 8px;
+}
+
+.modal-field-hour {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.modal-field-hour p {
+    margin-bottom: 16px;
+}
+
+.modal-study-content p {
+    margin-bottom: 16px;
+}
+
+.content-head {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0px;
+}
+
+.content p {
+    width: 300px;
+    text-align: left;
+}
+
+.num {
+    width: 40px;
+}
+
+.fn {
+    width: 160px;
+}
+
+.c-fn {
+    width: 260px;
+}
+
+.content-head .num,
+.content-head .c-fn {
+    margin-bottom: 0px;
+}
+
+.total-hour,
+.hour,
+.n-content {
+    width: 100px;
+}
+
