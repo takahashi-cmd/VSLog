@@ -151,11 +151,6 @@ def index_view(user_id):
         this_month=this_month
         )
 
-# @app.route('/all_time_graph/<user_id>', methods=['GET'])
-# def get_all_time_graph(user_id):
-#     svg = StudyLog.get_all_time_graph_by_field(user_id)
-#     return Response(svg, mimetype='image/svg+xml')
-
 @app.route('/graph/<user_id>', methods=['POST'])
 def get_graph_stats(user_id):
     data = request.get_json(silent=True) or {}
