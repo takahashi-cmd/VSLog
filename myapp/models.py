@@ -733,7 +733,7 @@ class StudyLog(db.Model):
         fig.tight_layout()
         plt.savefig(buf, format='svg', bbox_inches='tight')
         plt.close(fig)
-        svg_b64 = buf.getvalue()
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
         buf.close()
 
         return svg_b64

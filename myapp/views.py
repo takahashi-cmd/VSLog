@@ -142,22 +142,19 @@ def password_reset_process():
 @app.route('/index/<user_id>', methods=['GET'])
 @login_required
 def index_view(user_id):
-    # 全期間の統計値（デフォルト）の取得
-    total_day = StudyLog.get_total_day(user_id)
-    total_hour = StudyLog.get_total_hour(user_id)
-    avg_hour = round(total_hour / total_day, 1) if total_day else 0.0
+    this_year = datetime.now().year
+    this_month = datetime.now().month
 
     return render_template(
         'index.html',
-        total_day=total_day,
-        total_hour=total_hour,
-        avg_hour=avg_hour,
+        this_year=this_year,
+        this_month=this_month
         )
 
-@app.route('/all_time_graph/<user_id>', methods=['GET'])
-def get_all_time_graph(user_id):
-    svg = StudyLog.get_all_time_graph_by_field(user_id)
-    return Response(svg, mimetype='image/svg+xml')
+# @app.route('/all_time_graph/<user_id>', methods=['GET'])
+# def get_all_time_graph(user_id):
+#     svg = StudyLog.get_all_time_graph_by_field(user_id)
+#     return Response(svg, mimetype='image/svg+xml')
 
 @app.route('/graph/<user_id>', methods=['POST'])
 def get_graph_stats(user_id):
