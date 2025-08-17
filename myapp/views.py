@@ -142,22 +142,14 @@ def password_reset_process():
 @app.route('/index/<user_id>', methods=['GET'])
 @login_required
 def index_view(user_id):
-    # 全期間の統計値（デフォルト）の取得
-    total_day = StudyLog.get_total_day(user_id)
-    total_hour = StudyLog.get_total_hour(user_id)
-    avg_hour = round(total_hour / total_day, 1) if total_day else 0.0
+    this_year = datetime.now().year
+    this_month = datetime.now().month
 
     return render_template(
         'index.html',
-        total_day=total_day,
-        total_hour=total_hour,
-        avg_hour=avg_hour,
+        this_year=this_year,
+        this_month=this_month
         )
-
-@app.route('/all_time_graph/<user_id>', methods=['GET'])
-def get_all_time_graph(user_id):
-    svg = StudyLog.get_all_time_graph_by_field(user_id)
-    return Response(svg, mimetype='image/svg+xml')
 
 @app.route('/graph/<user_id>', methods=['POST'])
 def get_graph_stats(user_id):
@@ -169,96 +161,69 @@ def get_graph_stats(user_id):
     horizontalAxis = data.get('horizontalAxis')
     verticalAxis = data.get('verticalAxis')
 
-    print(data, period, year_str, month_year_str, month_str, horizontalAxis, verticalAxis)
+    # print(data, period, year_str, month_year_str, month_str, horizontalAxis, verticalAxis)
 
     svg = None
     total_day = 0
     total_hour = 0.0
     avg_hour = 0.0
 
-    # 全期間、分野別、時間
-    if period == 'all' and horizontalAxis == 'fields' and verticalAxis == 'time':
-        svg = StudyLog.get_all_time_graph_by_field(user_id)
-        total_day = StudyLog.get_total_day(user_id)
-        total_hour = StudyLog.get_total_hour(user_id)
-        avg_hour = round(total_hour / total_day, 1) if total_day else 0.0
-
-    # 全期間、年月日別、時間
-    elif period == 'all' and horizontalAxis == 'days' and verticalAxis == 'time':
-        svg = StudyLog.get_all_time_graph_by_days(user_id)
-        total_day = StudyLog.get_total_day(user_id)
-        total_hour = StudyLog.get_total_hour(user_id)
-        avg_hour = round(total_hour / total_day, 1) if total_day else 0.0
-
-    # 分野別年間グラフ、学習日数、時間の取得
-    elif period == 'year' and year_str and horizontalAxis == 'fields' and verticalAxis =='time':
-        svg = StudyLog.get_year_graph_by_field(user_id, year_str)
-        print(svg)
-        year_stats = StudyLog.get_year_stats(user_id, year_str)
-        total_day = year_stats['study_days']
-        total_hour = year_stats['total_hours']
-        avg_hour = year_stats['average_per_day']
-
-    # 年間グラフ、学習日数、時間の取得（積み上げ縦棒）
-    elif period == 'year' and year_str and horizontalAxis == 'days' and verticalAxis == 'time':
-        svg = StudyLog.get_year_graph(user_id, year_str)
-        print(svg)
-        year_stats = StudyLog.get_year_stats(user_id, year_str)
-        total_day = year_stats['study_days']
-        total_hour = year_stats['total_hours']
-        avg_hour = year_stats['average_per_day']
-        print(year_stats, total_day, total_hour, avg_hour)
-
-    # 分野別月間グラフ、学習日数、時間の取得
-    elif period == 'month' and month_year_str and month_str and horizontalAxis == 'fields' and verticalAxis == 'time':
-        svg = StudyLog.get_month_graph_by_field(user_id, month_year_str, month_str)
-        month_stats = StudyLog.get_month_stats(user_id, month_year_str, month_str)
-        total_day = month_stats['study_days']
-        total_hour = month_stats['total_hours']
-        avg_hour = month_stats['average_per_day']
-
-    # 月間グラフ、学習日数、時間の取得（積み上げ縦棒）
-    elif period == 'month' and month_year_str and month_str and horizontalAxis == 'days' and verticalAxis == 'time':
-        svg = StudyLog.get_month_graph(user_id, month_year_str, month_str)
-        month_stats = StudyLog.get_month_stats(user_id, month_year_str, month_str)
-        total_day = month_stats['study_days']
-        total_hour = month_stats['total_hours']
-        avg_hour = month_stats['average_per_day']
-
-    # 今週の学習グラフ、学習日数、時間の取得（分野別）
-    elif period == 'this_week' and horizontalAxis == 'fields' and verticalAxis == 'time':
-        svg = StudyLog.get_this_week_graph_by_fields(user_id)
+    # 今週の学習グラフ、学習日数、時間の取得
+    if period == 'this_week':
+        if horizontalAxis == 'fields' and verticalAxis == 'time':
+            svg = StudyLog.get_this_week_graph_by_fields(user_id)
+        elif horizontalAxis == 'days' and verticalAxis == 'time':
+            svg = StudyLog.get_this_week_graph_by_days(user_id)
         this_week_stats = StudyLog.get_this_week_stats(user_id)
         total_day = this_week_stats['study_days']
         total_hour = this_week_stats['total_hours']
         avg_hour = this_week_stats['average_per_day']
 
-    # 今週の学習グラフ、学習日数、時間の取得（積み上げ縦棒）
-    elif period == 'this_week' and horizontalAxis == 'days' and verticalAxis == 'time':
-        svg = StudyLog.get_this_week_graph_by_days(user_id)
-        this_week_stats = StudyLog.get_this_week_stats(user_id)
-        total_day = this_week_stats['study_days']
-        total_hour = this_week_stats['total_hours']
-        avg_hour = this_week_stats['average_per_day']
-
-    # 先週の学習グラフ、学習日数、時間の取得（積み上げ縦棒）
-    elif period == 'last_week' and horizontalAxis == 'days' and verticalAxis == 'time':
-        svg = StudyLog.get_last_week_graph_by_days(user_id)
+    # 先週の学習グラフ、学習日数、時間の取得
+    elif period == 'last_week':
+        if horizontalAxis == 'fields' and verticalAxis == 'time':
+            svg = StudyLog.get_last_week_graph_by_fields(user_id)
+        elif horizontalAxis == 'days' and verticalAxis == 'time':
+            svg = StudyLog.get_last_week_graph_by_days(user_id)
         last_week_stats = StudyLog.get_last_week_stats(user_id)
         total_day = last_week_stats['study_days']
         total_hour = last_week_stats['total_hours']
         avg_hour = last_week_stats['average_per_day']
 
-    # 先週の学習グラフ、学習日数、時間の取得（積み上げ縦棒）
-    elif period == 'last_week' and horizontalAxis == 'fields' and verticalAxis == 'time':
-        svg = StudyLog.get_last_week_graph_by_fields(user_id)
-        last_week_stats = StudyLog.get_last_week_stats(user_id)
-        total_day = last_week_stats['study_days']
-        total_hour = last_week_stats['total_hours']
-        avg_hour = last_week_stats['average_per_day']
+    # 月間の学習グラフ、学習日数、時間の取得
+    elif period == 'month' and month_year_str and month_str:
+        if horizontalAxis == 'fields' and verticalAxis == 'time':
+            svg = StudyLog.get_month_graph_by_field(user_id, month_year_str, month_str)
+        elif horizontalAxis == 'days' and verticalAxis == 'time':
+            svg = StudyLog.get_month_graph(user_id, month_year_str, month_str)
+        month_stats = StudyLog.get_month_stats(user_id, month_year_str, month_str)
+        total_day = month_stats['study_days']
+        total_hour = month_stats['total_hours']
+        avg_hour = month_stats['average_per_day']
+
+    # 年間の学習グラフ、学習日数、時間の取得
+    elif period == 'year' and year_str:
+        if horizontalAxis == 'fields' and verticalAxis =='time':
+            svg = StudyLog.get_year_graph_by_field(user_id, year_str)
+        elif horizontalAxis == 'days' and verticalAxis == 'time':
+            svg = StudyLog.get_year_graph(user_id, year_str)
+        year_stats = StudyLog.get_year_stats(user_id, year_str)
+        total_day = year_stats['study_days']
+        total_hour = year_stats['total_hours']
+        avg_hour = year_stats['average_per_day']
+
+    # 全期間の学習グラフ、学習日数、時間の取得
+    elif period == 'all':
+        if horizontalAxis == 'fields' and verticalAxis == 'time':
+            svg = StudyLog.get_all_time_graph_by_field(user_id)
+        elif horizontalAxis == 'days' and verticalAxis == 'time':
+            svg = StudyLog.get_all_time_graph_by_days(user_id)
+        total_day = StudyLog.get_total_day(user_id)
+        total_hour = StudyLog.get_total_hour(user_id)
+        avg_hour = round(total_hour / total_day, 1) if total_day else 0.0
 
     if svg:
-        print('svgあり')
+        # print('svgあり')
         return jsonify({
         "svg": svg,
         "total_day": total_day,
@@ -266,7 +231,7 @@ def get_graph_stats(user_id):
         "avg_hour": avg_hour
         })
     else:
-        print('svg無し')
+        # print('svg無し')
         return jsonify({
         "svg": svg,
         "total_day": total_day,

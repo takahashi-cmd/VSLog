@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 年リスト作成
     for (let y = startYear; y <= endYear; y++) {
         const option = new Option(y, y);
-        // console.log(option);
+        console.log(option);
         yearSelect.add(option.cloneNode(true));
         monthYearSelect.add(option);
     };
@@ -27,9 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // 月リスト作成
     for (let m = 1; m <= 12; m++) {
         const option = new Option(m, m);
-        // console.log(option);
+        console.log(option);
         monthSelect.add(option);
     };
+
+    // 画面起動時にformを自動送信
+    submitForm();
 
     // プルダウンメニュー選択時に自動でformを送信
     periodSelect.addEventListener('change', () => {

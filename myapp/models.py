@@ -684,7 +684,7 @@ class StudyLog(db.Model):
             ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
             bottom = [b + h for b, h in zip(bottom, data[fieldname])]
 
-        ax.set_title(f'年毎の全期間の学習履歴')
+        ax.set_title(f'年月日別全期間の学習履歴')
         ax.grid(True)
         ax.set_ylabel('学習時間（時間）')
         column_totals = [sum(day) for day in zip(*data.values())]
@@ -733,7 +733,7 @@ class StudyLog(db.Model):
         fig.tight_layout()
         plt.savefig(buf, format='svg', bbox_inches='tight')
         plt.close(fig)
-        svg_b64 = buf.getvalue()
+        svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
         buf.close()
 
         return svg_b64
