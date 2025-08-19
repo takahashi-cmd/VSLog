@@ -170,9 +170,9 @@ def get_graph_stats(user_id):
 
     # 今週の学習グラフ、学習日数、時間の取得
     if period == 'this_week':
-        if horizontalAxis == 'fields' and verticalAxis == 'time':
-            svg = StudyLog.get_this_week_graph_by_fields(user_id)
-        elif horizontalAxis == 'days' and verticalAxis == 'time':
+        if horizontalAxis == 'fields':
+            svg = StudyLog.get_this_week_graph_by_fields(user_id, period, verticalAxis)
+        elif horizontalAxis == 'days':
             svg = StudyLog.get_this_week_graph_by_days(user_id)
         this_week_stats = StudyLog.get_this_week_stats(user_id)
         total_day = this_week_stats['study_days']
@@ -181,9 +181,9 @@ def get_graph_stats(user_id):
 
     # 先週の学習グラフ、学習日数、時間の取得
     elif period == 'last_week':
-        if horizontalAxis == 'fields' and verticalAxis == 'time':
-            svg = StudyLog.get_last_week_graph_by_fields(user_id)
-        elif horizontalAxis == 'days' and verticalAxis == 'time':
+        if horizontalAxis == 'fields':
+            svg = StudyLog.get_last_week_graph_by_fields(user_id, period, verticalAxis)
+        elif horizontalAxis == 'days':
             svg = StudyLog.get_last_week_graph_by_days(user_id)
         last_week_stats = StudyLog.get_last_week_stats(user_id)
         total_day = last_week_stats['study_days']
@@ -192,9 +192,9 @@ def get_graph_stats(user_id):
 
     # 月間の学習グラフ、学習日数、時間の取得
     elif period == 'month' and month_year_str and month_str:
-        if horizontalAxis == 'fields' and verticalAxis == 'time':
-            svg = StudyLog.get_month_graph_by_field(user_id, month_year_str, month_str)
-        elif horizontalAxis == 'days' and verticalAxis == 'time':
+        if horizontalAxis == 'fields':
+            svg = StudyLog.get_month_graph_by_field(user_id, period, verticalAxis, month_year_str, month_str)
+        elif horizontalAxis == 'days':
             svg = StudyLog.get_month_graph(user_id, month_year_str, month_str)
         month_stats = StudyLog.get_month_stats(user_id, month_year_str, month_str)
         total_day = month_stats['study_days']
@@ -203,9 +203,9 @@ def get_graph_stats(user_id):
 
     # 年間の学習グラフ、学習日数、時間の取得
     elif period == 'year' and year_str:
-        if horizontalAxis == 'fields' and verticalAxis =='time':
-            svg = StudyLog.get_year_graph_by_field(user_id, year_str)
-        elif horizontalAxis == 'days' and verticalAxis == 'time':
+        if horizontalAxis == 'fields':
+            svg = StudyLog.get_year_graph_by_field(user_id, period, verticalAxis, year_str)
+        elif horizontalAxis == 'days':
             svg = StudyLog.get_year_graph(user_id, year_str)
         year_stats = StudyLog.get_year_stats(user_id, year_str)
         total_day = year_stats['study_days']
@@ -214,9 +214,9 @@ def get_graph_stats(user_id):
 
     # 全期間の学習グラフ、学習日数、時間の取得
     elif period == 'all':
-        if horizontalAxis == 'fields' and verticalAxis == 'time':
-            svg = StudyLog.get_all_time_graph_by_field(user_id)
-        elif horizontalAxis == 'days' and verticalAxis == 'time':
+        if horizontalAxis == 'fields':
+            svg = StudyLog.get_all_time_graph_by_field(user_id, period, verticalAxis)
+        elif horizontalAxis == 'days':
             svg = StudyLog.get_all_time_graph_by_days(user_id)
         total_day = StudyLog.get_total_day(user_id)
         total_hour = StudyLog.get_total_hour(user_id)
