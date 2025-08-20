@@ -241,6 +241,9 @@ class StudyLog(db.Model):
         for fieldname in sorted(data.keys()):
             ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
             bottom = [b + h for b, h in zip(bottom, data[fieldname])]
+        print(data)
+        print(data_labels)
+        print(bottom)
         
         if period == 'this_week' or period == 'last_week':
             ax.set_title(f'{first_day.strftime(date_format)}～{last_day.strftime(date_format)}の学習履歴')
@@ -255,9 +258,16 @@ class StudyLog(db.Model):
         ax.set_xlabel('年月日')
         ax.set_ylabel('学習時間（時間）')
         column_totals = [sum(day) for day in zip(*data.values())]
-        ymax = max(column_totals) + 1 if column_totals else 1
+        ymax_val = max(column_totals) if column_totals else 0
+        padding = max(1, ymax_val * 0.1)
+        ymax = ymax_val + padding
         ax.set_ylim(0, ymax)
-        ax.legend(loc='upper left', bbox_to_anchor=(1, 1), edgecolor='black')
+        if period == 'month':
+            plt.setp(ax.get_xticklabels(), rotation=270, ha='center')
+        ax.legend(loc='upper left', bbox_to_anchor=(1.04, 1), edgecolor='black', borderaxespad=0)
+        for x, y in zip(data_labels, bottom):
+            if y != 0:
+                plt.text(x, y, y, ha='center', va='bottom')
 
         # 画像をsvg形式で生成する
         buf = io.BytesIO()
@@ -291,7 +301,6 @@ class StudyLog(db.Model):
             return None
 
         date_format = '%#m/%#d(%a)' if platform.system() == 'Windows' else '%-m/%-d(%a)'
-
         data = {fieldname: float(hour) for fieldname, _, hour in logs}
         color_map = {fieldname: color_code for fieldname, color_code, _ in logs}
 
@@ -310,9 +319,13 @@ class StudyLog(db.Model):
         ax.grid(True)
         ax.set_xlabel('学習分野')
         ax.set_ylabel('学習時間（時間）')
-        max_hour = max(data.values()) if data else 0
-        ax.set_ylim(0, max_hour + 1)
+        ymax_val = max(data.values()) if data else 0
+        padding = max(1, ymax_val * 0.1)
+        ymax = ymax_val + padding
+        ax.set_ylim(0, ymax)
         plt.setp(ax.get_xticklabels(), rotation=45, ha='center')
+        for x, y in zip(data.keys(), data.values()):
+            plt.text(x, y, y, ha='center', va='bottom')
 
         buf = io.BytesIO()
         fig.tight_layout()
