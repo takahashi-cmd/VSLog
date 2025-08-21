@@ -23,8 +23,13 @@
         <div class="header-container">
             <div class="header-inner">
                 <div class="header-logo">
-                    <img src="{{ url_for('static', filename='image/logo.png') }}" alt="ロゴ画像">
-                    <p>VSLog</p>
+                    {% if current_user.user_id %}
+                        <a href="{{ url_for('index_view', user_id=current_user.user_id) }}"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="ロゴ画像"></a>
+                        <a href="{{ url_for('index_view', user_id=current_user.user_id) }}">VSLog</a>
+                    {% else %}
+                        <a href="{{ url_for('login_view') }}"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="ロゴ画像"></a>
+                        <a href="{{ url_for('login_view') }}">VSLog</a>
+                    {% endif %}
                 </div>
                 {% block header %}{% endblock %}
             </div>
