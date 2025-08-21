@@ -66,14 +66,17 @@ header {
     gap: 24px;
 }
 
+.header-logo a {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    font-size: 24px;
+    font-weight: bold;
+}
+
 .header-logo img {
     height: 100%;
     width: auto;
-}
-
-.header-logo p {
-    font-size: 24px;
-    font-weight: bold;
 }
 
 .header-nav {
