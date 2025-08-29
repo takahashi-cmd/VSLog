@@ -27,22 +27,23 @@ def login_process():
     password = request.form.get('password')
 
     if email == '' or password == '':
-        flash('空のフォームがあります')
+        flash('空のフォームがあります', 'エラー')
     elif re.match(EMAIL_PATTERN, email) is None:
-        flash('メールアドレスの形式になっていません')
+        flash('メールアドレスの形式になっていません', 'エラー')
     elif re.match(PASSWORD_PATTERN, password) is None:
-        flash('パスワードは8文字以上16文字以内で入力してください')
+        flash('パスワードは8文字以上16文字以内で入力してください', 'エラー')
     else:
         user = User.select_by_email(email)
         if user is None:
-            flash('登録されていないメールアドレスです')
+            flash('登録されていないメールアドレスです', 'エラー')
             return redirect(url_for('login_view'))
         else:
             if check_password_hash(user.password, password):
                 login_user(user)
+                flash('ログインしました', '正常')
                 return redirect(url_for('index_view', user_id=user.user_id))
             else:
-                flash('異なるパスワードです')
+                flash('異なるパスワードです', 'エラー')
                 return redirect(url_for('login_view'))
     return redirect(url_for('login_view'))
 
@@ -50,7 +51,7 @@ def login_process():
 @app.route('/logout', methods=['GET'])
 def logout():
     logout_user()
-    flash('ログアウトしました')
+    flash('ログアウトしました', '正常')
     return redirect(url_for('login_view'))
 
 # 新規登録画面表示
@@ -67,13 +68,13 @@ def signup_process():
     password2 = request.form.get('password2')
 
     if username == '' or email == '' or password1 == '' or password2 == '':
-        flash('空のフォームがあります')
+        flash('空のフォームがあります', 'エラー')
     elif password1 != password2:
-        flash('パスワードが一致しません')
+        flash('パスワードが一致しません', 'エラー')
     elif re.match(EMAIL_PATTERN, email) is None:
-        flash('メールアドレスの形式になっていません')
+        flash('メールアドレスの形式になっていません', 'エラー')
     elif re.match(PASSWORD_PATTERN, password1) is None:
-        flash('パスワードは8文字以上16文字以内で入力してください')
+        flash('パスワードは8文字以上16文字以内で入力してください', 'エラー')
     else:
         user_id = uuid.uuid4()
         user = User(
@@ -85,7 +86,7 @@ def signup_process():
 
         DBuser = User.select_by_email(email)
         if DBuser != None:
-            flash('登録済みのユーザーです') 
+            flash('登録済みのユーザーです', 'エラー') 
         else:
             try:
                 db.session.add(user)
@@ -95,7 +96,7 @@ def signup_process():
                 raise
             finally:
                 db.session.close()
-            flash('新規登録が完了しました')
+            flash('新規登録が完了しました', '正常')
             return redirect(url_for('login_view'))
     return redirect(url_for('signup_view'))
 
@@ -112,17 +113,17 @@ def password_reset_process():
     new_password2 = request.form.get('new_password2')
 
     if email == '' or new_password1 == '' or new_password2 == '':
-        flash('空のフォームがあります')
+        flash('空のフォームがあります', 'エラー')
     elif new_password1 != new_password2:
-        flash('パスワードが一致しません')
+        flash('パスワードが一致しません', 'エラー')
     elif re.match(EMAIL_PATTERN, email) is None:
-        flash('メールアドレスの形式になっていません')
+        flash('メールアドレスの形式になっていません', 'エラー')
     elif re.match(PASSWORD_PATTERN, new_password1) is None:
-        flash('パスワードは8文字以上16文字以内で入力してください')
+        flash('パスワードは8文字以上16文字以内で入力してください', 'エラー')
     else:
         DBuser = User.select_by_email(email)
         if DBuser == None:
-            flash('登録されていないメールアドレスです') 
+            flash('登録されていないメールアドレスです', 'エラー') 
         else:
             try:
                 DBuser.password = generate_password_hash(new_password1)
@@ -132,7 +133,7 @@ def password_reset_process():
                 raise
             finally:
                 db.session.close()
-            flash('パスワード再設定が完了しました')
+            flash('パスワード再設定が完了しました', '正常')
             return redirect(url_for('login_view'))
     return redirect(url_for('password_reset_view'))
 
@@ -238,15 +239,15 @@ def profile_edit_process(user_id):
     new_email = request.form.get('new_email')
 
     if new_username == '' or new_email == '':
-        flash('空のフォームがあります')
+        flash('空のフォームがあります', 'エラー')
     elif re.match(EMAIL_PATTERN, new_email) is None:
-        flash('メールアドレスの形式になっていません')
+        flash('メールアドレスの形式になっていません', 'エラー')
     else:
         try:
             current_user.username = new_username
             current_user.email = new_email
             db.session.commit()
-            flash('プロフィール編集が完了しました')
+            flash('プロフィール編集が完了しました', '正常')
         except:
             db.session.rollback()
             raise
@@ -270,18 +271,18 @@ def password_update_process(user_id):
     new_password2 = request.form.get('new_password2')
 
     if current_password == '' or new_password1 == '' or new_password2 == '':
-        flash('空のフォームがあります')
-    elif generate_password_hash(current_password) == current_user.password:
-        flash('現在のパスワードが正しくありません')
+        flash('空のフォームがあります', 'エラー')
+    elif generate_password_hash(current_password) != current_user.password:
+        flash('現在のパスワードが正しくありません', 'エラー')
     elif new_password1 != new_password2:
-        flash('新しいパスワードと新しいパスワード（確認用）が一致しません')
+        flash('新しいパスワードと新しいパスワード（確認用）が一致しません', 'エラー')
     elif re.match(PASSWORD_PATTERN, new_password1) is None:
-        flash('パスワードは8文字以上16文字以内で入力してください')
+        flash('パスワードは8文字以上16文字以内で入力してください', 'エラー')
     else:
         try:
             current_user.password = generate_password_hash(new_password1)
             db.session.commit()
-            flash('パスワード変更が完了しました')
+            flash('パスワード変更が完了しました', '正常')
         except:
             db.session.rollback()
             raise
@@ -319,7 +320,7 @@ def study_logs_process(user_id):
             # print("DEBUG:", study_date, hour, fieldname, study_log_id, row_action)
             # 登録
             if fieldname.strip() and fieldname.strip() not in [f.fieldname for f in current_user.fields]:
-                flash(f'{fieldname.strip()}が登録されていません。先に学習分野の登録をお願いします。')
+                flash(f'{fieldname.strip()}が登録されていません。先に学習分野の登録をお願いします。', 'エラー')
                 continue
             elif row_action == 'new' and study_date and hour and fieldname.strip():
                 study_log = StudyLog(
@@ -348,13 +349,13 @@ def study_logs_process(user_id):
                     registered = True
         db.session.commit()
         if registered:
-            flash('学習記録の更新が完了しました')
+            flash('学習記録の更新が完了しました', '正常')
     except IntegrityError as e:
         db.session.rollback()
-        flash('学習記録の更新ができませんでした（重複または制約違反）')
+        flash('学習記録の更新ができませんでした（重複または制約違反）', 'エラー')
     except Exception as e:
         db.session.rollback()
-        flash('予期しないエラーが発生しました')
+        flash('予期しないエラーが発生しました', 'エラー')
     finally:
         db.session.close()
     
@@ -384,7 +385,7 @@ def study_fields_process(user_id):
             # 登録
             if row_action == 'new' and fieldname.strip():
                 if fieldname in existing_names:
-                    flash(f'{fieldname}は既に登録されています')
+                    flash(f'{fieldname}は既に登録されています', 'エラー')
                 else:
                     field = Field(
                         user_id = user_id,
@@ -407,13 +408,13 @@ def study_fields_process(user_id):
                     db.session.delete(field)
         db.session.commit()
         if registered:
-            flash('学習分野の更新に成功しました')
+            flash('学習分野の更新に成功しました', '正常')
     except IntegrityError as e:
         db.session.rollback()
-        flash('学習分野の更新ができませんでした（重複または制約違反）')
+        flash('学習分野の更新ができませんでした（重複または制約違反）', 'エラー')
     except Exception as e:
         db.session.rollback()
-        flash('予期しないエラーが発生しました')
+        flash('予期しないエラーが発生しました', 'エラー')
     finally:
         db.session.close()
 
