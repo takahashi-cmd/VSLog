@@ -105,6 +105,26 @@ header {
     padding: 0 24px;
 }
 
+.message.normal {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    background-color: var(--hover-color);
+    color: var(--main-color);
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.message.error {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    background-color: var(--error-background-color);
+    color: var(--error-text-color);
+    padding: 12px;
+    border-radius: 10px;
+}
+
 footer {
     height: 80px; /* PCデフォルト */
     background-color: var(--contents-bg-color);

@@ -38,6 +38,39 @@
 
     <!-- コンテンツ -->
     <main>
+        <!-- フラッシュメッセージ -->
+        {% block flash %}
+        <div class="flash-messsage">
+            <div class="normal-message">
+                {% with normal_messages = get_flashed_messages(category_filter=["正常"]) %}
+                {% if normal_messages %}
+                    {% for message in normal_messages %}
+                        <p class="message normal">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
+            </div>
+            <div class="error-message">
+                {% with error_messages = get_flashed_messages(category_filter=["エラー"]) %}
+                {% if error_messages %}
+                    {% for message in error_messages %}
+                        <p class="message error">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+        <script>
+            const flashMessage = document.querySelectorAll('.message')
+            console.log(flashMessage);
+            flashMessage.forEach((message) => {
+                setTimeout(() => {
+                    message.remove()
+                }, 5000);
+            })
+        </script>
+        {% endblock %}
+        <!-- 内容（ここに上書き） -->
         {% block content %} 内容 {% endblock %}
     </main>
 

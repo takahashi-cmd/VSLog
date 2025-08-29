@@ -21,18 +21,6 @@
 {% endblock %}
 
 {% block content %}
-<div class="flash-messsage">
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <div class="flashes">
-        {% for message in messages %}
-        <p>{{ message }}</p>
-        {% endfor %}
-    </div>
-    {% endif %}
-    {% endwith %}
-</div>
-
 <div class="main-container">
     <div class="study-inner">
         <div class="study-head">
