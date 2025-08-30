@@ -1,7 +1,7 @@
 from .app import db
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text, DECIMAL, TIMESTAMP, extract, desc
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text, DECIMAL, DATETIME, extract, desc
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, functions
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from matplotlib import font_manager
@@ -30,7 +30,7 @@ class User(UserMixin, db.Model):
     username = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, server_default=func.now())
+    created_at = Column(DATETIME, nullable=False, server_default=functions.current_timestamp())
 
     # fields,study_logsに紐づけし、双方向でアクセス
     fields = relationship('Field', back_populates='users')
@@ -60,7 +60,7 @@ class Field(db.Model):
     user_id = Column(String(36), ForeignKey('users.user_id'), nullable=False)
     fieldname = Column(String(20, collation='utf8mb4_general_ci'), nullable=False)
     color_code = Column(String(7), nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, server_default=func.now())
+    created_at = Column(DATETIME, nullable=False, server_default=functions.current_timestamp())
 
     # users,study_logsに紐づけし、双方向でアクセス
     # study_logsとはcascade設定をし、fieldが削除されれば、関連するstudy_logsも削除するよう設定

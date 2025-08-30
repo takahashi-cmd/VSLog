@@ -68,7 +68,7 @@ def signup_process():
     password2 = request.form.get('password2')
 
     if username == '' or email == '' or password1 == '' or password2 == '':
-        flash('空のフォームがあります', 'エラー')
+        flash('ユーザー名、メールアドレス、パスワードのいずれかが空です', 'エラー')
     elif password1 != password2:
         flash('パスワードが一致しません', 'エラー')
     elif re.match(EMAIL_PATTERN, email) is None:
@@ -86,7 +86,7 @@ def signup_process():
 
         DBuser = User.select_by_email(email)
         if DBuser != None:
-            flash('登録済みのユーザーです', 'エラー') 
+            flash('既に登録されているメールアドレスです', 'エラー') 
         else:
             try:
                 db.session.add(user)
