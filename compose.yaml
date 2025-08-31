@@ -24,6 +24,7 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - TZ=Asia/Tokyo
     # .envファイルから環境変数を読み込む
     env_file:
       - .env
@@ -56,6 +57,7 @@ services:
     environment:
       - FLASK_APP=${FLASK_APP}
       - FLASK_ENV=${FLASK_ENV}
+      - TZ=Asia/Tokyo
     # dbサービスがhealthyになるまで待機
     depends_on:
       db:
