@@ -256,7 +256,10 @@ class StudyLog(db.Model):
             ax.set_title(f'年月日別全期間の学習履歴')
         ax.grid(True)
         ax.set_xlabel('年月日')
-        ax.set_ylabel('学習時間（時間）')
+        if verticalAxis == 'time':
+            ax.set_ylabel('学習時間（時間）')
+        elif verticalAxis == 'percent':
+            ax.set_ylabel('学習時間（%）')
         column_totals = [sum(day) for day in zip(*data.values())]
         ymax_val = max(column_totals) if column_totals else 0
         padding = max(1, ymax_val * 0.1)
@@ -318,7 +321,10 @@ class StudyLog(db.Model):
 
         ax.grid(True)
         ax.set_xlabel('学習分野')
-        ax.set_ylabel('学習時間（時間）')
+        if verticalAxis == 'time':
+            ax.set_ylabel('学習時間（時間）')
+        elif verticalAxis == 'percent':
+            ax.set_ylabel('学習時間（%）')
         ymax_val = max(data.values()) if data else 0
         padding = max(1, ymax_val * 0.1)
         ymax = ymax_val + padding
