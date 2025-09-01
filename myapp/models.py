@@ -233,7 +233,16 @@ class StudyLog(db.Model):
                 index = int(selected_date) - 1
             elif period == 'all':
                 index = date_list.index(selected_date)
-            data[fieldname][index] = float(hour)
+
+            # 縦軸の表示形式が「時間（time）」と「％（percent）」で条件分岐
+            if verticalAxis == 'time':
+                data[fieldname][index] = float(hour)
+            elif verticalAxis == 'percent':
+                total_hour = 0
+                percentage = 100
+                for _, _, _, hour_p in logs:
+                    total_hour += float(hour_p)
+                data[fieldname][index] = round((float(hour) / float(total_hour) * percentage), 1)
         
         # グラフ描画
         fig, ax = plt.subplots(figsize=(10, 4))
@@ -241,9 +250,6 @@ class StudyLog(db.Model):
         for fieldname in sorted(data.keys()):
             ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
             bottom = [b + h for b, h in zip(bottom, data[fieldname])]
-        print(data)
-        print(data_labels)
-        print(bottom)
         
         if period == 'this_week' or period == 'last_week':
             ax.set_title(f'{first_day.strftime(date_format)}～{last_day.strftime(date_format)}の学習履歴')
@@ -270,7 +276,7 @@ class StudyLog(db.Model):
         ax.legend(loc='upper left', bbox_to_anchor=(1.04, 1), edgecolor='black', borderaxespad=0)
         for x, y in zip(data_labels, bottom):
             if y != 0:
-                plt.text(x, y, y, ha='center', va='bottom')
+                plt.text(x, round(y, 1), round(y, 1), ha='center', va='bottom')
 
         # 画像をsvg形式で生成する
         buf = io.BytesIO()
@@ -304,7 +310,14 @@ class StudyLog(db.Model):
             return None
 
         date_format = '%#m/%#d(%a)' if platform.system() == 'Windows' else '%-m/%-d(%a)'
-        data = {fieldname: float(hour) for fieldname, _, hour in logs}
+        if verticalAxis == 'time':
+            data = {fieldname: float(hour) for fieldname, _, hour in logs}
+        elif verticalAxis == 'percent':
+            total_hour = 0
+            percentage = 100
+            for _, _, hour in logs:
+                total_hour += float(hour)
+            data = {fieldname: round((float(hour) / float(total_hour) * percentage), 1) for fieldname, _, hour in logs}
         color_map = {fieldname: color_code for fieldname, color_code, _ in logs}
 
         fig, ax = plt.subplots(figsize=(10, 4))
@@ -331,7 +344,7 @@ class StudyLog(db.Model):
         ax.set_ylim(0, ymax)
         plt.setp(ax.get_xticklabels(), rotation=45, ha='center')
         for x, y in zip(data.keys(), data.values()):
-            plt.text(x, y, y, ha='center', va='bottom')
+            plt.text(x, round(y, 1), round(y, 1), ha='center', va='bottom')
 
         buf = io.BytesIO()
         fig.tight_layout()
