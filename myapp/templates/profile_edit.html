@@ -5,19 +5,6 @@
 
 {% block title %} プロフィール {% endblock %}
 
-{% block header %}
-<div class="header-nav">
-    <a href="{{ url_for('index_view', user_id=current_user.user_id) }}">ホーム</a>
-    <a href="{{ url_for('profile_edit_view', user_id=current_user.user_id) }}">プロフィール</a>
-    <a href="{{ url_for('study_logs_view', user_id=current_user.user_id) }}">学習記録の登録・編集</a>
-    <a href="{{ url_for('study_fields_view', user_id=current_user.user_id) }}">学習分野の登録・編集</a>
-    <a href="{{ url_for('study_logs_list_view', user_id=current_user.user_id) }}">学習履歴の一覧</a>
-    <form action="{{ url_for('logout') }}" method="get">
-        <button class="logout" type="submit">ログアウト</button>
-    </form>
-</div>
-{% endblock %}
-
 {% block content %}
 <div class="main-container">
     <div class="auth-section">
