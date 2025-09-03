@@ -22,16 +22,32 @@
     <header>
         <div class="header-container">
             <div class="header-inner">
-                <div class="header-logo">
-                    {% if current_user.user_id %}
+                {% if current_user.user_id %}
+                    <div class="header-logo">
                         <a href="{{ url_for('index_view', user_id=current_user.user_id) }}"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="ロゴ画像"></a>
                         <a href="{{ url_for('index_view', user_id=current_user.user_id) }}">VSLog</a>
-                    {% else %}
+                    </div>
+                    <div class="header-nav">
+                        <a href="{{ url_for('index_view', user_id=current_user.user_id) }}">ホーム</a>
+                        <a href="{{ url_for('profile_edit_view', user_id=current_user.user_id) }}">プロフィール</a>
+                        <a href="{{ url_for('study_logs_view', user_id=current_user.user_id) }}">学習記録の登録・編集</a>
+                        <a href="{{ url_for('study_fields_view', user_id=current_user.user_id) }}">学習分野の登録・編集</a>
+                        <a href="{{ url_for('study_logs_list_view', user_id=current_user.user_id) }}">学習履歴の一覧</a>
+                        <form action="{{ url_for('logout') }}" method="get">
+                            <button class="logout" type="submit">ログアウト</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="header-logo">
                         <a href="{{ url_for('login_view') }}"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="ロゴ画像"></a>
                         <a href="{{ url_for('login_view') }}">VSLog</a>
-                    {% endif %}
-                </div>
-                {% block header %}{% endblock %}
+                    </div>
+                    <div class="header-nav">
+                        <a href="{{ url_for('login_view') }}">ログイン画面はこちら</a>
+                        <a href="{{ url_for('signup_view') }}">新規登録はこちら</a>
+                        <a href="{{ url_for('password_reset_view') }}">パスワードをお忘れの方はこちら</a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </header>
