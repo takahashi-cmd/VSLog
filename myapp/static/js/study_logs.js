@@ -1,14 +1,15 @@
 // study_logsの動作
 
 // 日付を動的に表示
-document.addEventListener('DOMContentLoaded', () => {
-    const dateInput = document.getElementById('study_date');
-    const form = document.getElementById('study-date-form');
+const dateInput = document.getElementById('study_date');
+const form = document.getElementById('study-date-form');
 
-    dateInput.addEventListener('change', () => {
-        form.submit();
-    })
-});
+dateInput.addEventListener('change', () => {
+    form.submit();
+})
+
+    // 初回表示時にも実行（今日の学習記録を描画）
+    // submitForm();
 
 // 学習記録の新しい行の追加
 const addRowLogs = (btn) => {
@@ -34,3 +35,32 @@ const addRowLogs = (btn) => {
     </td>`;
     table.appendChild(newRow);
 }
+
+// 既存行の削除
+const markDeleted = (btn) => {
+    const result = window.confirm('本当に学習記録を削除しますか？\n削除した場合、復元できません！')
+    if (result) {
+        const row = btn.closest('tr');
+        row.querySelector('input[name="row_action[]"]').value = 'delete';
+        document.forms['study_logs_process'].submit();
+    }
+};
+
+// // FetchAPIによる非同期通信
+// function submitForm() {
+//     const formData = new FormData(form);
+//     const jsonData = {};
+//     formData.forEach((value, key) => {
+//         jsonData[key] = value;
+//     })
+//     fetch(form.action, {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify(jsonData)
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+        
+//     }
+// }
+

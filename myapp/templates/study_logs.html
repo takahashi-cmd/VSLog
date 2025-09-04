@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block head_link %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/study.css') }}">
-    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/study_logs.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/study_logs.js') }}" defer></script>
 {% endblock %}
 
 {% block title %} 学習記録の登録・編集 {% endblock %}
@@ -23,7 +23,7 @@
         </div>
         <!-- 学習記録登録・編集時のフォーム -->
         <div class="study-form">
-            <form class="study_logs_process" action="{{ url_for('study_logs_process', user_id=current_user.user_id) }}" method="post">
+            <form class="study_logs_process" action="{{ url_for('study_logs_process', user_id=current_user.user_id) }}" method="post" name="study_logs_process">
                 <div class="study-table-container">
                 <table class="study-logs" id="study-logs">
                     <thead>

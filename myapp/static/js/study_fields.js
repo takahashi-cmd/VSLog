@@ -16,3 +16,13 @@ const addRowFields = (btn) => {
     </td>`;
     table.appendChild(newRow);
 }
+
+// 既存行の削除
+const markDeleted = (btn) => {
+    const result = window.confirm('本当に学習分野を削除しますか？\n削除した場合、関連する学習分野の学習記録がすべて削除されます！')
+    if (result) {
+        const row = btn.closest('tr');
+        row.querySelector('input[name="row_action[]"]').value = 'delete';
+        document.forms['study_fields_process'].submit();
+    }
+};
