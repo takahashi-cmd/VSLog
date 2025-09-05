@@ -2,11 +2,11 @@
 
 // 学習分野の新しい行の追加
 const addRowFields = (btn) => {
-    const table = document.getElementById('study-fields');
+    const tableBody = document.querySelector('#study-fields tbody');
     const newRow = document.createElement('tr');
-    const rowNum = table.rows.length
+    newRow.classList.add('study-tr', 'fields');
     newRow.innerHTML = `
-    <td class="table-num">${rowNum}</td>
+    <td class="table-num"></td>
     <td><input type="text" name="fieldname[]" value=""></td>
     <td class="table-field-color"><input type="color" name="color_code[]" value="#000000"></td>
     <td>
@@ -14,7 +14,22 @@ const addRowFields = (btn) => {
     <input type="hidden" name="row_action[]" value="new">
     <button class="delete-button" type="button" onclick="removeRow(this)">🗑️</button>
     </td>`;
-    table.appendChild(newRow);
+    tableBody.appendChild(newRow);
+
+    // 追加後に番号を振り直す
+    renumberRows();
+}
+
+// 番号の振り直し
+const renumberRows = () => {
+    const rows = document.querySelectorAll('#study-fields tbody tr.study-tr.fields');
+    rows.forEach((row, index) => {
+        const numCell = row.querySelector('.table-num');
+        console.log(numCell)
+        if (numCell) {
+            numCell.textContent = index + 1
+        }
+    })
 }
 
 // 既存行の削除

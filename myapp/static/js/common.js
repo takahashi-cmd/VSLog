@@ -3,6 +3,7 @@
 // 空白行の削除
 const removeRow = (btn) => {
     btn.closest('tr').remove();
+    renumberRows();
 }
 
 

@@ -26,6 +26,7 @@
                         </tr>
                     </thead>
                     <tbody id="field-rows">
+                        <!-- 学習分野がある場合はループで表示 -->
                         {% for field in current_user.fields %}
                         <tr class="study-tr fields">
                             <td class="table-num">{{ loop.index }}</td>
