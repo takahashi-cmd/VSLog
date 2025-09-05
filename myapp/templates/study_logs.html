@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block head_link %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/study.css') }}">
-    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/study_logs.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/study_logs.js') }}" defer></script>
 {% endblock %}
 
 {% block title %} 学習記録の登録・編集 {% endblock %}
@@ -21,9 +21,17 @@
                 <input type="date" name="study_date" id="study_date" value="{{ selected_date }}">
             </form>
         </div>
+
+        <!-- 学習分野のプルダウンリスト設定 -->
+        <datalist id="field_list">
+            {% for field in current_user.fields %}
+            <option value="{{ field.fieldname }}"></option>
+            {% endfor %}
+        </datalist>
+
         <!-- 学習記録登録・編集時のフォーム -->
         <div class="study-form">
-            <form class="study_logs_process" action="{{ url_for('study_logs_process', user_id=current_user.user_id) }}" method="post">
+            <form class="study_logs_process" action="{{ url_for('study_logs_process', user_id=current_user.user_id) }}" method="post" name="study_logs_process">
                 <div class="study-table-container">
                 <table class="study-logs" id="study-logs">
                     <thead>
@@ -43,11 +51,6 @@
                                 <td class="table-hour"><input type="number" step="0.1" min="0" max="24" name="hours[]" value="{{ study_log.hour }}"></td>
                                 <td class="table-fieldname">
                                     <input type="text" name="fieldname[]" value="{{ study_log.fields.fieldname }}" list="field_list">
-                                    <datalist id="field_list">
-                                        {% for field in current_user.fields %}
-                                        <option value="{{ field.fieldname }}"></option>
-                                        {% endfor %}
-                                    </datalist>
                                 </td>
                                 <td class="table-content"><textarea name="contents[]" rows="" cols="">{{ study_log.content }}</textarea></td>
                                 <td class="table-delete">
@@ -65,16 +68,11 @@
                             <td class="table-num">{{ study_logs|length + i + 1 }}</td>
                             <td class="table-hour"><input type="number" step="0.1" min="0" max="24" name="hours[]" value=""></td>
                             <td class="table-fieldname">
-                                <input type="text" name="fieldname[]" value="" list="field_list2">
-                                <datalist id="field_list2" data-fieldname="{{ current_user.fields }}">
-                                    {% for field in current_user.fields %}
-                                    <option value="{{ field.fieldname }}"></option>
-                                    {% endfor %}
-                                </datalist>
+                                <input type="text" name="fieldname[]" value="" list="field_list">
                             </td>
                             <td class="table-content"><textarea name="contents[]" rows="" cols=""></textarea></td>
                             <td class="table-delete">
-                                <input type="hidden" name="study_dates[]" id="selected_date" data-selected-date="{{ selected_date }}" value="{{selected_date}}">
+                                <input type="hidden" name="study_dates[]" value="{{selected_date}}">
                                 <input type="hidden" name="study_log_id[]" value="">
                                 <input type="hidden" name="row_action[]" value="new">
                                 <button class="delete-button" type="button" onclick="removeRow(this)">🗑️</button>
