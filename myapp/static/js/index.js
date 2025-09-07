@@ -57,6 +57,7 @@ verticalAxisSelect.addEventListener('change', submitForm);
 // FetchAPIによる非同期通信
 function submitForm() {
     const formData = new FormData(graphForm);
+    console.log(formData);
     const jsonData = {};
     formData.forEach((value, key) => {
         jsonData[key] = value;

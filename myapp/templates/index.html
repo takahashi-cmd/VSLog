@@ -64,21 +64,21 @@
                 <img src="{{ url_for('static', filename='image/days.png') }}" alt="学習日数">
                 <div class="home-stats-area">
                     <p>学習日数</p>
-                    <section><p id="total_day">{{ total_day }}日</p></section>
+                    <section><p id="total_day"></p></section>
                 </div>
             </div>
             <div class="home-stats">
                 <img src="{{ url_for('static', filename='image/total.png') }}" alt="学習時間（合計）">
                 <div class="home-stats-area">
                     <p>学習時間（合計）</p>
-                    <section><p id="total_hour">{{ total_hour }}時間</p></section>
+                    <section><p id="total_hour"></p></section>
                 </div>
             </div>
             <div class="home-stats">
                 <img src="{{ url_for('static', filename='image/average.png') }}" alt="学習時間（平均）">
                 <div class="home-stats-area">
                     <p>学習時間（平均）</p>
-                    <section><p id="avg_hour">{{ avg_hour }}時間/日</p></section>
+                    <section><p id="avg_hour"></p></section>
                 </div>
             </div>
         </div>
@@ -86,5 +86,4 @@
         </div>
     <div>
 </div>
-
 {% endblock %}

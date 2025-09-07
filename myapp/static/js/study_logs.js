@@ -2,15 +2,42 @@
 
 // 日付を動的に表示
 const dateInput = document.getElementById('study_date');
-const form = document.getElementById('study-date-form');
+const studyDateForm = document.getElementById('study-date-form');
 console.log(dateInput.value)
 
 dateInput.addEventListener('change', () => {
-    form.submit();
+    submitForm();
 })
 
-    // 初回表示時にも実行（今日の学習記録を描画）
-    // submitForm();
+// FetchAPIによる非同期通信
+function submitForm() {
+    const formData = new FormData(studyDateForm);
+    const jsonData = {};
+    formData.forEach((value, key) => {
+        jsonData[key] = value;
+    })
+    fetch(studyDateForm.action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(jsonData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.studyDicts) {
+            console.log(data.studyDicts);
+            
+        //     data.studyDicts.forEach((dict) => {
+
+        // })
+        }
+        else {
+            console.log('データなし')
+        }
+    })
+}
+
+// 初回表示時にも実行（今日の学習記録を描画）
+submitForm();
 
 // 学習記録の新しい行の追加
 const addRowLogs = (btn) => {
@@ -57,21 +84,5 @@ const markDeleted = (btn) => {
     }
 };
 
-// // FetchAPIによる非同期通信
-// function submitForm() {
-//     const formData = new FormData(form);
-//     const jsonData = {};
-//     formData.forEach((value, key) => {
-//         jsonData[key] = value;
-//     })
-//     fetch(form.action, {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify(jsonData)
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-        
-//     }
-// }
+
 

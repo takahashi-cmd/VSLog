@@ -295,10 +295,31 @@ def password_update_process(user_id):
 @app.route('/study-logs/<user_id>', methods=['GET', 'POST'])
 @login_required
 def study_logs_view(user_id):
-    today = date.today().strftime('%Y-%m-%d')
-    date_str = request.form.get('study_date') or today
-    study_logs = StudyLog.get_study_logs_by_study_date(user_id, date_str)
-    return render_template('study_logs.html', study_logs=study_logs, selected_date=date_str)
+    if request.method == 'GET':
+        today = date.today().strftime('%Y-%m-%d')
+        study_logs = StudyLog.get_study_logs_by_study_date(user_id, today)
+        return render_template('study_logs.html', study_logs=study_logs, selected_date=today)
+    elif request.method == 'POST':
+        data = request.get_json(silent=True) or {}
+        date_str = data.get('study_date')
+        # print(f'DEBUG:{data},{date_str}')
+        study_logs = StudyLog.get_study_logs_by_study_date(user_id, date_str)
+        if study_logs:
+            study_dicts = [] # 辞書の初期化
+            for row in study_logs:
+                d = row_to_dict(row)
+                print(f'{row}:{d}')
+                study_dicts.append(d)
+            # print(study_dicts)
+            print('データあり')
+            return jsonify({
+                "studyDicts": study_dicts
+            })
+        else:
+            print('データなし')
+            return jsonify({
+                "studyDicts": None
+            })
 
 # 学習記録登録・編集・削除
 @app.route('/study-logs_process/<user_id>', methods=['POST'])
@@ -437,6 +458,7 @@ def study_logs_list_process(user_id):
     selected_date = data.get('study_date')
     year_str, month_str = selected_date.split('-')
     study_logs = StudyLog.get_study_logs_by_study_month(user_id, year_str, month_str)
+    print(study_logs)
     study_dicts = defaultdict(list) # 辞書の初期化
     for row in study_logs:
         d = row_to_dict(row)
