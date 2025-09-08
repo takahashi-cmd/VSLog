@@ -291,14 +291,33 @@ def password_update_process(user_id):
         return redirect(url_for('password_update_view', user_id=user_id))
     return redirect(url_for('password_update_view', user_id=user_id))
 
-# 学習登録画面表示
+# 学習登録画面表示、日付に応じて学習履歴変更
 @app.route('/study-logs/<user_id>', methods=['GET', 'POST'])
 @login_required
 def study_logs_view(user_id):
-    today = date.today().strftime('%Y-%m-%d')
-    date_str = request.form.get('study_date') or today
-    study_logs = StudyLog.get_study_logs_by_study_date(user_id, date_str)
-    return render_template('study_logs.html', study_logs=study_logs, selected_date=date_str)
+    if request.method == 'GET':
+        today = date.today().strftime('%Y-%m-%d')
+        date_str = request.args.get('selected_date') or today
+        return render_template('study_logs.html', selected_date=date_str)
+    
+    elif request.method == 'POST':
+        data = request.get_json(silent=True) or {}
+        date_str = data.get('study_date')
+        study_logs = StudyLog.get_study_logs_by_study_date(user_id, date_str)
+        if study_logs:
+            study_dicts = [] # 辞書の初期化
+            for row in study_logs:
+                d = row_to_dict(row)
+                study_dicts.append(d)
+            return jsonify({
+                "studyDicts": study_dicts,
+                "selectedDate": date_str
+            })
+        else:
+            return jsonify({
+                "studyDicts": study_logs,
+                "selectedDate": date_str
+            })
 
 # 学習記録登録・編集・削除
 @app.route('/study-logs_process/<user_id>', methods=['POST'])
@@ -310,6 +329,7 @@ def study_logs_process(user_id):
     contents = request.form.getlist('contents[]')
     study_log_ids = request.form.getlist('study_log_id[]')
     row_actions = request.form.getlist('row_action[]')
+    selected_date = ''.join(set(study_dates)) # study_datesから日付を取得
 
     # print("DEBUG:", study_dates, hours, fieldnames, contents, study_log_ids, row_actions)
     registered = False
@@ -359,7 +379,7 @@ def study_logs_process(user_id):
     finally:
         db.session.close()
     
-    return redirect(url_for('study_logs_view', user_id=user_id))
+    return redirect(url_for('study_logs_view', user_id=user_id, selected_date=selected_date))
 
 # 学習分野画面表示
 @app.route('/study-fields/<user_id>', methods=['GET'])
@@ -437,6 +457,7 @@ def study_logs_list_process(user_id):
     selected_date = data.get('study_date')
     year_str, month_str = selected_date.split('-')
     study_logs = StudyLog.get_study_logs_by_study_month(user_id, year_str, month_str)
+    print(study_logs)
     study_dicts = defaultdict(list) # 辞書の初期化
     for row in study_logs:
         d = row_to_dict(row)

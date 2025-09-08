@@ -111,7 +111,20 @@ class StudyLog(db.Model):
     @classmethod
     def get_study_logs_by_study_date(cls, user_id, date_str):
         study_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-        return cls.query.filter_by(user_id=user_id, study_date=study_date).all()
+        logs = (
+            db.session.query(cls.study_log_id, cls.study_date, Field.fieldname.label('fieldname'), cls.content, cls.hour)
+            .join(Field, cls.field_id == Field.field_id)
+            .filter(
+            cls.user_id == user_id,
+            cls.study_date == date_str
+            )
+            .all()
+        )
+
+        if not logs:
+            return None
+        
+        return logs
 
     # 月に応じたユーザー毎の学習履歴取得
     @classmethod
