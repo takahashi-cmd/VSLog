@@ -120,10 +120,11 @@ class StudyLog(db.Model):
             )
             .all()
         )
-        return logs
 
         if not logs:
             return None
+        
+        return logs
 
     # 月に応じたユーザー毎の学習履歴取得
     @classmethod

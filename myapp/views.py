@@ -291,34 +291,32 @@ def password_update_process(user_id):
         return redirect(url_for('password_update_view', user_id=user_id))
     return redirect(url_for('password_update_view', user_id=user_id))
 
-# 学習登録画面表示
+# 学習登録画面表示、日付に応じて学習履歴変更
 @app.route('/study-logs/<user_id>', methods=['GET', 'POST'])
 @login_required
 def study_logs_view(user_id):
     if request.method == 'GET':
         today = date.today().strftime('%Y-%m-%d')
-        study_logs = StudyLog.get_study_logs_by_study_date(user_id, today)
-        return render_template('study_logs.html', study_logs=study_logs, selected_date=today)
+        date_str = request.args.get('selected_date') or today
+        return render_template('study_logs.html', selected_date=date_str)
+    
     elif request.method == 'POST':
         data = request.get_json(silent=True) or {}
         date_str = data.get('study_date')
-        # print(f'DEBUG:{data},{date_str}')
         study_logs = StudyLog.get_study_logs_by_study_date(user_id, date_str)
         if study_logs:
             study_dicts = [] # 辞書の初期化
             for row in study_logs:
                 d = row_to_dict(row)
-                print(f'{row}:{d}')
                 study_dicts.append(d)
-            # print(study_dicts)
-            print('データあり')
             return jsonify({
-                "studyDicts": study_dicts
+                "studyDicts": study_dicts,
+                "selectedDate": date_str
             })
         else:
-            print('データなし')
             return jsonify({
-                "studyDicts": None
+                "studyDicts": study_logs,
+                "selectedDate": date_str
             })
 
 # 学習記録登録・編集・削除
@@ -331,6 +329,7 @@ def study_logs_process(user_id):
     contents = request.form.getlist('contents[]')
     study_log_ids = request.form.getlist('study_log_id[]')
     row_actions = request.form.getlist('row_action[]')
+    selected_date = ''.join(set(study_dates)) # study_datesから日付を取得
 
     # print("DEBUG:", study_dates, hours, fieldnames, contents, study_log_ids, row_actions)
     registered = False
@@ -380,7 +379,7 @@ def study_logs_process(user_id):
     finally:
         db.session.close()
     
-    return redirect(url_for('study_logs_view', user_id=user_id))
+    return redirect(url_for('study_logs_view', user_id=user_id, selected_date=selected_date))
 
 # 学習分野画面表示
 @app.route('/study-fields/<user_id>', methods=['GET'])

@@ -46,7 +46,9 @@ function submitForm() {
 
         for (let d = 1; d < totalDays(year, month) + 1; d++) {
             const dateObj = new Date(year, month - 1, d);
+            // template要素の内容を複製
             const node = studyLogsTemplate.content.firstElementChild.cloneNode(true);
+            console.log(node);
             // 日付の取得
             node.querySelector('.study-days').textContent = String(d);
             // 曜日の取得
