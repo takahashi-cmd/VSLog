@@ -92,6 +92,12 @@
     padding: 5px;
 }
 
+.hm {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
 .study-tr.logs textarea {
     width: 100%;
     line-height: 1.6;

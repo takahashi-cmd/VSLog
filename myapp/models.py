@@ -88,7 +88,7 @@ class StudyLog(db.Model):
     user_id = Column(String(36), ForeignKey('users.user_id'), nullable=False)
     field_id = Column(Integer, ForeignKey('fields.field_id'), nullable=False)
     study_date = Column(Date, nullable=False)
-    hour = Column(DECIMAL(6,1), nullable=False)
+    hour = Column(DECIMAL(6,2), nullable=False)
     content = Column(Text, nullable=False)
 
     # users,fieldsに紐づけし、双方向でアクセス
@@ -255,7 +255,7 @@ class StudyLog(db.Model):
                 percentage = 100
                 for _, _, _, hour_p in logs:
                     total_hour += float(hour_p)
-                data[fieldname][index] = round((float(hour) / float(total_hour) * percentage), 1)
+                data[fieldname][index] = round((float(hour) / float(total_hour) * percentage), 2)
         
         # グラフ描画
         fig, ax = plt.subplots(figsize=(10, 4))
@@ -289,7 +289,7 @@ class StudyLog(db.Model):
         ax.legend(loc='upper left', bbox_to_anchor=(1.04, 1), edgecolor='black', borderaxespad=0)
         for x, y in zip(data_labels, bottom):
             if y != 0:
-                plt.text(x, round(y, 1), round(y, 1), ha='center', va='bottom')
+                plt.text(x, round(y, 2), round(y, 2), ha='center', va='bottom')
 
         # 画像をsvg形式で生成する
         buf = io.BytesIO()
@@ -357,7 +357,7 @@ class StudyLog(db.Model):
         ax.set_ylim(0, ymax)
         plt.setp(ax.get_xticklabels(), rotation=45, ha='center')
         for x, y in zip(data.keys(), data.values()):
-            plt.text(x, round(y, 1), round(y, 1), ha='center', va='bottom')
+            plt.text(x, round(y, 2), round(y, 2), ha='center', va='bottom')
 
         buf = io.BytesIO()
         fig.tight_layout()
