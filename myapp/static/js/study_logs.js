@@ -27,24 +27,31 @@ function submitForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(jsonData)
     })
-    .then(response => response.json())
-    .then(data => {
-        selectedDate.textContent = `${data.selectedDate}の学習記録`;
-        const studyLogsTbody = document.querySelector('.study-logs tbody');
-        studyLogsTbody.textContent = '' // 前の日付のtemplateが残らないように初期化
-        const studyLogsTemplate = document.getElementById('study-logs-template');
-        const frag = document.createDocumentFragment();
-        const defaultRowLength = 5
+        .then(response => response.json())
+        .then(data => {
+            selectedDate.textContent = `${data.selectedDate}の学習記録`;
+            const studyLogsTbody = document.querySelector('.study-logs tbody');
+            studyLogsTbody.textContent = '' // 前の日付のtemplateが残らないように初期化
+            const studyLogsTemplate = document.getElementById('study-logs-template');
+            const frag = document.createDocumentFragment();
+            const defaultRowLength = 5
 
-        // data.studyDictsがある場合の処理
-        if (data.studyDicts) {
-            // 既存行の表示
-            for (let i = 0; i < data.studyDicts.length; i++) {
-                // template要素の内容を複製
-                const node = studyLogsTemplate.content.firstElementChild.cloneNode(true);
+            // data.studyDictsがある場合の処理
+            if (data.studyDicts) {
+                // 既存行の表示
+                for (let i = 0; i < data.studyDicts.length; i++) {
+                    // template要素の内容を複製
+                    const node = studyLogsTemplate.content.firstElementChild.cloneNode(true);
+                    console.log(node)
+                    // 時間、分の取り出し
+                    const h = Math.trunc(data.studyDicts[i].hour.toFixed(2));
+                    const m = ((data.studyDicts[i].hour.toFixed(2) - h) * 60).toFixed(0);
+                console.log(h, m);
                 // templateの内容を既存行に書き換え
                 node.querySelector('.table-num').textContent = i + 1;
-                node.querySelector('input[name="hours[]"]').value = data.studyDicts[i].hour.toFixed(1);
+                node.querySelector('.hm-hour').value = h;
+                node.querySelector('.hm-minute').value = m;
+                node.querySelector('input[name="hours[]"]').value = data.studyDicts[i].hour.toFixed(2);
                 node.querySelector('input[name="fieldname[]"]').value = data.studyDicts[i].fieldname;
                 node.querySelector('textarea[name="contents[]"]').value = data.studyDicts[i].content;
                 node.querySelector('input[name="study_dates[]"]').value = data.studyDicts[i].study_date;
@@ -61,6 +68,7 @@ function submitForm() {
                 for (let i = 0; i < defaultRowLength - data.studyDicts.length; i++) {
                     // template要素の内容を複製
                     const node = studyLogsTemplate.content.firstElementChild.cloneNode(true);
+                    console.log(node)
                     // templateの内容を空白行に書き換え
                     node.querySelector('.table-num').textContent = i + 1 + data.studyDicts.length;
                     node.querySelector('input[name="study_dates[]"]').value = data.selectedDate;
@@ -74,6 +82,7 @@ function submitForm() {
             for (let i = 0; i < defaultRowLength; i++) {
                 // template要素の内容を複製
                 const node = studyLogsTemplate.content.firstElementChild.cloneNode(true);
+                console.log(node)
                 // templateの内容を空白行に書き換え
                 node.querySelector('.table-num').textContent = i + 1;
                 node.querySelector('input[name="study_dates[]"]').value = data.selectedDate;
@@ -85,6 +94,23 @@ function submitForm() {
     })
 }
 
+// 学習時間hourを合算してform送信
+const studyLogsProcess = document.getElementById('study_logs_process');
+console.log(studyLogsProcess);
+studyLogsProcess.addEventListener('submit', function () {
+    console.log('送信イベント発生!');
+    document.querySelectorAll('#study-logs tbody tr.study-tr.logs').forEach(row => {
+        // 過去の仕様や互換性を考慮し、念のため10進数に変換
+        const h = parseInt(row.querySelector('.hm-hour')?.value || '0', 10);
+        const m = parseInt(row.querySelector('.hm-minute')?.value || '0', 10);
+        // 0～59に丸め
+        const mm = Math.min(59, Math.max(0, isNaN(m) ? 0 : m));
+        const total = (isNaN(h) ? 0 : h) + mm / 60;
+        console.log(total);
+        row.querySelector('.hm-total').value = total.toFixed(2);
+    });
+});
+
 // 学習記録の新しい行の追加
 const addRowLogs = (btn) => {
     const tableBody = document.querySelector('#study-logs tbody');
@@ -92,7 +118,12 @@ const addRowLogs = (btn) => {
     newRow.classList.add('study-tr', 'logs');
     newRow.innerHTML = `
     <td class="table-num"></td>
-    <td class="table-hour"><input type="number" step="0.1" min="0" max="24" name="hours[]" value=""></td>
+    <td class="table-hour">
+        <div class="hm">
+            <input type="number" class="hm-hour" min="0" max="24" step="1" inputmode="numeric">時間
+            <input type="number" class="hm-minute" min="0" max="59" step="1" inputmode="numeric">分
+        </div>
+        <input type="hidden" name="hours[]" class="hm-total">
     <td class="table-fieldname">
         <input type="text" name="fieldname[]" value="" list="field_list">
     </td>
