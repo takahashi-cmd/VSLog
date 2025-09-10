@@ -116,6 +116,21 @@
     background-color: var(--contents-bg-color);
     border: 2px solid var(--form-color);
     margin-bottom: 24px;
+    position: relative;
+}
+
+.study-logs-join .open {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.study-logs-join .open:hover {
+    opacity: 0.8;
+    border-radius: 0px;
 }
 
 .study-logs-date {
@@ -136,21 +151,7 @@
     justify-content: center;
     padding: 8px 12px;
     width: auto;
-}
-
-.open {
-    padding: 0px;
-    background-color: var(--contents-bg-color);
-    color: var(--base-text-color);
-    border-radius: 0px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.5s;
-}
-
-.open:hover {
-    background-color: var(--hover-color);
-    opacity: 0.8;
+    position: relative;
 }
 
 .study-logs-modal .modal-content {
@@ -180,6 +181,7 @@
     background-color: rgba(0, 0, 0, .6);
     position: fixed;
     inset: 0;
+    z-index: 90;
 }
 
 .modal-date {

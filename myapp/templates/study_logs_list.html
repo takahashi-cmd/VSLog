@@ -24,6 +24,7 @@
                 <input type="month" name="study_date" id="study_date" value="{{ selected_date }}">
             </form>
         </div>
+        <!-- 以下のdivにtemplateの内容がDOM操作で挿入される -->
         <div class="study-logs-list" id="study-logs-list"></div>
         <template id="study-logs-template">
             <div class="study-logs-join">
@@ -35,8 +36,9 @@
                     <p class="total-hours">学習時間：〇時間</p>
                     <p class="fields">学習分野：〇〇〇</p>
                 </div>
+                <!-- カード全面を覆う透明ボタン（中身なし） -->
+                <button class="open" type="button" aria-label="詳細を開く"></button>
                 <div class="study-logs-modal">
-                    <button class="open">＞</button>
                     <div class="modal-content">
                         <div class="modal-date"></div>
                         <div class="modal-head-h"><h2>学習時間（合計）</h2></div>
@@ -45,7 +47,7 @@
                             <div class="modal-field-hour"></div>
                         <div class="modal-head-c"><h2>学習内容</h2></div>
                             <div class="modal-study-content"></div>
-                        <button class="close">閉じる</button>
+                        <button class="close" type="button">閉じる</button>
                     </div>
                     <div class="mask"></div>
                 </div>
