@@ -1,15 +1,15 @@
 // study_logs_listの動作
 
+
 // 日付を動的に表示
 const dateInput = document.getElementById('study_date');
 const form = document.getElementById('study-date-form');
-
-// 初回表示時にも実行（今月の一覧を描画）
-submitForm();
-
 dateInput.addEventListener('change', () => {
     submitForm();
 })
+
+// 初回表示時にも実行（今月の一覧を描画）
+submitForm();
 
 // FetchAPIによる非同期通信
 function submitForm() {
@@ -18,7 +18,6 @@ function submitForm() {
     formData.forEach((value, key) => {
         jsonData[key] = value;
     })
-    console.log(jsonData);
     fetch(form.action, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -26,8 +25,6 @@ function submitForm() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data)
-        console.log(data.selectedDate)
         const selectedDate = document.getElementById('selected_date');
         const [year, month] = data.selectedDate.split('-');
         selectedDate.innerHTML = `<p>${year}年${month}月の学習履歴一覧</p>`;
@@ -36,7 +33,7 @@ function submitForm() {
             const getDays = new Date(year, month, 0).getDate();
             return getDays;
         };
-        console.log(`year:${year},month:${month},totalDays:${totalDays(year, month)}`);
+        // console.log(`year:${year},month:${month},totalDays:${totalDays(year, month)}`);
         const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
         const studyLogsList = document.getElementById('study-logs-list');
@@ -45,13 +42,12 @@ function submitForm() {
         const frag = document.createDocumentFragment();
 
         for (let d = 1; d < totalDays(year, month) + 1; d++) {
-            const dateObj = new Date(year, month - 1, d);
             // template要素の内容を複製
             const node = studyLogsTemplate.content.firstElementChild.cloneNode(true);
             console.log(node);
-            // 日付の取得
+            // 一覧行へ日付・曜日の挿入
+            const dateObj = new Date(year, month - 1, d);
             node.querySelector('.study-days').textContent = String(d);
-            // 曜日の取得
             node.querySelector('.day-of-week').textContent = weekdays[dateObj.getDay()];
             // 学習時間、学習分野の取得
             const formatted = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -64,8 +60,10 @@ function submitForm() {
                 for (let i = 0; i < studyArray.length; i++) {
                     let hour = studyArray[i]['hour'];
                     let fieldname = studyArray[i]['fieldname'];
+                    // 一覧行の時間・分野取得
                     totalHour += hour;
                     fieldNames.push(fieldname);
+                    // モーダルウインドウのNo、時間、分野、内容取得
                     fieldHour +=
                         `<p class="num">${[i + 1]}</p>
                         <p class="fn">${fieldname}</p>
@@ -85,8 +83,10 @@ function submitForm() {
                 fieldHour = `<p class="hour">なし</p>`
                 content = `<p class="n-content">なし</p>`
             }
+            // 一覧行へ挿入
             node.querySelector('.total-hours').textContent = `学習時間：${totalHour}時間`;
             node.querySelector('.fields').textContent = `学習分野：${fieldNames}`;
+            // モーダルウインドウへ挿入
             node.querySelector('.modal-date').innerHTML = `<h1>${year}年${month}月${d}日</h1>`
             node.querySelector('.modal-total-hour').innerHTML =
                 `<p class="total-hour">${totalHour}時間</p>`
@@ -125,27 +125,30 @@ function closeModal(modal, mask) {
 }
 
 studyLogsList.addEventListener('click', (e) => {
-    const openBtn = e.target.closest('.open');
-    if (openBtn) {
-        const card = openBtn.closest('.study-logs-join');
-        const modal = card.querySelector('.modal-content');
-        const mask = card.querySelector('.mask');
-        openModal(modal, mask);
-        return;
-    }
+    // 1)閉じる処理
     const closeBtn = e.target.closest('.close');
     if (closeBtn) {
-        const card = closeBtn.closest('.study-logs-join');
-        const modal = card.querySelector('.modal-content');
-        const mask = card.querySelector('.mask');
+        const modalWrap = closeBtn.closest('.study-logs-modal');
+        const modal = modalWrap.querySelector('.modal-content');
+        const mask = modalWrap.querySelector('.mask');
         closeModal(modal, mask);
         return;
     }
-
+    // 2)マスク除去処理
     if (e.target.classList.contains('mask')) {
-        const card = e.target.closest('.study-logs-join');
-        const modal = card.querySelector('.modal-content');
+        const modalWrap = e.target.closest('.study-logs-modal');
+        const modal = modalWrap.querySelector('.modal-content');
         closeModal(modal, e.target);
+    }
+    // 3)開く処理
+    const openBtn = e.target.closest('.open');
+    if (openBtn) {
+        const card = openBtn.closest('.study-logs-join');
+        const modalWrap = card.querySelector('.study-logs-modal')
+        const modal = modalWrap.querySelector('.modal-content');
+        const mask = modalWrap.querySelector('.mask');
+        openModal(modal, mask);
+        return;
     }
 })
 
