@@ -27,6 +27,8 @@ function submitForm() {
     .then(data => {
         const selectedDate = document.getElementById('selected_date');
         const [year, month] = data.selectedDate.split('-');
+        const today = new Date();
+        const dateString = today.toLocaleDateString(today);
         selectedDate.innerHTML = `<p>${year}年${month}月の学習履歴一覧</p>`;
         
         const totalDays = (year, month) => {
@@ -62,7 +64,6 @@ function submitForm() {
                     // hourから時間・分の取り出し
                     const h = Math.trunc(studyArray[i]['hour'].toFixed(2));
                     const m = parseInt(((studyArray[i]['hour'].toFixed(2) - h) * 60).toFixed(0));
-                    console.log(h, m)
                     let fieldname = studyArray[i]['fieldname'];
                     // 一覧行の時間・分、分野取得
                     subtotalHour += h;
@@ -81,6 +82,8 @@ function submitForm() {
                         <div class="content">
                         <p>${studyArray[i]['content']}</p>
                         </div>`
+                    // 背景色設定クラスの追加
+                    node.closest('.study-logs-join').classList.add('isLogs');
                 }
             } else {
                 subtotalHour = 0;
@@ -88,6 +91,8 @@ function submitForm() {
                 fieldNames = `なし`
                 fieldHour = `<p class="hour">なし</p>`
                 content = `<p class="n-content">なし</p>`
+                // 背景色設定クラスの追加
+                node.closest('.study-logs-join').classList.add('noLogs');
             }
             // 合計時間・分の取得
             let totalHour = subtotalHour + Math.trunc(subtotalMinute / 60);

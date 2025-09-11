@@ -23,7 +23,6 @@
 
 .study-date p, .study-date form {
     background-color: var(--contents-bg-color);
-    border: 2px solid var(--form-color);
     padding: 8px;
 }
 
@@ -43,7 +42,7 @@
 }
 
 .study-table-container table {
-    border: 2px solid var(--form-color);
+    border: 1px solid var(--form-color);
     border-collapse: collapse;
 }
 
@@ -106,17 +105,25 @@
 }
 
 .study-logs-list {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     justify-content: space-between;
+    background-color: var(--contents-bg-color);
+    gap: 16px;
+    padding: 16px;
 }
 
 .study-logs-join {
     display: flex;
-    background-color: var(--contents-bg-color);
-    border: 2px solid var(--form-color);
-    margin-bottom: 24px;
     position: relative;
+}
+
+.study-logs-join.isLogs {
+    background-color: var(--isLogs-background-color);
+}
+
+.study-logs-join.noLogs {
+    background-color: var(--noLogs-background-color);
 }
 
 .study-logs-join .open {
@@ -134,24 +141,15 @@
 }
 
 .study-logs-date {
-    border-right: 2px solid var(--form-color);
+    border-right: 1px solid var(--form-color);
     padding: 8px;
     text-align: center;
     width: 80px;
 }
 
 .study-logs-content {
+    flex: 1;
     padding: 8px;
-    width: 400px;
-}
-
-.study-logs-modal {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 12px;
-    width: auto;
-    position: relative;
 }
 
 .study-logs-modal .modal-content {
