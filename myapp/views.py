@@ -453,19 +453,16 @@ def study_logs_list_view(user_id):
 @login_required
 def study_logs_list_process(user_id):
     data = request.get_json(silent=True) or {}
-    print(data)
     selected_date = data.get('study_date')
     year_str, month_str = selected_date.split('-')
     study_logs = StudyLog.get_study_logs_by_study_month(user_id, year_str, month_str)
-    print(study_logs)
     study_dicts = defaultdict(list) # 辞書の初期化
     for row in study_logs:
         d = row_to_dict(row)
         study_dicts[d['study_date']].append(d)
-    print(study_dicts)
     return jsonify({
         "selectedDate": selected_date,
-        "studyDicts": study_dicts
+        "studyDicts": study_dicts,
     })
 
 # DBから取得した列を辞書形式に変換
