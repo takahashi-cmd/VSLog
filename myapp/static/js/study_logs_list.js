@@ -52,22 +52,27 @@ function submitForm() {
             // 学習時間、学習分野の取得
             const formatted = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
             const studyArray = data.studyDicts[formatted];
-            let totalHour = 0;
+            let subtotalHour = 0;
+            let subtotalMinute = 0;
             let fieldNames = [];
             let fieldHour = '';
             let content = '';
             if (studyArray) {
                 for (let i = 0; i < studyArray.length; i++) {
-                    let hour = studyArray[i]['hour'];
+                    // hourから時間・分の取り出し
+                    const h = Math.trunc(studyArray[i]['hour'].toFixed(2));
+                    const m = parseInt(((studyArray[i]['hour'].toFixed(2) - h) * 60).toFixed(0));
+                    console.log(h, m)
                     let fieldname = studyArray[i]['fieldname'];
-                    // 一覧行の時間・分野取得
-                    totalHour += hour;
+                    // 一覧行の時間・分、分野取得
+                    subtotalHour += h;
+                    subtotalMinute += m;
                     fieldNames.push(fieldname);
                     // モーダルウインドウのNo、時間、分野、内容取得
                     fieldHour +=
                         `<p class="num">${[i + 1]}</p>
                         <p class="fn">${fieldname}</p>
-                        <p class="hour">${hour}時間</p><br>`
+                        <p class="hour">${h}時間${m}分</p><br>`
                     content +=
                         `<div class="content-head">
                         <p class="num">${[i + 1]}</p>
@@ -78,18 +83,23 @@ function submitForm() {
                         </div>`
                 }
             } else {
-                totalHour = 0;
+                subtotalHour = 0;
+                subtotalMinute = 0;
                 fieldNames = `なし`
                 fieldHour = `<p class="hour">なし</p>`
                 content = `<p class="n-content">なし</p>`
             }
+            // 合計時間・分の取得
+            let totalHour = subtotalHour + Math.trunc(subtotalMinute / 60);
+            let totalMinute = subtotalMinute - (Math.trunc(subtotalMinute / 60) * 60);
+
             // 一覧行へ挿入
-            node.querySelector('.total-hours').textContent = `学習時間：${totalHour}時間`;
+            node.querySelector('.total-hours').textContent = `学習時間：${totalHour}時間${totalMinute}分`;
             node.querySelector('.fields').textContent = `学習分野：${fieldNames}`;
             // モーダルウインドウへ挿入
             node.querySelector('.modal-date').innerHTML = `<h1>${year}年${month}月${d}日</h1>`
             node.querySelector('.modal-total-hour').innerHTML =
-                `<p class="total-hour">${totalHour}時間</p>`
+                `<p class="total-hour">${totalHour}時間${totalMinute}分</p>`
             node.querySelector('.modal-field-hour').innerHTML =
                 `${fieldHour}`
             node.querySelector('.modal-study-content').innerHTML =
