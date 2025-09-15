@@ -180,7 +180,7 @@ class StudyLog(db.Model):
 
     # 年月日別グラフ取得の共通関数
     @classmethod
-    def common_graph_by_days(cls, user_id, period, verticalAxis, first_day=None, last_day=None, year=None, month=None, month_num=None):
+    def common_graph_by_days(cls, user_id, period, verticalAxis, graphType, first_day=None, last_day=None, year=None, month=None, month_num=None):
         if period == 'this_week' or period == 'last_week' or period == 'month':
             selected_date = cls.study_date
         elif period == 'year':
@@ -263,6 +263,7 @@ class StudyLog(db.Model):
         for fieldname in sorted(data.keys()):
             ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
             bottom = [b + h for b, h in zip(bottom, data[fieldname])]
+        print(f'bottom:{bottom}, data_labels:{data_labels}')
         
         if period == 'this_week' or period == 'last_week':
             ax.set_title(f'{first_day.strftime(date_format)}～{last_day.strftime(date_format)}の学習履歴')
@@ -294,8 +295,8 @@ class StudyLog(db.Model):
         # 画像をsvg形式で生成する
         buf = io.BytesIO()
         fig.tight_layout()
-        plt.savefig(buf, format='svg', bbox_inches='tight')
-        plt.close(fig)
+        plt.savefig(buf, format='svg', bbox_inches='tight') # 画像ファイルとして保存
+        plt.close(fig) # 図window(fig)を閉じてpyplotから登録を解除
         svg_b64 = base64.b64encode(buf.getvalue()).decode('utf-8')
         buf.close()
 
@@ -303,7 +304,7 @@ class StudyLog(db.Model):
 
     # 分野別グラフ取得の共通関数
     @classmethod
-    def common_graph_by_fields(cls, user_id, period, verticalAxis, first_day=None, last_day=None, year=None, month=None, month_num=None):
+    def common_graph_by_fields(cls, user_id, period, verticalAxis, graphType, first_day=None, last_day=None, year=None, month=None, month_num=None):
         filters = [cls.user_id == user_id]
         if first_day:
             filters.append(cls.study_date >= first_day)
@@ -332,9 +333,15 @@ class StudyLog(db.Model):
                 total_hour += float(hour)
             data = {fieldname: round((float(hour) / float(total_hour) * percentage), 1) for fieldname, _, hour in logs}
         color_map = {fieldname: color_code for fieldname, color_code, _ in logs}
+        print(data, color_map)
 
+        # グラフ描画
         fig, ax = plt.subplots(figsize=(10, 4))
+        # グラフ種類によって条件分岐（棒グラフ、円グラフ）
         ax.bar(data.keys(), data.values(), color=[color_map[f] for f in data.keys()])
+        # ax.pie(list(data.values()), labels=list(data.keys()), colors=[color_map[f] for f in data.keys()])
+        print(f'data.keys:{list(data.keys())}, data.values:{list(data.values())}')
+        
 
         if period == 'this_week' or period == 'last_week':
             ax.set_title(f'{first_day.strftime(date_format)}～{last_day.strftime(date_format)}の学習履歴')
@@ -379,16 +386,16 @@ class StudyLog(db.Model):
 
     # 今週のグラフ作成
     @classmethod
-    def get_this_week_graph(cls, user_id, period, horizontalAxis, verticalAxis):
+    def get_this_week_graph(cls, user_id, period, horizontalAxis, verticalAxis, graphType):
         today = date.today()
         first_day = today - timedelta(days=today.weekday())
         last_day = first_day + timedelta(days=6)
 
         if horizontalAxis == 'days':
-            return StudyLog.common_graph_by_days(user_id, period, verticalAxis, first_day, last_day)
+            return StudyLog.common_graph_by_days(user_id, period, verticalAxis, graphType, first_day, last_day)
         
         elif horizontalAxis == 'fields':
-            return StudyLog.common_graph_by_fields(user_id, period, verticalAxis, first_day, last_day)
+            return StudyLog.common_graph_by_fields(user_id, period, verticalAxis, graphType, first_day, last_day)
 
     # 先週の学習時間（合計、平均）、学習日数の取得
     @classmethod
@@ -401,16 +408,16 @@ class StudyLog(db.Model):
 
     # 先週のグラフ作成
     @classmethod
-    def get_last_week_graph(cls, user_id, period, horizontalAxis, verticalAxis):
+    def get_last_week_graph(cls, user_id, period, horizontalAxis, verticalAxis, graphType):
         today = date.today()
         first_day = today - timedelta(days=today.weekday() + 7)
         last_day = first_day + timedelta(days=6)
 
         if horizontalAxis == 'days':
-            return StudyLog.common_graph_by_days(user_id, period, verticalAxis, first_day, last_day)
+            return StudyLog.common_graph_by_days(user_id, period, verticalAxis, graphType, first_day, last_day)
 
         elif horizontalAxis == 'fields':
-            return StudyLog.common_graph_by_fields(user_id, period, verticalAxis, first_day, last_day)
+            return StudyLog.common_graph_by_fields(user_id, period, verticalAxis, graphType, first_day, last_day)
 
     # 月間学習日数、学習時間（合計）、学習時間（平均）の取得
     @classmethod
@@ -425,7 +432,7 @@ class StudyLog(db.Model):
 
     # 月間グラフ作成
     @classmethod
-    def get_month_graph(cls, user_id, period, horizontalAxis, verticalAxis, month_year_str, month_str):
+    def get_month_graph(cls, user_id, period, horizontalAxis, verticalAxis, graphType, month_year_str, month_str):
         year = int(month_year_str)
         month = int(month_str)
         first_day = date(year, month, 1)
@@ -433,9 +440,9 @@ class StudyLog(db.Model):
         last_day = date(year, month, month_num)
 
         if horizontalAxis == 'days':
-            return StudyLog.common_graph_by_days(user_id, period, verticalAxis, first_day, last_day, year, month, month_num)
+            return StudyLog.common_graph_by_days(user_id, period, verticalAxis, graphType, first_day, last_day, year, month, month_num)
         elif horizontalAxis == 'fields':
-            return StudyLog.common_graph_by_fields(user_id, period, verticalAxis, first_day, last_day, year, month, month_num)
+            return StudyLog.common_graph_by_fields(user_id, period, verticalAxis, graphType, first_day, last_day, year, month, month_num)
 
     # 年間学習日数、学習時間（合計）、学習時間（平均）の取得
     @classmethod
@@ -448,15 +455,15 @@ class StudyLog(db.Model):
 
     # 年間グラフ作成
     @classmethod
-    def get_year_graph(cls, user_id, period, horizontalAxis, verticalAxis, year_str):
+    def get_year_graph(cls, user_id, period, horizontalAxis, verticalAxis, graphType, year_str):
         year = int(year_str)
         first_day = date(year, 1, 1)
         last_day= date(year, 12, 31)
 
         if horizontalAxis == 'days':
-            return StudyLog.common_graph_by_days(user_id, period, verticalAxis, first_day, last_day, year)
+            return StudyLog.common_graph_by_days(user_id, period, verticalAxis, graphType, first_day, last_day, year)
         elif horizontalAxis == 'fields':
-            return StudyLog.common_graph_by_fields(user_id, period, verticalAxis, first_day, last_day, year)
+            return StudyLog.common_graph_by_fields(user_id, period, verticalAxis, graphType, first_day, last_day, year)
 
     # 全期間の学習日数取得
     @classmethod
@@ -472,10 +479,10 @@ class StudyLog(db.Model):
 
     # 全期間グラフ作成
     @classmethod
-    def get_all_time_graph(cls, user_id, period, horizontalAxis, verticalAxis):
+    def get_all_time_graph(cls, user_id, period, horizontalAxis, verticalAxis, graphType):
         if horizontalAxis == 'days':
-            return StudyLog.common_graph_by_days(user_id, period, verticalAxis)
+            return StudyLog.common_graph_by_days(user_id, period, verticalAxis, graphType)
         elif horizontalAxis == 'fields':
-            return StudyLog.common_graph_by_fields(user_id, period, verticalAxis)
+            return StudyLog.common_graph_by_fields(user_id, period, verticalAxis, graphType)
 
 

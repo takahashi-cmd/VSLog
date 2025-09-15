@@ -11,6 +11,7 @@ const monthYearSelect = document.getElementById('month-year')
 const monthSelect = document.getElementById('month')
 const horizontalAxisSelect = document.getElementById('horizontalAxis');
 const verticalAxisSelect = document.getElementById('verticalAxis');
+const graphType = document.getElementById('graphType');
 
 const startYear = 2020;
 const endYear = 2040;
@@ -53,6 +54,7 @@ monthYearSelect.addEventListener('change', submitForm);
 monthSelect.addEventListener('change', submitForm);
 horizontalAxisSelect.addEventListener('change', submitForm);
 verticalAxisSelect.addEventListener('change', submitForm);
+graphType.addEventListener('change', submitForm);
 
 // FetchAPIによる非同期通信
 function submitForm() {
