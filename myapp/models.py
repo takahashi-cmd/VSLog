@@ -170,10 +170,10 @@ class StudyLog(db.Model):
             .scalar()
         )
 
-        average_per_day = total_hours / study_days if study_days else 0.0
+        average_per_day = total_hours / study_days if study_days else 0.00
 
         return {
-            'total_hours': float(total_hours or 0.0),
+            'total_hours': round(total_hours or 0.00, 2),
             'study_days': study_days,
             'average_per_day': round(average_per_day, 2)
         }
