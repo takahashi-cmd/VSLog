@@ -6,6 +6,7 @@ from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from matplotlib import font_manager
 import matplotlib.pyplot as plt
+import numpy as np
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 import calendar
@@ -284,12 +285,33 @@ class StudyLog(db.Model):
                 if y != 0:
                     plt.text(x, round(y, 2), round(y, 2), ha='center', va='bottom')
         
-        # 円グラフの設定（年月日では表示しないようガード処理）
+        # 円グラフの設定
         elif graphType == 'pie':
-            return None
+            for fieldname in sorted(data.keys()):
+                bottom = [b + h for b, h in zip(bottom, data[fieldname])]
+            # bottomが0の時のbottomとdata_labelsを除外する関数
+            def filter_zero(bottom, data_labels):
+                filtered = [(b, l) for b, l in zip(bottom, data_labels) if b > 0]
+                if not filtered:
+                    return [], []
+                b, l = zip(*filtered)
+                return list(b), list(l)
+            # 時間と％の場合で出力を変更する関数
+            def format_time(pct, allvalues):
+                total = sum(allvalues)
+                value = pct/100 * total
+                if verticalAxis == 'time':
+                    return f'{value:.2f}時間'
+                elif verticalAxis == 'percent':
+                    return f'{value:.2f}%'
+            b, l = filter_zero(bottom, data_labels)
+            ax.pie(x=b, labels=l, counterclock=False, startangle=90, autopct=lambda pct: format_time(pct, b))
+            ax.axis('equal')
+            ax.legend(loc='upper left', bbox_to_anchor=(0.8, 1), edgecolor='black', borderaxespad=0)
 
+        # 折れ線グラフの設定
         elif graphType == 'line':
-            print('a')
+            return None
         print(f'bottom:{bottom}, data_labels:{data_labels}')
         
         # グラフタイトル【共通】
