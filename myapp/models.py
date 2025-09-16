@@ -260,37 +260,48 @@ class StudyLog(db.Model):
         # グラフ描画
         fig, ax = plt.subplots(figsize=(10, 4))
         bottom = [0] * date_num
-        for fieldname in sorted(data.keys()):
-            ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
-            bottom = [b + h for b, h in zip(bottom, data[fieldname])]
+        # グラフ種類によって条件分岐（棒グラフ、円グラフ、折れ線グラフ）
+        # 棒グラフの設定
+        if graphType == 'bar':
+            for fieldname in sorted(data.keys()):
+                ax.bar(data_labels, data[fieldname], bottom=bottom, label=fieldname, color=color_map.get(fieldname))
+                bottom = [b + h for b, h in zip(bottom, data[fieldname])]
+            ax.grid(True)
+            ax.set_xlabel('年月日')
+            if verticalAxis == 'time':
+                ax.set_ylabel('学習時間（時間）')
+            elif verticalAxis == 'percent':
+                ax.set_ylabel('学習時間（%）')
+            column_totals = [sum(day) for day in zip(*data.values())]
+            ymax_val = max(column_totals) if column_totals else 0
+            padding = max(1, ymax_val * 0.1)
+            ymax = ymax_val + padding
+            ax.set_ylim(0, ymax)
+            if period == 'month':
+                plt.setp(ax.get_xticklabels(), rotation=270, ha='center')
+            ax.legend(loc='upper left', bbox_to_anchor=(1.04, 1), edgecolor='black', borderaxespad=0)
+            for x, y in zip(data_labels, bottom):
+                if y != 0:
+                    plt.text(x, round(y, 2), round(y, 2), ha='center', va='bottom')
+        
+        # 円グラフの設定（年月日では表示しないようガード処理）
+        elif graphType == 'pie':
+            return None
+
+        elif graphType == 'line':
+            print('a')
         print(f'bottom:{bottom}, data_labels:{data_labels}')
         
+        # グラフタイトル【共通】
         if period == 'this_week' or period == 'last_week':
-            ax.set_title(f'{first_day.strftime(date_format)}～{last_day.strftime(date_format)}の学習履歴')
+            ax.set_title(f'{first_day.strftime(date_format)}～{last_day.strftime(date_format)}の学習履歴', y=1.04)
         elif period == 'month' and year and month and month_num:
-            ax.set_title(f'{year}年{month}月1日～{month}月{month_num}日の学習履歴')
+            ax.set_title(f'{year}年{month}月1日～{month}月{month_num}日の学習履歴', y=1.04)
         elif period == 'year':
             date_format_head = '%#Y年%#m月' if platform.system() == 'Windows' else '%Y年%-m月'
-            ax.set_title(f'{first_day.strftime(date_format_head)}～{last_day.strftime(date_format_head)}までの学習履歴')
+            ax.set_title(f'{first_day.strftime(date_format_head)}～{last_day.strftime(date_format_head)}までの学習履歴', y=1.04)
         elif period == 'all':
-            ax.set_title(f'年月日別全期間の学習履歴')
-        ax.grid(True)
-        ax.set_xlabel('年月日')
-        if verticalAxis == 'time':
-            ax.set_ylabel('学習時間（時間）')
-        elif verticalAxis == 'percent':
-            ax.set_ylabel('学習時間（%）')
-        column_totals = [sum(day) for day in zip(*data.values())]
-        ymax_val = max(column_totals) if column_totals else 0
-        padding = max(1, ymax_val * 0.1)
-        ymax = ymax_val + padding
-        ax.set_ylim(0, ymax)
-        if period == 'month':
-            plt.setp(ax.get_xticklabels(), rotation=270, ha='center')
-        ax.legend(loc='upper left', bbox_to_anchor=(1.04, 1), edgecolor='black', borderaxespad=0)
-        for x, y in zip(data_labels, bottom):
-            if y != 0:
-                plt.text(x, round(y, 2), round(y, 2), ha='center', va='bottom')
+            ax.set_title(f'年月日別全期間の学習履歴', y=1.04)
 
         # 画像をsvg形式で生成する
         buf = io.BytesIO()
@@ -333,38 +344,54 @@ class StudyLog(db.Model):
                 total_hour += float(hour)
             data = {fieldname: round((float(hour) / float(total_hour) * percentage), 1) for fieldname, _, hour in logs}
         color_map = {fieldname: color_code for fieldname, color_code, _ in logs}
-        print(data, color_map)
 
         # グラフ描画
         fig, ax = plt.subplots(figsize=(10, 4))
-        # グラフ種類によって条件分岐（棒グラフ、円グラフ）
-        ax.bar(data.keys(), data.values(), color=[color_map[f] for f in data.keys()])
-        # ax.pie(list(data.values()), labels=list(data.keys()), colors=[color_map[f] for f in data.keys()])
-        print(f'data.keys:{list(data.keys())}, data.values:{list(data.values())}')
+        # グラフ種類によって条件分岐（棒グラフ、円グラフ、折れ線グラフ）
+        # 棒グラフの設定
+        if graphType == 'bar':
+            ax.bar(data.keys(), data.values(), color=[color_map[f] for f in data.keys()])
+            ax.grid(True)
+            ax.set_xlabel('学習分野')
+            if verticalAxis == 'time':
+                ax.set_ylabel('学習時間（時間）')
+            elif verticalAxis == 'percent':
+                ax.set_ylabel('学習時間（%）')
+            ymax_val = max(data.values()) if data else 0
+            padding = max(1, ymax_val * 0.1)
+            ymax = ymax_val + padding
+            ax.set_ylim(0, ymax)
+            plt.setp(ax.get_xticklabels(), rotation=45, ha='center')
+            for x, y in zip(data.keys(), data.values()):
+                plt.text(x, round(y, 2), round(y, 2), ha='center', va='bottom')
+
+        # 円グラフの設定
+        elif graphType == 'pie':
+            # 時間と％の場合で出力を変更する関数
+            def format_time(pct, allvalues):
+                total = sum(allvalues)
+                value = pct/100 * total
+                if verticalAxis == 'time':
+                    return f'{value:.2f}時間'
+                elif verticalAxis == 'percent':
+                    return f'{value:.2f}%'
+            ax.pie(x=list(data.values()), labels=list(data.keys()), colors=[color_map[f] for f in data.keys()], counterclock=False, startangle=90, autopct=lambda pct: format_time(pct, list(data.values())))
+            ax.axis('equal')
+            ax.legend(loc='upper left', bbox_to_anchor=(0.8, 1), edgecolor='black', borderaxespad=0)
         
+        # 折れ線グラフの設定（学習分野では表示しないようガード処理）
+        elif graphType == 'line':
+            return None
 
+        # グラフタイトル【共通】
         if period == 'this_week' or period == 'last_week':
-            ax.set_title(f'{first_day.strftime(date_format)}～{last_day.strftime(date_format)}の学習履歴')
+            ax.set_title(f'{first_day.strftime(date_format)}～{last_day.strftime(date_format)}の学習履歴', y=1.04)
         elif period == 'month' and year and month and month_num:
-            ax.set_title(f'{year}年{month}月1日～{month}月{month_num}日の分野別学習履歴')
+            ax.set_title(f'{year}年{month}月1日～{month}月{month_num}日の分野別学習履歴', y=1.04)
         elif period == 'year' and year:
-            ax.set_title(f'{year}年の分野別学習履歴')
+            ax.set_title(f'{year}年の分野別学習履歴', y=1.04)
         elif period == 'all':
-            ax.set_title('分野別全期間の学習履歴')
-
-        ax.grid(True)
-        ax.set_xlabel('学習分野')
-        if verticalAxis == 'time':
-            ax.set_ylabel('学習時間（時間）')
-        elif verticalAxis == 'percent':
-            ax.set_ylabel('学習時間（%）')
-        ymax_val = max(data.values()) if data else 0
-        padding = max(1, ymax_val * 0.1)
-        ymax = ymax_val + padding
-        ax.set_ylim(0, ymax)
-        plt.setp(ax.get_xticklabels(), rotation=45, ha='center')
-        for x, y in zip(data.keys(), data.values()):
-            plt.text(x, round(y, 2), round(y, 2), ha='center', va='bottom')
+            ax.set_title('分野別全期間の学習履歴', y=1.04)
 
         buf = io.BytesIO()
         fig.tight_layout()
