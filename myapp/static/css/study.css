@@ -136,8 +136,9 @@
 }
 
 .study-logs-join .open:hover {
-    opacity: 0.8;
+    opacity: 0.3;
     border-radius: 0px;
+    background-color: var(--contents-bg-color);
 }
 
 .study-logs-date {
