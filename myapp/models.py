@@ -311,7 +311,27 @@ class StudyLog(db.Model):
 
         # 折れ線グラフの設定
         elif graphType == 'line':
-            return None
+            for fieldname in sorted(data.keys()):
+                ax.plot(data_labels, data[fieldname], '-', color=color_map.get(fieldname), linewidth=1, alpha=1, marker='.', label=fieldname)
+            ax.grid(True)
+            ax.set_xlabel('年月日')
+            if verticalAxis == 'time':
+                ax.set_ylabel('学習時間（時間）')
+            elif verticalAxis == 'percent':
+                ax.set_ylabel('学習時間（%）')
+            column_totals = [max(day) for day in zip(*data.values())]
+            ymax_val = max(column_totals) if column_totals else 0
+            padding = max(1, ymax_val * 0.1)
+            ymax = ymax_val + padding
+            ax.set_ylim(0, ymax)
+            if period == 'month':
+                plt.setp(ax.get_xticklabels(), rotation=270, ha='center')
+            ax.legend(loc='upper left', bbox_to_anchor=(1.04, 1), edgecolor='black', borderaxespad=0)
+            for fieldname in sorted(data.keys()):
+                for x, y in zip(data_labels, data[fieldname]):
+                    if y != 0:
+                        plt.text(x, round(y, 2), round(y, 2), ha='center', va='bottom')
+        
         print(f'bottom:{bottom}, data_labels:{data_labels}')
         
         # グラフタイトル【共通】
