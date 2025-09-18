@@ -31,6 +31,28 @@
     flex: 1;
 }
 
+.home-display {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--contents-bg-color);
+    flex: 1;
+    gap: 4px;
+}
+
+.home-display-period {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.home-display-add {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
 .home-stats {
     display: flex;
     justify-content: center;

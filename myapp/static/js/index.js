@@ -37,13 +37,17 @@ submitForm();
 // プルダウンメニュー選択時に自動でformを送信
 periodSelect.addEventListener('change', () => {
     const selected = periodSelect.value;
+    yearContainer.classList.remove('home-display-add');
     yearContainer.classList.add('hidden');
+    monthContainer.classList.remove('home-display-add');
     monthContainer.classList.add('hidden');
 
     if (selected === 'year') {
         yearContainer.classList.remove('hidden');
+        yearContainer.classList.add('home-display-add');
     } else if (selected === 'month') {
         monthContainer.classList.remove('hidden');
+        monthContainer.classList.add('home-display-add');
     };
     submitForm();
 });
@@ -86,8 +90,16 @@ function submitForm() {
     });
 }
 
+// 折れ線グラフと分野別の組み合わせが選択できないようガード処理
+const fieldsOption = horizontalAxisSelect.querySelector('option[value="fields"]');
+const lineOption = graphType.querySelector('option[value="line"]');
+console.log(fieldsOption, lineOption);
 
+function syncAxisAvailability() {
+    fieldsOption.disabled = graphType.value === 'line';
+    lineOption.disabled = horizontalAxisSelect.value === 'fields'
+}
 
-
-
+horizontalAxisSelect.addEventListener('change', syncAxisAvailability);
+graphType.addEventListener('change', syncAxisAvailability);
 
