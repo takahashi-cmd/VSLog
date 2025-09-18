@@ -15,50 +15,52 @@
         <div class="home-format">
             <form action="{{ url_for('get_graph_stats', user_id=current_user.user_id) }}" method="post" id="graphForm">
                 <!-- メイン表示期間選択 -->
-                <div class="home-stats">
-                    <label for="period">表示期間：</label>
-                    <select name="period" id="period">
-                        <option value="this_week" selected>今週</option>
-                        <option value="last_week">先週</option>
-                        <option value="month">月間</option>
-                        <option value="year">年間</option>
-                        <option value="all">全期間</option>
-                    </select>
-                <!-- 年間選択 -->
-                    <div id="year-container" class="hidden">
-                        <label for="year">年：</label>
-                        <select name="year" id="year">
-                            <option value="{{ this_year }}" selected>{{ this_year }}</option>
+                <div class="home-display">
+                    <label for="period">表示期間</label>
+                    <div class="home-display-period">
+                        <select name="period" id="period">
+                            <option value="this_week" selected>今週</option>
+                            <option value="last_week">先週</option>
+                            <option value="month">月間</option>
+                            <option value="year">年間</option>
+                            <option value="all">全期間</option>
                         </select>
-                    </div>
-                <!-- 月間選択 -->
-                    <div id="month-container" class="hidden">
-                        <label for="month-year">年：</label>
-                        <select name="month-year" id="month-year">
-                            <option value="{{ this_year }}" selected>{{ this_year }}</option>
-                        </select><br>
-                        <label for="month">月：</label>
-                        <select name="month" id="month">
-                            <option value="{{ this_month }}" selected>{{ this_month }}</option>
-                        </select>
+                        <!-- 月間選択 -->
+                        <div id="month-container" class="hidden">
+                            <label for="month-year">年：</label>
+                            <select name="month-year" id="month-year">
+                                <option value="{{ this_year }}" selected>{{ this_year }}</option>
+                            </select><br>
+                            <label for="month">月：</label>
+                            <select name="month" id="month">
+                                <option value="{{ this_month }}" selected>{{ this_month }}</option>
+                            </select>
+                        </div>
+                        <!-- 年間選択 -->
+                        <div id="year-container" class="hidden">
+                            <label for="year">年：</label>
+                            <select name="year" id="year">
+                                <option value="{{ this_year }}" selected>{{ this_year }}</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                <div class="home-stats">
-                    <label for="horizontalAxis">横軸表示形式：</label>
+                <div class="home-display">
+                    <label for="horizontalAxis">横軸表示形式</label>
                     <select name="horizontalAxis" id="horizontalAxis">
                         <option value="days" selected>年月日別</option>
                         <option value="fields">分野別</option>
                     </select>
                 </div>
-                <div class="home-stats">
-                    <label for="verticalAxis">縦軸表示形式：</label>
+                <div class="home-display">
+                    <label for="verticalAxis">縦軸表示形式</label>
                     <select name="verticalAxis" id="verticalAxis">
                         <option value="time" selected>時間</option>
                         <option value="percent">%</option>
                     </select>
                 </div>
-                <div class="home-stats">
-                    <label for="graphType">グラフ種類：</label>
+                <div class="home-display">
+                    <label for="graphType">グラフ種類</label>
                     <select name="graphType" id="graphType">
                         <option value="bar" selected>棒グラフ</option>
                         <option value="pie">円グラフ</option>

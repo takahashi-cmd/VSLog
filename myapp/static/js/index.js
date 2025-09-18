@@ -37,13 +37,17 @@ submitForm();
 // プルダウンメニュー選択時に自動でformを送信
 periodSelect.addEventListener('change', () => {
     const selected = periodSelect.value;
+    yearContainer.classList.remove('home-display-add');
     yearContainer.classList.add('hidden');
+    monthContainer.classList.remove('home-display-add');
     monthContainer.classList.add('hidden');
 
     if (selected === 'year') {
         yearContainer.classList.remove('hidden');
+        yearContainer.classList.add('home-display-add');
     } else if (selected === 'month') {
         monthContainer.classList.remove('hidden');
+        monthContainer.classList.add('home-display-add');
     };
     submitForm();
 });
