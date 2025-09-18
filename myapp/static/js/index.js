@@ -90,8 +90,16 @@ function submitForm() {
     });
 }
 
+// 折れ線グラフと分野別の組み合わせが選択できないようガード処理
+const fieldsOption = horizontalAxisSelect.querySelector('option[value="fields"]');
+const lineOption = graphType.querySelector('option[value="line"]');
+console.log(fieldsOption, lineOption);
 
+function syncAxisAvailability() {
+    fieldsOption.disabled = graphType.value === 'line';
+    lineOption.disabled = horizontalAxisSelect.value === 'fields'
+}
 
-
-
+horizontalAxisSelect.addEventListener('change', syncAxisAvailability);
+graphType.addEventListener('change', syncAxisAvailability);
 

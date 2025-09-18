@@ -45,14 +45,12 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    flex: 1;
 }
 
 .home-display-add {
     display: flex;
     align-items: center;
     gap: 4px;
-    flex: 1;
 }
 
 .home-stats {
