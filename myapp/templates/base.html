@@ -37,6 +37,9 @@
                             <button class="logout" type="submit">ログアウト</button>
                         </form>
                     </div>
+                    <div class="menu-icon">
+                        <img src="{{ url_for('static', filename='image/menu-icon.png') }}" alt="メニューアイコン">
+                    </div>
                 {% else %}
                     <div class="header-logo">
                         <a href="{{ url_for('login_view') }}"><img src="{{ url_for('static', filename='image/logo.png') }}" alt="ロゴ画像"></a>
@@ -46,6 +49,9 @@
                         <a href="{{ url_for('login_view') }}">ログイン画面はこちら</a>
                         <a href="{{ url_for('signup_view') }}">新規登録はこちら</a>
                         <a href="{{ url_for('password_reset_view') }}">パスワードをお忘れの方はこちら</a>
+                    </div>
+                    <div class="menu-icon">
+                        <img src="{{ url_for('static', filename='image/menu-icon.png') }}" alt="メニューアイコン">
                     </div>
                 {% endif %}
             </div>

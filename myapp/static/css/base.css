@@ -38,7 +38,7 @@ a {
 
 
 header {
-    height: 80px; /* PCデフォルト */
+    height: 80px; /* PCデフォルト値 */
     background-color: var(--contents-bg-color);
     width: 100%;
 }
@@ -107,8 +107,25 @@ header {
     border-radius: 10px;
 }
 
+.menu-icon {
+    display: none;
+    height: 100%;
+    align-items: center;
+
+}
+
+.menu-icon img {
+    height: 50%;
+    width: auto;
+}
+
+.menu-icon img:hover {
+    opacity: 0.8;
+}
+
 .main-container {
-    max-width: 1120px;
+    max-width: 1120px; /* 画面幅の上限値 */
+    width: 100%;
     margin: 0 auto;
     padding: 0 24px;
 }

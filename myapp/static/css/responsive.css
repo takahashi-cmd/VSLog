@@ -1,1 +1,21 @@
 /* レスポンシブデザインに対応したメディアクエリを記述 */
+
+/* スマホサイズ */
+@media (min-width:375px) {
+    .header-nav {
+        display: none;
+    }
+    .menu-icon {
+        display: flex;
+    }
+}
+
+/* PC・タブレットサイズ */
+@media (min-width:768px) {
+    .header-nav {
+        display: flex;
+    }
+    .menu-icon {
+        display: none;
+    }
+}
