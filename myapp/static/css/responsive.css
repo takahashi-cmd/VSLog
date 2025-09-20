@@ -1,21 +1,31 @@
 /* レスポンシブデザインに対応したメディアクエリを記述 */
 
-/* スマホサイズ */
-@media (min-width:375px) {
+/* タブレットサイズ（768px〜960px） */
+@media (max-width:960px) {
+    /* ヘッダーの共通設定 */
     .header-nav {
         display: none;
     }
+
     .menu-icon {
         display: flex;
     }
 }
 
-/* PC・タブレットサイズ */
-@media (min-width:768px) {
+/* スマホサイズ（～768px未満） */
+@media (max-width:767.98px) {
+    /* ヘッダーの共通設定 */
     .header-nav {
-        display: flex;
+        display: none;
     }
     .menu-icon {
-        display: none;
+        display: flex;
+    }
+    /* study_logsの設定 */
+    .study-date-view {
+        display: flex;
+        flex-flow: column;
+        text-align: center;
+        gap: 24px;
     }
 }

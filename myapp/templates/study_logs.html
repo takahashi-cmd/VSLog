@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block head_link %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/study.css') }}">
-    <script src="{{ url_for('static', filename='js/common.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/study_logs.js') }}" defer></script>
 {% endblock %}
 
@@ -14,12 +13,16 @@
             <h1>学習記録の登録・編集</h1>
         </div>
         <!-- 画面表示時のフォーム -->
-        <div class="study-date">
-            <p>{{ selected_date }}の学習記録</p>
-            <form action="{{ url_for('study_logs_view', user_id=current_user.user_id) }}" method="post" id="study-date-form">
-                <label for="study_date">日付：</label>
-                <input type="date" name="study_date" id="study_date" value="{{ selected_date }}">
-            </form>
+        <div class="study-date-view">
+            <div class="study-date">
+                <p>{{ selected_date }}の学習記録</p>
+            </div>
+            <div class="study-date">
+                <form action="{{ url_for('study_logs_view', user_id=current_user.user_id) }}" method="post" id="study-date-form">
+                    <label for="study_date">日付：</label>
+                    <input type="date" name="study_date" id="study_date" value="{{ selected_date }}">
+                </form>
+            </div>
         </div>
 
         <!-- 学習分野のプルダウンリスト設定 -->

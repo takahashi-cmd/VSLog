@@ -1,6 +1,6 @@
 /* ボタン、テーブル等の各共通コンポーネント（部品）の定義 */
 button {
-    padding: 10px 40px;
+    padding: 10px 20px;
     background-color: var(--main-color);
     color: var(--contents-bg-color);
     border-radius: 10px;

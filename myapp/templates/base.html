@@ -14,6 +14,8 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='image/favicon/favicon.ico') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='image/favicon/apple-touch-icon.png') }}">
     <link rel="manifest" href="{{ url_for('static', filename='image/favicon/site.webmanifest') }}">
+    <!-- common.jsの読み込み -->
+    <script src="{{ url_for('static', filename='js/common.js') }}" defer></script>
     {% block head_link %}{% endblock %}
     <title>{% block title %} タイトル {% endblock %}</title>
 </head>

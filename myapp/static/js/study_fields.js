@@ -7,9 +7,9 @@ const addRowFields = (btn) => {
     newRow.classList.add('study-tr', 'fields');
     newRow.innerHTML = `
     <td class="table-num"></td>
-    <td><input type="text" name="fieldname[]" value=""></td>
+    <td class="table-fieldname"><input type="text" name="fieldname[]" value=""></td>
     <td class="table-field-color"><input type="color" name="color_code[]" value="#000000"></td>
-    <td>
+    <td class="table-delete">
     <input type="hidden" name="field_id[]" value="">
     <input type="hidden" name="row_action[]" value="new">
     <button class="delete-button" type="button" onclick="removeRow(this)">🗑️</button>

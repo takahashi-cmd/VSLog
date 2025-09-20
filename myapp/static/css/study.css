@@ -3,6 +3,7 @@
 .study-inner {
     max-width: 1120px;
     height: auto;
+    width: 100%;
     margin: 100px auto 100px auto;
 }
 
@@ -15,7 +16,7 @@
     font-size: 24px;
 }
 
-.study-date {
+.study-date-view {
     display: flex;
     justify-content: space-between;
     margin-bottom: 24px;
@@ -39,6 +40,7 @@
     justify-content: center;
     align-items: center;
     margin-bottom: 24px;
+    width: 100%;
 }
 
 .study-table-container table {
@@ -46,39 +48,60 @@
     border-collapse: collapse;
 }
 
+/* study_logsの表幅の設定 */
 .study-logs {
     width: 100%;
+    table-layout: auto;
 }
 
-.study-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 24px;
-}
-
-.table-field-color {
-    text-align: center;
-}
-
-.th-num {
+.study-tr.logs th.th-num {
     width: 5%;
+    white-space: nowrap;
 }
 
-.th-hour{
+.study-tr.logs th.th-hour {
     width: 15%;
+    white-space: nowrap;
 }
 
-.th-fieldname {
+.study-tr.logs th.th-fieldname {
     width: 15%;
+    white-space: nowrap;
 }
 
-.th-content {
+.study-tr.logs th.th-content {
     width: 60%;
+    white-space: nowrap;
 }
 
-.th-delete {
+.study-tr.logs th.th-delete {
     width: 5%;
+    white-space: nowrap;
+}
+
+/* study_fieldsの表幅の設定 */
+.study-fields {
+    table-layout: auto;
+}
+
+.study-tr.fields th.th-num {
+    width: 5%;
+    white-space: nowrap;
+}
+
+.study-tr.fields th.th-fieldname {
+    width: 20%;
+    white-space: nowrap;
+}
+
+.study-tr.fields th.th-color {
+    width: 10%;
+    white-space: nowrap;
+}
+
+.study-tr.fields th.th-delete {
+    width: 5%;
+    white-space: nowrap;
 }
 
 .study-tr th,td {
@@ -87,6 +110,12 @@
 }
 
 .study-tr.logs input {
+    width: 100%;
+    padding: 5px;
+}
+
+.table-fieldname input,
+.table-delete input {
     width: 100%;
     padding: 5px;
 }
@@ -104,6 +133,14 @@
     resize: vertical;
 }
 
+.study-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+}
+
+/* study_logs_listの設定 */
 .study-logs-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
@@ -153,6 +190,7 @@
     padding: 8px;
 }
 
+/* study_logs_listのモーダルウインドウ設定 */
 .study-logs-modal .modal-content {
     display: none;
     background-color: var(--contents-bg-color);
