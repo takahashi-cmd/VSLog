@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block head_link %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/study.css') }}">
-    <script src="{{ url_for('static', filename='js/common.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/study_fields.js') }}" defer></script>
 {% endblock %}
 
@@ -30,9 +29,9 @@
                         {% for field in current_user.fields %}
                         <tr class="study-tr fields">
                             <td class="table-num">{{ loop.index }}</td>
-                            <td><input type="text" name="fieldname[]" value="{{ field.fieldname }}"></td>
+                            <td class="table-fieldname"><input type="text" name="fieldname[]" value="{{ field.fieldname }}"></td>
                             <td class="table-field-color"><input type="color" name="color_code[]" value="{{ field.color_code }}"></td>
-                            <td>
+                            <td class="table-delete">
                                 <input type="hidden" name="field_id[]" value="{{ field.field_id }}">
                                 <input type="hidden" name="row_action[]" value="update">
                                 <button class="delete-button" type="button" onclick="markDeleted(this)">🗑️</button>
@@ -44,9 +43,9 @@
                         {% for i in range(5 - current_user.fields|length) %}
                         <tr class="study-tr fields">
                             <td class="table-num">{{ current_user.fields|length + i + 1 }}</td>
-                            <td><input type="text" name="fieldname[]" value=""></td>
+                            <td class="table-fieldname"><input type="text" name="fieldname[]" value=""></td>
                             <td class="table-field-color"><input type="color" name="color_code[]" value="#000000"></td>
-                            <td>
+                            <td class="table-delete">
                                 <input type="hidden" name="field_id[]" value="">
                                 <input type="hidden" name="row_action[]" value="new">
                                 <button class="delete-button" type="button" onclick="removeRow(this)">🗑️</button>

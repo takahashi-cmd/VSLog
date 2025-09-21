@@ -71,9 +71,11 @@ function submitForm() {
                     fieldNames.push(fieldname);
                     // モーダルウインドウのNo、時間、分野、内容取得
                     fieldHour +=
-                        `<p class="num">${[i + 1]}</p>
-                        <p class="fn">${fieldname}</p>
-                        <p class="hour">${h}時間${m}分</p><br>`
+                        `<div class="modal-field-hour-list">
+                            <p class="num">${[i + 1]}</p>
+                            <p class="fn">${fieldname}</p>
+                            <p class="hour">${h}時間${m}分</p>
+                        </div>`
                     content +=
                         `<div class="content-head">
                         <p class="num">${[i + 1]}</p>
@@ -89,7 +91,7 @@ function submitForm() {
                 subtotalHour = 0;
                 subtotalMinute = 0;
                 fieldNames = `なし`
-                fieldHour = `<p class="hour">なし</p>`
+                fieldHour = `<p class="n-hour">なし</p>`
                 content = `<p class="n-content">なし</p>`
                 // 背景色設定クラスの追加
                 node.closest('.study-logs-join').classList.add('noLogs');

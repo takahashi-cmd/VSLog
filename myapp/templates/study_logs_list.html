@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block head_link %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/study.css') }}">
-    <script src="{{ url_for('static', filename='js/common.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/study_logs_list.js') }}" defer></script>
 
 {% endblock %}
@@ -15,14 +14,16 @@
             <h1>{{ current_user.username }}さんの学習履歴一覧</h1>
         </div>
         <!-- 画面表示時のフォーム -->
-        <div class="study-date">
-            <div id="selected_date">
+        <div class="study-date-view">
+            <div class="study-date" id="selected_date">
                 <p>{{ this_year }}年{{ this_month }}月の学習履歴一覧</p>
             </div>
-            <form action="{{ url_for('study_logs_list_process', user_id=current_user.user_id) }}" method="post" id="study-date-form">
-                <label for="study_date">日付：</label>
-                <input type="month" name="study_date" id="study_date" value="{{ selected_date }}">
-            </form>
+            <div class="study-date">
+                <form action="{{ url_for('study_logs_list_process', user_id=current_user.user_id) }}" method="post" id="study-date-form">
+                    <label for="study_date">日付：</label>
+                    <input type="month" name="study_date" id="study_date" value="{{ selected_date }}">
+                </form>
+            </div>
         </div>
         <!-- 以下のdivにtemplateの内容がDOM操作で挿入される -->
         <div class="study-logs-list" id="study-logs-list"></div>
