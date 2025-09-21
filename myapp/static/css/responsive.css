@@ -21,11 +21,41 @@
     .menu-icon {
         display: flex;
     }
-    /* study_logsの設定 */
+    /* study_logs, study_logs_listの日付表示設定 */
     .study-date-view {
         display: flex;
         flex-flow: column;
         text-align: center;
         gap: 24px;
+    }
+    /* study_logsの表幅の設定 */
+    .study-logs {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    .study-tr.logs th.th-num {
+        width: 7.5%;
+    }
+
+    .study-tr.logs th.th-hour {
+        width: 25%;
+    }
+
+    .study-tr.logs th.th-fieldname {
+        width: 15%;
+    }
+
+    .study-tr.logs th.th-content {
+        width: 10%;
+    }
+
+    .study-tr.logs th.th-delete {
+        width: 10%;
+    }
+
+    /* study_logs_listの表幅の設定 */
+    .study-logs-list {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
 }
