@@ -130,6 +130,7 @@ header {
     padding: 0 24px;
 }
 
+/* flashメッセージの設定 */
 .message.normal {
     position: fixed;
     right: 18px;
@@ -151,7 +152,7 @@ header {
 }
 
 footer {
-    height: 80px; /* PCデフォルト */
+    height: 80px; /* PCデフォルト値 */
     background-color: var(--contents-bg-color);
     width: 100%;
 }

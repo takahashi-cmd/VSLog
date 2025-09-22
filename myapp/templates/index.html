@@ -12,64 +12,62 @@
         <div class="home-head">
             <h1>{{ current_user.username }}さんの学習履歴</h1>
         </div>
-        <div class="home-format">
-            <form action="{{ url_for('get_graph_stats', user_id=current_user.user_id) }}" method="post" id="graphForm">
-                <!-- メイン表示期間選択 -->
-                <div class="home-display">
-                    <label for="period">表示期間</label>
-                    <div class="home-display-period">
-                        <select name="period" id="period">
-                            <option value="this_week" selected>今週</option>
-                            <option value="last_week">先週</option>
-                            <option value="month">月間</option>
-                            <option value="year">年間</option>
-                            <option value="all">全期間</option>
+        <form action="{{ url_for('get_graph_stats', user_id=current_user.user_id) }}" method="post" id="graphForm" class="home-display-wrap">
+            <!-- メイン表示期間選択 -->
+            <div class="home-display">
+                <label for="period">表示期間</label>
+                <div class="home-display-period">
+                    <select name="period" id="period">
+                        <option value="this_week" selected>今週</option>
+                        <option value="last_week">先週</option>
+                        <option value="month">月間</option>
+                        <option value="year">年間</option>
+                        <option value="all">全期間</option>
+                    </select>
+                    <!-- 月間選択 -->
+                    <div id="month-container" class="hidden">
+                        <label for="month-year">年：</label>
+                        <select name="month-year" id="month-year">
+                            <option value="{{ this_year }}" selected>{{ this_year }}</option>
+                        </select><br>
+                        <label for="month">月：</label> 
+                        <select name="month" id="month">
+                            <option value="{{ this_month }}" selected>{{ this_month }}</option>
                         </select>
-                        <!-- 月間選択 -->
-                        <div id="month-container" class="hidden">
-                            <label for="month-year">年：</label>
-                            <select name="month-year" id="month-year">
-                                <option value="{{ this_year }}" selected>{{ this_year }}</option>
-                            </select><br>
-                            <label for="month">月：</label> 
-                            <select name="month" id="month">
-                                <option value="{{ this_month }}" selected>{{ this_month }}</option>
-                            </select>
-                        </div>
-                        <!-- 年間選択 -->
-                        <div id="year-container" class="hidden">
-                            <label for="year">年：</label>
-                            <select name="year" id="year">
-                                <option value="{{ this_year }}" selected>{{ this_year }}</option>
-                            </select>
-                        </div>
+                    </div>
+                    <!-- 年間選択 -->
+                    <div id="year-container" class="hidden">
+                        <label for="year">年：</label>
+                        <select name="year" id="year">
+                            <option value="{{ this_year }}" selected>{{ this_year }}</option>
+                        </select>
                     </div>
                 </div>
-                <div class="home-display">
-                    <label for="horizontalAxis">横軸表示形式</label>
-                    <select name="horizontalAxis" id="horizontalAxis">
-                        <option value="days" selected>年月日別</option>
-                        <option value="fields">分野別</option>
-                    </select>
-                </div>
-                <div class="home-display">
-                    <label for="verticalAxis">縦軸表示形式</label>
-                    <select name="verticalAxis" id="verticalAxis">
-                        <option value="time" selected>時間</option>
-                        <option value="percent">%</option>
-                    </select>
-                </div>
-                <div class="home-display">
-                    <label for="graphType">グラフ種類</label>
-                    <select name="graphType" id="graphType">
-                        <option value="bar" selected>棒グラフ</option>
-                        <option value="pie">円グラフ</option>
-                        <option value="line">折れ線グラフ</option>
-                    </select>
-                </div>
-            </form>
-        </div>
-        <div class="home-format">
+            </div>
+            <div class="home-display">
+                <label for="horizontalAxis">横軸表示形式</label>
+                <select name="horizontalAxis" id="horizontalAxis">
+                    <option value="days" selected>年月日別</option>
+                    <option value="fields">分野別</option>
+                </select>
+            </div>
+            <div class="home-display">
+                <label for="verticalAxis">縦軸表示形式</label>
+                <select name="verticalAxis" id="verticalAxis">
+                    <option value="time" selected>時間</option>
+                    <option value="percent">%</option>
+                </select>
+            </div>
+            <div class="home-display">
+                <label for="graphType">グラフ種類</label>
+                <select name="graphType" id="graphType">
+                    <option value="bar" selected>棒グラフ</option>
+                    <option value="pie">円グラフ</option>
+                    <option value="line">折れ線グラフ</option>
+                </select>
+            </div>
+        </form>
+        <div class="home-stats-wrap">
             <div class="home-stats">
                 <img src="{{ url_for('static', filename='image/days.png') }}" alt="学習日数">
                 <div class="home-stats-area">
@@ -93,7 +91,8 @@
             </div>
         </div>
         <div class="home-graph" id="home-graph">
+            <!-- ここにグラフを表示 -->
         </div>
-    <div>
+    </div>
 </div>
 {% endblock %}
