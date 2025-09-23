@@ -107,6 +107,7 @@ header {
     border-radius: 10px;
 }
 
+/* ハンバーガーメニューの設定 */
 .menu-icon {
     display: none;
     height: 100%;
@@ -123,6 +124,55 @@ header {
     opacity: 0.8;
 }
 
+.modal-header-overlay {
+    display: none;
+}
+
+.modal-header-overlay.open {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, .6);
+    z-index: 90;
+}
+
+.modal-header-nav {
+    display: none;
+}
+
+.modal-header-nav.open {
+    display: block;
+}
+
+.modal-header-content {
+    font-size: 12px;
+    background-color: var(--contents-bg-color);
+    border-radius: 10px;
+    width: 250px;
+    padding: 12px;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    box-shadow: 4px 4px 4px rgba(0, 0, 0, .6);
+    z-index: 100;
+}
+
+.modal-header-content li {
+    line-height: 2.5;
+}
+
+.modal-header-content li a {
+    display: block;
+}
+
+.is-hover:hover {
+    background-color: var(--hover-color);
+    border-radius: 10px;
+}
+
 .main-container {
     max-width: 1120px; /* 画面幅の上限値 */
     width: 100%;
@@ -130,6 +180,7 @@ header {
     padding: 0 24px;
 }
 
+/* flashメッセージの設定 */
 .message.normal {
     position: fixed;
     right: 18px;
@@ -151,7 +202,7 @@ header {
 }
 
 footer {
-    height: 80px; /* PCデフォルト */
+    height: 80px; /* PCデフォルト値 */
     background-color: var(--contents-bg-color);
     width: 100%;
 }

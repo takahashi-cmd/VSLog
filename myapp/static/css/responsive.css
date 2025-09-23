@@ -10,6 +10,15 @@
     .menu-icon {
         display: flex;
     }
+    /* indexのコンテンツ幅の設定 */
+    .home-display-wrap {
+        grid-template-columns: repeat(2, 1fr); /* 2分割のグリッドを用意 */
+    }
+
+    .home-stats-wrap {
+        grid-template-columns: repeat(2, 1fr); /* 2分割のグリッドを用意 */
+    }
+
 }
 
 /* スマホサイズ（～768px未満） */
@@ -21,6 +30,15 @@
     .menu-icon {
         display: flex;
     }
+    /* indexのコンテンツ幅の設定 */
+    .home-display-wrap {
+        grid-template-columns: repeat(1, 1fr); /* 1分割のグリッドを用意 */
+    }
+
+    .home-stats-wrap {
+    grid-template-columns: repeat(1, 1fr); /* 1分割のグリッドを用意 */
+    }
+
     /* study_logs, study_logs_listの日付表示設定 */
     .study-date-view {
         display: flex;
