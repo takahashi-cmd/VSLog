@@ -126,15 +126,6 @@
                 {% endwith %}
             </div>
         </div>
-        <script>
-            const flashMessage = document.querySelectorAll('.message')
-            console.log(flashMessage);
-            flashMessage.forEach((message) => {
-                setTimeout(() => {
-                    message.remove()
-                }, 5000);
-            })
-        </script>
         {% endblock %}
         <!-- 内容（ここに上書き） -->
         {% block content %} 内容 {% endblock %}

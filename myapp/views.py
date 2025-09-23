@@ -405,7 +405,7 @@ def study_fields_process(user_id):
         for fieldname, color_code, field_id, row_action in zip(fieldnames, color_codes, field_ids, row_actions):
             # 登録
             if row_action == 'new' and fieldname.strip():
-                if fieldname in existing_names:
+                if fieldname.strip().lower() in existing_names:
                     flash(f'{fieldname}は既に登録されています', 'エラー')
                 else:
                     field = Field(
