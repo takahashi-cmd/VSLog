@@ -107,6 +107,7 @@ header {
     border-radius: 10px;
 }
 
+/* ハンバーガーメニューの設定 */
 .menu-icon {
     display: none;
     height: 100%;
@@ -121,6 +122,55 @@ header {
 
 .menu-icon img:hover {
     opacity: 0.8;
+}
+
+.modal-header-overlay {
+    display: none;
+}
+
+.modal-header-overlay.open {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, .6);
+    z-index: 90;
+}
+
+.modal-header-nav {
+    display: none;
+}
+
+.modal-header-nav.open {
+    display: block;
+}
+
+.modal-header-content {
+    font-size: 12px;
+    background-color: var(--contents-bg-color);
+    border-radius: 10px;
+    width: 250px;
+    padding: 12px;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    box-shadow: 4px 4px 4px rgba(0, 0, 0, .6);
+    z-index: 100;
+}
+
+.modal-header-content li {
+    line-height: 2.5;
+}
+
+.modal-header-content li a {
+    display: block;
+}
+
+.is-hover:hover {
+    background-color: var(--hover-color);
+    border-radius: 10px;
 }
 
 .main-container {

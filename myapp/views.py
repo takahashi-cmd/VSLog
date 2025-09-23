@@ -43,7 +43,7 @@ def login_process():
                 flash('ログインしました', '正常')
                 return redirect(url_for('index_view', user_id=user.user_id))
             else:
-                flash('異なるパスワードです', 'エラー')
+                flash('パスワードが違います', 'エラー')
                 return redirect(url_for('login_view'))
     return redirect(url_for('login_view'))
 
@@ -86,7 +86,7 @@ def signup_process():
 
         DBuser = User.select_by_email(email)
         if DBuser != None:
-            flash('既に登録されているメールアドレスです', 'エラー') 
+            flash('既に登録されているメールアドレスです', 'エラー')
         else:
             try:
                 db.session.add(user)
