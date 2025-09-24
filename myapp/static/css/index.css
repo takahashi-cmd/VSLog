@@ -89,6 +89,13 @@
     background-color: var(--contents-bg-color);
     text-align: center;
     overflow-x: scroll;
+    width: 100%;
+}
+
+.home-graph-data {
+    max-width: 960px;
+    width: 85vw;
+    height: 100%;
 }
 
 .hidden {

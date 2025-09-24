@@ -77,7 +77,7 @@ function submitForm() {
     .then(data => {
         if (data.svg) {
             const src = `data:image/svg+xml;base64,${data.svg}`;
-            graphArea.innerHTML = `<object data="${src}" type="image/svg+xml">`;
+            graphArea.innerHTML = `<object class="home-graph-data" data="${src}" type="image/svg+xml">`;
         } else {
             graphArea.innerHTML = `<p style='color:var(--base-text-color);'>学習記録がありません。</p>`;
         }

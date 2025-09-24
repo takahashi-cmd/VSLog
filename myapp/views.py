@@ -273,7 +273,7 @@ def password_update_process(user_id):
 
     if current_password == '' or new_password1 == '' or new_password2 == '':
         flash('空のフォームがあります', 'エラー')
-    elif generate_password_hash(current_password) != current_user.password:
+    elif not check_password_hash(current_user.password, current_password):
         flash('現在のパスワードが正しくありません', 'エラー')
     elif new_password1 != new_password2:
         flash('新しいパスワードと新しいパスワード（確認用）が一致しません', 'エラー')
