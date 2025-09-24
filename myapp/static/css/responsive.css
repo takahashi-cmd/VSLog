@@ -76,4 +76,9 @@
     .study-logs-list {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
+
+    /* study_logs_listのモーダルウインドウ幅の設定 */
+    .study-logs-modal .modal-content {
+        width: 300px;
+    }
 }

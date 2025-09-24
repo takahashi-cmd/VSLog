@@ -174,9 +174,9 @@ class StudyLog(db.Model):
         average_per_day = total_hours / study_days if study_days else 0.00
 
         return {
-            'total_hours': round(total_hours or 0.00, 2),
+            'total_hours': f'{total_hours:.2f}' or 0.00,
             'study_days': study_days,
-            'average_per_day': round(average_per_day, 2)
+            'average_per_day': f'{average_per_day:.2f}'
         }
 
     # 年月日別グラフ取得の共通関数
@@ -215,7 +215,7 @@ class StudyLog(db.Model):
 
         elif period == 'month' and year and month and month_num:
             date_num = month_num # 月毎の日数
-            date_format = '%#m/%#d' if platform.system() == 'Windows' else '%-m/%-d'
+            date_format = '%#m/%#d(%a)' if platform.system() == 'Windows' else '%-m/%-d(%a)'
             set_days = [first_day + timedelta(days=i) for i in range(date_num)]
             data_labels = [d.strftime(date_format) for d in set_days]
 
@@ -283,7 +283,7 @@ class StudyLog(db.Model):
             ax.legend(loc='upper left', bbox_to_anchor=(1.04, 1), edgecolor='black', borderaxespad=0)
             for x, y in zip(data_labels, bottom):
                 if y != 0:
-                    plt.text(x, round(y, 2), round(y, 2), ha='center', va='bottom')
+                    plt.text(x, y, f'{y:.2f}', ha='center', va='bottom')
         
         # 円グラフの設定
         elif graphType == 'pie':
@@ -405,7 +405,7 @@ class StudyLog(db.Model):
             ax.set_ylim(0, ymax)
             plt.setp(ax.get_xticklabels(), rotation=45, ha='center')
             for x, y in zip(data.keys(), data.values()):
-                plt.text(x, round(y, 2), round(y, 2), ha='center', va='bottom')
+                plt.text(x, y, f'{y:.2f}', ha='center', va='bottom')
 
         # 円グラフの設定
         elif graphType == 'pie':

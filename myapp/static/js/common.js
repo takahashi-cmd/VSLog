@@ -33,6 +33,14 @@ document.addEventListener('click', (e) => {
     }
 })
 
+// flashメッセージの表示
+const flashMessage = document.querySelectorAll('.message')
+console.log(flashMessage);
+flashMessage.forEach((message) => {
+    setTimeout(() => {
+        message.remove()
+    }, 5000);
+})
 
 // 空白行の削除
 const removeRow = (btn) => {
