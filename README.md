@@ -57,7 +57,7 @@ http://localhost:5000/login
 本アプリ（Flask）のポート番号は「5000」に設定しており、その後ろにログイン画面のURLを記述している。  
 既にローカルPC上でポート番号「5000」が使用されている場合は、.envファイルのFlaskポートの番号を変更する。例）5001, 55000など  
 
-（以下は必要に応じて修正する。）
+（以下が該当箇所であり、必要に応じて修正する。）
 ***  
 ファイルパス：2025.07_personal_development/.env  
 該当箇所：`FLASK_PORT=5000`  
@@ -138,18 +138,24 @@ http://localhost:5000/login
     └── requirements.txt                        # Python依存パッケージ一覧
 </pre>
 
+### ディレクトリ・ファイル命名規則
+Flaskアプリの中身である.pyファイルは、前述したMVTモデルに準じ、「models.py」, 「views.py」と命名した。  
+Flaskでのtemplateファイル（html）は、Jinja2テンプレートエンジンが認識できるよう「templates」直下に置くこととし、各URL名と突き合わせができるよう、URL名と同じファイル名で命名した。  
+base.htmlはすべてのhtmlファイルに共通するヘッダー、フッター等の設定内容を記述している。  
+css, JSファイルは、htmlファイルとの突き合わせができるよう基本的にはhtmlと同じ名前にしているが、共通化できるものは一つのファイルに整理することとし、common, componentsという名前にした。
+
 ## 詳細説明
 以降より、本アプリの詳細説明を示す。
 
 ### 使用技術の選定理由
 
 ### 機能一覧
-以下に機能一覧を示す。  
 本アプリはユーザーが学習分野を自由に登録し、その学習分野に関する学習時間・学習内容を日報形式で登録すると自動的にグラフが作成され、積み上げた学習記録が可視化できるようになっている。  
 ホーム画面にて、学習日数・学習時間の合計・平均の統計値、グラフ（棒グラフ・円グラフ・折れ線グラフ）が表示される。  
 統計値は表示期間によって、動的に変更される。例えば、月間2025年9月の表示形式を選択した場合、その年月の統計値が自動で取得できる。  
 グラフは、横軸・縦軸・グラフ種類からユーザーが表示したいものを選択し、表示できる。  
 プルダウンメニューの変更があれば、自動でフォームが送信され、統計値・グラフのいずれも非同期通信で内容が変化する。  
+以下に機能一覧を示す。  
 
 | **分類** | **URL** | **機能** |
 | --- | --- | --- |
@@ -198,8 +204,7 @@ http://localhost:5000/login
 <img width="auto" height="auto" alt="Image" src="https://github.com/user-attachments/assets/97efb631-2f62-4119-86d8-9927f8853966" />
 
 #### 画面デザイン（ワイヤーフレーム）
-画面デザインを以下に示す。  
-画面デザインはFigmaで作成した。  
+画面デザインを以下に示す。画面デザインはFigmaで作成した。  
 <img width="auto" height="auto" alt="Image" src="https://github.com/user-attachments/assets/ed9e1c38-737c-4448-af64-25563f97e90c" />
 
 ### DB設計
@@ -220,5 +225,51 @@ ER図を以下に示す。
 - 2038年問題を考慮し、created_atの型は「DATETIME」とする。
 
 ### データフロー
+本アプリにおけるデータフローを次のとおり示す。  
+fetch APIにより、ユーザーが表示したい情報をFlaskへ送り、MySQL（DB）から必要な情報を取得し、responseを返すという流れである。  
 
-### リクエスト／レスポンスの処理手順
+#### 全体図
+データフローの全体図を以下に示す。  
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant T as Template(Browser) (HTML/JS)
+    participant V as views.py(Server)
+    participant M as models.py(Server)
+    participant D as MySQL(DB)
+
+    U->>T: 入力 (form)
+    T->>V: fetch POST
+    V->>M: 条件分岐、対象関数の呼び出し
+    M->>D: SQL
+    D-->>M: 結果返却
+    M-->>V: 結果返却
+    V-->>T: JSON Response
+    T-->>U: 画面更新
+```
+
+#### 詳細図
+データフローの詳細図を以下に示す。  
+ここでは、本アプリの核となる機能の「グラフ・統計値取得」を対象とする。
+詳細図では、全体図にformの種類、Flask側での条件分岐、関数等を追記して示すものとする。  
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant T as index.html(Browser) (HTML/JS)
+    participant V as views.py(Server)
+    participant M as models.py(Server)
+    participant D as MySQL(DB)
+
+	  U->>T: form入力<br/>表示期間(period), 横軸(horizontalAxis), 縦軸(verticalAxis), グラフ種類(graphType)
+    T->>V: fetch POST /graph/<user_id>
+    V->>V: @app.route('/graph/<user_id>')<br/>get_graph_stats
+    V->>M: form内容からif文で条件分岐<br/>該当の関数呼び出し
+    M->>D: SQL SELECT<br/>学習日(study_date), 学習時間(hour), 学習分野(fieldname), 凡例カラー(color_code)
+    D-->>M: 結果返却
+    M-->>M: 結果を基にグラフ作成
+    M-->>V: グラフ(svg), 学習日数(total_day), 学習時間合計(total_hour), 学習時間平均(total_hour)
+    V-->>T: JSON Response<br/> {"svg": svg, "total_day": total_day, "total_hour": total_hour, "avg_hour": avg_hour}
+    T-->>U: DOM更新 (グラフ・統計値に反映)
+```
