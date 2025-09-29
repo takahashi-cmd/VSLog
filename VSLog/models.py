@@ -174,7 +174,7 @@ class StudyLog(db.Model):
         average_per_day = total_hours / study_days if study_days else 0.00
 
         return {
-            'total_hours': f'{total_hours:.2f}' or 0.00,
+            'total_hours': f'{total_hours:.2f}' if total_hours else 0.00,
             'study_days': study_days,
             'average_per_day': f'{average_per_day:.2f}'
         }
