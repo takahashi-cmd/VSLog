@@ -41,10 +41,8 @@ VSLog(Visualized Study Log：見える化された学習記録)
 - matplotlib
 
 ## デモ
-以下のデモ動画にて、アプリの内容を示す。
-<video src="https://github.com/takahashi-cmd/demo-assets/releases/download/untagged-e9abc8b63e598b0495f0/VSLog_demo.mp4" controls width="auto">
-お使いのブラウザは動画に対応していません
-</video>
+以下のデモ動画にて、アプリの内容を示す。  
+https://github.com/user-attachments/assets/0df36f40-1d37-42a7-8828-cc6ba8cfe0c6
 
 
 ## アプリの起動・終了方法
