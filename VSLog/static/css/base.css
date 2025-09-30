@@ -18,6 +18,13 @@ body {
     font-family: "IPAexGothic", "IPAexゴシック", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
     line-height: 1.6;
     color: var(--base-text-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1; /* 余白はmainに持たせる */
 }
 
 h1, h2, h3, h4, h5, h6 {
