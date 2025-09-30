@@ -203,10 +203,8 @@ DBは、軽量で安定性が高く、小規模なアプリに適する **「MyS
 |  | /study-logs/<user_id> | 学習記録の登録・編集機能 |
 |  | /study-logs/<user_id> | 年月日に応じた学習記録の切り替え機能 |
 |  | /study-fields/<user_id> | 学習分野の登録・編集機能 |
-|  | /study-logs/<user_id>
-/study-fields/<user_id> | 新規入力項目追加機能 |
-|  | /study-logs/<user_id>
-/study-fields/<user_id> | 入力項目削除機能 |
+|  | /study-logs/<user_id>, /study-fields/<user_id> | 新規入力項目追加機能 |
+|  | /study-logs/<user_id>, /study-fields/<user_id> | 入力項目削除機能 |
 |  | /study-logs-list/<user_id> | 学習履歴一覧の閲覧機能 |
 |  | /study-logs-list/<user_id> | 学習履歴一覧のモーダルウインドウ表示機能 |
 |  | /study-logs-list/<user_id> | 学習履歴一覧の入力・未入力の色分け機能（青・赤） |
