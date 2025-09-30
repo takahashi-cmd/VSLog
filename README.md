@@ -42,10 +42,32 @@ VSLog(Visualized Study Log：見える化された学習記録)
 
 ## デモ
 以下のデモ動画にて、アプリの内容を示す。  
-https://github.com/user-attachments/assets/0df36f40-1d37-42a7-8828-cc6ba8cfe0c6
+※音声は出ません。
 
+[![デモ動画](<img width="auto" height="auto" alt="Image" src="https://github.com/user-attachments/assets/30b58de3-b13b-4e44-bb18-2aee5b241f6f" />)](https://github.com/user-attachments/assets/0df36f40-1d37-42a7-8828-cc6ba8cfe0c6)
 
 ## アプリの起動・終了方法
+### 環境変数ファイルの準備
+.env.exampleファイルをコピーし、ファイル名を.envにしてルートディレクトリ直下に保存する。  
+.envには以下の内容を記述する。
+
+```
+# MySQL設定
+MYSQL_HOST=db
+MYSQL_ROOT_PASSWORD=secret
+MYSQL_USER=testuser
+MYSQL_PASSWORD=pass1234
+MYSQL_DATABASE=myapp
+MYSQL_PORT=3306
+
+# Flask設定
+FLASK_PORT=5000
+SECRET_KEY=dev-secret-key
+FLASK_APP=VSLog.app
+FLASK_ENV=development
+```
+
+### Dockerによる起動・終了
 本アプリはDockerにて開発環境の構築を行っているため、はじめに、自身のローカルPCにDockerデスクトップをインストールする。  
 https://www.docker.com/ja-jp/
 
