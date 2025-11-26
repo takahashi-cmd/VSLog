@@ -95,7 +95,7 @@ http://localhost:5000/login
 
 <pre>
 .
-└── 2025.07_personal_development/               # 個人開発プロジェクトのルート
+└── VSLog/                                      # 個人開発プロジェクトのルート
     ├── Docker/                                 # FlaskとMySQL用のDocker設定
     │   ├── Flask/                              # Flask用ディレクトリ
     │   │   └── Dockerfile                      # FlaskのDockerfile
