@@ -72,7 +72,10 @@ FLASK_ENV=development
 https://www.docker.com/ja-jp/
 
 Dockerデスクトップをインストール後、GitHubから本アプリをcloneする。その後、ターミナル上で以下のコマンドを打つと本アプリがローカルホストで起動する。  
-起動コマンド：`docker compose up --build`
+起動コマンド  
+```
+docker compose up --build
+```
 
 次にブラウザを開き、URLの入力フォームに以下を入力する。  
 http://localhost:5000/login
@@ -82,12 +85,15 @@ http://localhost:5000/login
 
 （以下が該当箇所であり、必要に応じて修正する。）
 ***  
-ファイルパス：2025.07_personal_development/.env  
+ファイルパス：VSLog/.env  
 該当箇所：`FLASK_PORT=5000`  
 ***
 
 アプリを終了するには、ターミナル上で以下のコマンドを打つ。  
-終了コマンド：`docker compose down`
+終了コマンド  
+```
+docker compose down
+```
 
 ## ディレクトリ・ファイル構成
 ディレクトリ・ファイル構成を以下に示す。  
@@ -108,7 +114,7 @@ http://localhost:5000/login
     │   ├── env.py                              # マイグレーション環境設定
     │   ├── README                              # マイグレーションテンプレREADME
     │   └── script.py.mako                      # マイグレーションスクリプトテンプレ
-    ├── VSLog/                                  # Flaskアプリ本体
+    ├── myapp/                                  # Flaskアプリ本体
     │   ├── static/                             # 静的ファイル（CSS, JS, 画像）
     │   │   ├── css/                            # CSSディレクトリ
     │   │   │   ├── auth.css                    # 認証前（ログイン、新規登録、パスワード設定）のCSS
@@ -148,7 +154,7 @@ http://localhost:5000/login
     │   │   ├── study_fields.html               # 学習分野の登録・編集画面のHTML
     │   │   ├── study_logs_list.html            # 学習履歴一覧画面のHTML
     │   │   └── study_logs.html                 # 学習記録の登録・編集画面のHTML
-    │   ├── __init__.py                         # VSLogディレクトリをパッケージとして認識させるための空ファイル
+    │   ├── __init__.py                         # myappディレクトリをパッケージとして認識させるための空ファイル
     │   ├── app.py                              # 本アプリを起動するためのファイル
     │   ├── models.py                           # DBモデル、グラフ作成・描画等のためのファイル（MVTのMに相当）
     │   └── views.py                            # 各画面へのルーティングのためのファイル（MVTのVに相当）
