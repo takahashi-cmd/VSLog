@@ -26,6 +26,13 @@ def create_app(config_object=Config) -> Flask:
         from .models.users import User
         return User.query.get(user_id)
     
-    # from .blueprints import 
+    # Blueprint登録
+    from .blueprints.auth import auth_bp
+    from .blueprints.profile import profile_bp
+    from .blueprints.study import study_bp
+
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(profile_bp)
+    app.register_blueprint(study_bp)
 
     return app

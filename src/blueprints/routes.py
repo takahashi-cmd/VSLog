@@ -1,158 +1,29 @@
-from flask import request, render_template, redirect, url_for, flash, Response, jsonify
-from flask_login import login_user, login_required, logout_user, current_user
-from flask_bcrypt import generate_password_hash, check_password_hash
-from sqlalchemy.exc import IntegrityError
-from .app import app, db
-from .models import User, Field, StudyLog
-from datetime import datetime, date
 from collections import defaultdict
-import re
-import uuid
-import base64
+from datetime import datetime, date
 
-# 定数定義
-EMAIL_PATTERN = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9.]+$'
-PASSWORD_PATTERN = r'^.{8,16}$'
+from flask import request, render_template, redirect, url_for, flash, jsonify
+from flask_login import login_required, current_user
+from sqlalchemy.exc import IntegrityError
 
-# ルーティング
-# ログイン画面表示
-@app.route('/login', methods=['GET'])
-def login_view():
-    return render_template('login.html')
-
-# ログイン処理
-@app.route('/login', methods=['POST'])
-def login_process():
-    email = request.form.get('email')
-    password = request.form.get('password')
-
-    if email == '' or password == '':
-        flash('空のフォームがあります', 'エラー')
-    elif re.match(EMAIL_PATTERN, email) is None:
-        flash('メールアドレスの形式になっていません', 'エラー')
-    elif re.match(PASSWORD_PATTERN, password) is None:
-        flash('パスワードは8文字以上16文字以内で入力してください', 'エラー')
-    else:
-        user = User.select_by_email(email)
-        if user is None:
-            flash('登録されていないメールアドレスです', 'エラー')
-            return redirect(url_for('login_view'))
-        else:
-            if check_password_hash(user.password, password):
-                login_user(user)
-                flash('ログインしました', '正常')
-                return redirect(url_for('index_view', user_id=user.user_id))
-            else:
-                flash('パスワードが違います', 'エラー')
-                return redirect(url_for('login_view'))
-    return redirect(url_for('login_view'))
-
-# ログアウト
-@app.route('/logout', methods=['GET'])
-def logout():
-    logout_user()
-    flash('ログアウトしました', '正常')
-    return redirect(url_for('login_view'))
-
-# 新規登録画面表示
-@app.route('/signup', methods=['GET'])
-def signup_view():
-    return render_template('signup.html')
-
-# 新規登録処理
-@app.route('/signup', methods=['POST'])
-def signup_process():
-    username = request.form.get('username')
-    email = request.form.get('email')
-    password1 = request.form.get('password1')
-    password2 = request.form.get('password2')
-
-    if username == '' or email == '' or password1 == '' or password2 == '':
-        flash('ユーザー名、メールアドレス、パスワードのいずれかが空です', 'エラー')
-    elif password1 != password2:
-        flash('パスワードが一致しません', 'エラー')
-    elif re.match(EMAIL_PATTERN, email) is None:
-        flash('メールアドレスの形式になっていません', 'エラー')
-    elif re.match(PASSWORD_PATTERN, password1) is None:
-        flash('パスワードは8文字以上16文字以内で入力してください', 'エラー')
-    else:
-        user_id = uuid.uuid4()
-        user = User(
-            user_id = user_id,
-            username = username,
-            email = email,
-            password = password1
-        )
-
-        DBuser = User.select_by_email(email)
-        if DBuser != None:
-            flash('既に登録されているメールアドレスです', 'エラー')
-        else:
-            try:
-                db.session.add(user)
-                db.session.commit()
-            except:
-                db.session.rollback()
-                raise
-            finally:
-                db.session.close()
-            flash('新規登録が完了しました', '正常')
-            return redirect(url_for('login_view'))
-    return redirect(url_for('signup_view'))
-
-# パスワード再設定画面表示
-@app.route('/password-reset', methods=['GET'])
-def password_reset_view():
-    return render_template('password_reset.html')
-
-# パスワード再設定処理
-@app.route('/password-reset', methods=['POST'])
-def password_reset_process():
-    email = request.form.get('email')
-    new_password1 = request.form.get('new_password1')
-    new_password2 = request.form.get('new_password2')
-
-    if email == '' or new_password1 == '' or new_password2 == '':
-        flash('空のフォームがあります', 'エラー')
-    elif new_password1 != new_password2:
-        flash('パスワードが一致しません', 'エラー')
-    elif re.match(EMAIL_PATTERN, email) is None:
-        flash('メールアドレスの形式になっていません', 'エラー')
-    elif re.match(PASSWORD_PATTERN, new_password1) is None:
-        flash('パスワードは8文字以上16文字以内で入力してください', 'エラー')
-    else:
-        DBuser = User.select_by_email(email)
-        if DBuser == None:
-            flash('登録されていないメールアドレスです', 'エラー') 
-        else:
-            try:
-                DBuser.password = generate_password_hash(new_password1)
-                db.session.commit()
-            except:
-                db.session.rollback()
-                raise
-            finally:
-                db.session.close()
-            flash('パスワード再設定が完了しました', '正常')
-            return redirect(url_for('login_view'))
-    return redirect(url_for('password_reset_view'))
-
-# ーーーーーーーーーーーーーーーーーーー以降認証後画面ーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+from ...extensions import db
+from ...models.studyLogs import StudyLog
+from ...models.fields import Field
+from . import study_bp
 
 # ホーム画面表示
-@app.route('/index/<user_id>', methods=['GET'])
+@study_bp.route('/index/<user_id>', methods=['GET'])
 @login_required
 def index_view(user_id):
     this_year = datetime.now().year
     this_month = datetime.now().month
 
     return render_template(
-        'index.html',
+        'study/index.html',
         this_year=this_year,
         this_month=this_month
         )
 
-@app.route('/graph/<user_id>', methods=['POST'])
+@study_bp.route('/graph/<user_id>', methods=['POST'])
 def get_graph_stats(user_id):
     data = request.get_json(silent=True) or {}
     period = data.get('period')
@@ -229,13 +100,13 @@ def get_graph_stats(user_id):
 
 
 # 学習登録画面表示、日付に応じて学習履歴変更
-@app.route('/study-logs/<user_id>', methods=['GET', 'POST'])
+@study_bp.route('/study-logs/<user_id>', methods=['GET', 'POST'])
 @login_required
 def study_logs_view(user_id):
     if request.method == 'GET':
         today = date.today().strftime('%Y-%m-%d')
         date_str = request.args.get('selected_date') or today
-        return render_template('study_logs.html', selected_date=date_str)
+        return render_template('study/study_logs.html', selected_date=date_str)
     
     elif request.method == 'POST':
         data = request.get_json(silent=True) or {}
@@ -245,7 +116,7 @@ def study_logs_view(user_id):
             study_dicts = [] # 辞書の初期化
             for row in study_logs:
                 d = row_to_dict(row)
-                study_dicts.append(d)
+                study_dicts.study_bpend(d)
             return jsonify({
                 "studyDicts": study_dicts,
                 "selectedDate": date_str
@@ -257,7 +128,7 @@ def study_logs_view(user_id):
             })
 
 # 学習記録登録・編集・削除
-@app.route('/study-logs_process/<user_id>', methods=['POST'])
+@study_bp.route('/study-logs_process/<user_id>', methods=['POST'])
 @login_required
 def study_logs_process(user_id):
     study_dates = request.form.getlist('study_dates[]')
@@ -316,16 +187,16 @@ def study_logs_process(user_id):
     finally:
         db.session.close()
     
-    return redirect(url_for('study_logs_view', user_id=user_id, selected_date=selected_date))
+    return redirect(url_for('study.study_logs_view', user_id=user_id, selected_date=selected_date))
 
 # 学習分野画面表示
-@app.route('/study-fields/<user_id>', methods=['GET'])
+@study_bp.route('/study-fields/<user_id>', methods=['GET'])
 @login_required
 def study_fields_view(user_id):
-    return render_template('study_fields.html')
+    return render_template('study/study_fields.html')
 
 # 学習分野登録・編集・削除
-@app.route('/study-fields/<user_id>/', methods=['POST'])
+@study_bp.route('/study-fields/<user_id>/', methods=['POST'])
 @login_required
 def study_fields_process(user_id):
     fieldnames = request.form.getlist('fieldname[]')
@@ -375,18 +246,18 @@ def study_fields_process(user_id):
     finally:
         db.session.close()
 
-    return redirect(url_for('study_fields_view', user_id=user_id))
+    return redirect(url_for('study.study_fields_view', user_id=user_id))
 
 # 学習履歴一覧画面表示
-@app.route('/study-logs-list/<user_id>', methods=['GET'])
+@study_bp.route('/study-logs-list/<user_id>', methods=['GET'])
 @login_required
 def study_logs_list_view(user_id):
     this_year = datetime.now().year
     this_month = datetime.now().month
     this_month_year = date(this_year, this_month, 1).strftime('%Y-%m')
-    return render_template('study_logs_list.html', this_year=this_year, this_month=this_month,selected_date=this_month_year)
+    return render_template('study/study_logs_list.html', this_year=this_year, this_month=this_month,selected_date=this_month_year)
 
-@app.route('/study-logs-list/<user_id>', methods=['POST'])
+@study_bp.route('/study-logs-list/<user_id>', methods=['POST'])
 @login_required
 def study_logs_list_process(user_id):
     data = request.get_json(silent=True) or {}
@@ -396,7 +267,7 @@ def study_logs_list_process(user_id):
     study_dicts = defaultdict(list) # 辞書の初期化
     for row in study_logs:
         d = row_to_dict(row)
-        study_dicts[d['study_date']].append(d)
+        study_dicts[d['study_date']].study_bpend(d)
     return jsonify({
         "selectedDate": selected_date,
         "studyDicts": study_dicts,
@@ -404,9 +275,10 @@ def study_logs_list_process(user_id):
 
 # DBから取得した列を辞書形式に変換
 def row_to_dict(row):
-    d = dict(row._mapping)
+    d = dict(row._mstudy_bping)
     if d.get('study_date'):
         d['study_date'] = d['study_date'].isoformat()
     if d.get('hour') is not None:
         d['hour'] = float(d['hour'])
     return d
+
