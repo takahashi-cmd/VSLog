@@ -1,0 +1,41 @@
+{% extends "base.html" %} {% block head_link %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/auth.css') }}"
+/>
+{% endblock %} {% block title %} ログイン {% endblock %} {% block content %}
+<div class="main-container">
+  <div class="auth-inner">
+    <div class="auth-content">
+      <h1>ログイン</h1>
+      <div class="auth-form">
+        <form action="{{ url_for('login_process') }}" method="post">
+          <div class="auth-input">
+            <input
+              placeholder="メールアドレス"
+              type="email"
+              id="email"
+              name="email"
+            /><br />
+            <input
+              placeholder="パスワード"
+              type="password"
+              id="password"
+              name="password"
+            /><br />
+          </div>
+          <div class="auth-button">
+            <button type="submit">ログイン</button>
+          </div>
+        </form>
+      </div>
+      <div class="auth-link">
+        <a href="{{ url_for('signup_view') }}">新規登録はこちら</a>
+        <a href="{{ url_for('password_reset_view') }}"
+          >パスワードをお忘れの方はこちら</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

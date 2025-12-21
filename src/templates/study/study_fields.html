@@ -1,0 +1,108 @@
+{% extends "base.html" %} {% block head_link %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/study.css') }}"
+/>
+<script
+  src="{{ url_for('static', filename='js/study_fields.js') }}"
+  defer
+></script>
+{% endblock %} {% block title %} 学習分野の登録・編集 {% endblock %} {% block
+content %}
+<div class="main-container">
+  <div class="study-inner">
+    <div class="study-head">
+      <h1>学習分野の登録・編集</h1>
+    </div>
+    <div class="study-form">
+      <form
+        action="{{ url_for('study_fields_process', user_id=current_user.user_id) }}"
+        method="post"
+        name="study_fields_process"
+      >
+        <div class="study-table-container">
+          <table class="study-fields" id="study-fields">
+            <thead>
+              <tr class="study-tr fields">
+                <th class="th-num">No.</th>
+                <th class="th-fieldname">分野名</th>
+                <th class="th-color">凡例カラー</th>
+                <th class="th-delete">削除</th>
+              </tr>
+            </thead>
+            <tbody id="field-rows">
+              <!-- 学習分野がある場合はループで表示 -->
+              {% for field in current_user.fields %}
+              <tr class="study-tr fields">
+                <td class="table-num">{{ loop.index }}</td>
+                <td class="table-fieldname">
+                  <input
+                    type="text"
+                    name="fieldname[]"
+                    value="{{ field.fieldname }}"
+                  />
+                </td>
+                <td class="table-field-color">
+                  <input
+                    type="color"
+                    name="color_code[]"
+                    value="{{ field.color_code }}"
+                  />
+                </td>
+                <td class="table-delete">
+                  <input
+                    type="hidden"
+                    name="field_id[]"
+                    value="{{ field.field_id }}"
+                  />
+                  <input type="hidden" name="row_action[]" value="update" />
+                  <button
+                    class="delete-button"
+                    type="button"
+                    onclick="markDeleted(this)"
+                  >
+                    🗑️
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+
+              <!-- 空行の記入欄の表示（デフォルトでは5行表示） -->
+              {% for i in range(5 - current_user.fields|length) %}
+              <tr class="study-tr fields">
+                <td class="table-num">
+                  {{ current_user.fields|length + i + 1 }}
+                </td>
+                <td class="table-fieldname">
+                  <input type="text" name="fieldname[]" value="" />
+                </td>
+                <td class="table-field-color">
+                  <input type="color" name="color_code[]" value="#000000" />
+                </td>
+                <td class="table-delete">
+                  <input type="hidden" name="field_id[]" value="" />
+                  <input type="hidden" name="row_action[]" value="new" />
+                  <button
+                    class="delete-button"
+                    type="button"
+                    onclick="removeRow(this)"
+                  >
+                    🗑️
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="study-button">
+          <button type="submit">更新</button>
+          <button type="button" onclick="addRowFields(this)">
+            記入欄を追加する
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

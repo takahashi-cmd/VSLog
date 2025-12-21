@@ -27,8 +27,8 @@ migrate = Migrate(app, db)
 
 # FlaskアプリとDBオブジェクトが完全に初期化されたあとにmodelsを読み込む(循環参照を回避)
 # viewsのインポート
-from . import models, views
-from .models import User
+from . import views
+from .models.models import User, models
 
 # LoginManagerのインスタンス化、Flaskとの紐づけ
 login_manager = LoginManager()
