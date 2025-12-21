@@ -36,3 +36,4 @@ def create_app(config_object=Config) -> Flask:
     app.register_blueprint(study_bp)
 
     return app
+

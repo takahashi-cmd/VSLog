@@ -9,7 +9,7 @@
     <div class="auth-content">
       <h1>新規登録</h1>
       <div class="auth-form">
-        <form action="{{ url_for('signup_process') }}" method="post">
+        <form action="{{ url_for('auth.signup_process') }}" method="post">
           <div class="auth-input">
             <input
               placeholder="氏名"
@@ -42,8 +42,8 @@
         </form>
       </div>
       <div class="auth-link">
-        <a href="{{ url_for('login_view') }}">ログイン画面はこちら</a>
-        <a href="{{ url_for('password_reset_view') }}"
+        <a href="{{ url_for('auth.login_view') }}">ログイン画面はこちら</a>
+        <a href="{{ url_for('auth.password_reset_view') }}"
           >パスワードをお忘れの方はこちら</a
         >
       </div>

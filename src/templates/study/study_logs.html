@@ -21,7 +21,7 @@ content %}
       </div>
       <div class="study-date">
         <form
-          action="{{ url_for('study_logs_view', user_id=current_user.user_id) }}"
+          action="{{ url_for('study.study_logs_view', user_id=current_user.user_id) }}"
           method="post"
           id="study-date-form"
         >
@@ -48,7 +48,7 @@ content %}
       <form
         class="study_logs_process"
         id="study_logs_process"
-        action="{{ url_for('study_logs_process', user_id=current_user.user_id) }}"
+        action="{{ url_for('study.study_logs_process', user_id=current_user.user_id) }}"
         method="post"
         name="study_logs_process"
       >
