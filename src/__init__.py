@@ -26,6 +26,9 @@ def create_app(config_object=Config) -> Flask:
         from .models.users import User
         return User.query.get(user_id)
     
+    # models読み込み
+    from . import models
+
     # Blueprint登録
     from .blueprints.auth import auth_bp
     from .blueprints.profile import profile_bp
