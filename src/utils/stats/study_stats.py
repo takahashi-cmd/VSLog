@@ -11,3 +11,4 @@ def build_stats(total_hours, study_days):
         'study_days': days,
         'average_per_day': f'{average_per_day:.2f}',
     }
+
