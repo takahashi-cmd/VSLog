@@ -7,11 +7,11 @@
 <div class="main-container">
   <div class="auth-section">
     <div class="auth-href">
-      <a href="{{ url_for('profile_edit_view', user_id=current_user.user_id) }}"
+      <a href="{{ url_for('profile.profile_edit_view', user_id=current_user.user_id) }}"
         >プロフィール</a
       >
       <a
-        href="{{ url_for('password_update_view', user_id=current_user.user_id) }}"
+        href="{{ url_for('profile.password_update_view', user_id=current_user.user_id) }}"
         >パスワード変更</a
       >
     </div>
@@ -21,7 +21,7 @@
       <h1>プロフィール</h1>
       <div class="auth-form">
         <form
-          action="{{ url_for('profile_edit_process', user_id=current_user.user_id) }}"
+          action="{{ url_for('profile.profile_edit_process', user_id=current_user.user_id) }}"
           method="post"
         >
           <div class="auth-input">
