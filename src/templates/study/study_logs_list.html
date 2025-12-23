@@ -1,0 +1,69 @@
+{% extends "base.html" %} {% block head_link %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/study.css') }}"
+/>
+<script
+  src="{{ url_for('static', filename='js/study_logs_list.js') }}"
+  defer
+></script>
+
+{% endblock %} {% block title %} 学習履歴一覧 {% endblock %} {% block content %}
+<div class="main-container">
+  <div class="study-inner">
+    <div class="study-head">
+      <h1>{{ current_user.username }}さんの学習履歴一覧</h1>
+    </div>
+    <!-- 画面表示時のフォーム -->
+    <div class="study-date-view">
+      <div class="study-date" id="selected_date">
+        <p>{{ this_year }}年{{ this_month }}月の学習履歴一覧</p>
+      </div>
+      <div class="study-date">
+        <form
+          action="{{ url_for('study.study_logs_list_process', user_id=current_user.user_id) }}"
+          method="post"
+          id="study-date-form"
+        >
+          <label for="study_date">日付：</label>
+          <input
+            type="month"
+            name="study_date"
+            id="study_date"
+            value="{{ selected_date }}"
+          />
+        </form>
+      </div>
+    </div>
+    <!-- 以下のdivにtemplateの内容がDOM操作で挿入される -->
+    <div class="study-logs-list" id="study-logs-list"></div>
+    <template id="study-logs-template">
+      <div class="study-logs-join">
+        <div class="study-logs-date">
+          <p class="study-days">日付</p>
+          <p class="day-of-week">曜日</p>
+        </div>
+        <div class="study-logs-content">
+          <p class="total-hours">学習時間：〇時間</p>
+          <p class="fields">学習分野：〇〇〇</p>
+        </div>
+        <!-- カード全面を覆う透明ボタン（中身なし） -->
+        <button class="open" type="button" aria-label="詳細を開く"></button>
+        <div class="study-logs-modal">
+          <div class="modal-content">
+            <div class="modal-date"></div>
+            <div class="modal-head-h"><h2>学習時間（合計）</h2></div>
+            <div class="modal-total-hour"></div>
+            <div class="modal-head-f"><h2>学習分野</h2></div>
+            <div class="modal-field-hour"></div>
+            <div class="modal-head-c"><h2>学習内容</h2></div>
+            <div class="modal-study-content"></div>
+            <button class="close" type="button">閉じる</button>
+          </div>
+          <div class="mask"></div>
+        </div>
+      </div>
+    </template>
+  </div>
+</div>
+{% endblock %}
