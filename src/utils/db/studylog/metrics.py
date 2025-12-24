@@ -8,6 +8,7 @@ from sqlalchemy import func
 from ....extensions import db
 from ....models import StudyLog
 
+# 共通のフィルター条件
 def _build_filters(user_id: str, first_day: date | None = None, last_day: date | None = None):
     filters = [StudyLog.user_id == user_id]
     if first_day:
