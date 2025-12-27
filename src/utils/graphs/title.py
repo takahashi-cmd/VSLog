@@ -4,7 +4,7 @@ import platform
 from dataclasses import dataclass
 from datetime import date
 from typing import Callable
-from ..types import Period
+from .types import Period
 
 def _date_format(fmt_windows: str, fmt_unix: str) -> str:
     return fmt_windows if platform.system() == 'Windows' else fmt_unix
@@ -27,15 +27,15 @@ def _week_title(ctx: TitleContext, date_fmt: str) -> str | None:
 def _month_title(ctx: TitleContext, date_fmt: str) -> str | None:
     if not (ctx.year and ctx.month and ctx.month_num):
         return None
-    return f'{ctx.year}年{ctx.month}月1日～{ctx.month}月{ctx.month_num}日の分野別学習履歴'
+    return f'{ctx.year}年{ctx.month}月1日～{ctx.month}月{ctx.month_num}日の学習履歴'
 
 def _year_title(ctx: TitleContext, date_fmt: str) -> str | None:
     if not ctx.year:
         return None
-    return f'{ctx.year}年の分野別学習履歴'
+    return f'{ctx.year}年の学習履歴'
 
 def _all_title(ctx: TitleContext, date_fmt: str) -> str | None:
-    return '分野別全期間の学習履歴'
+    return '全期間の学習履歴'
 
 # period -> builder の対応表
 _BUILDER_BY_PERIOD: dict[Period, Callable[[TitleContext, str], str | None]] = {
