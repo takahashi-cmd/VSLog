@@ -1,7 +1,8 @@
 # 統計値取得関数
+from __future__ import annotations
 from decimal import Decimal
 
-def build_stats(total_hours, study_days):
+def build_stats(total_hours: float, study_days: str):
     total_hours_val = float(total_hours or 0.0)
     days = int(study_days or 0)
     average_per_day = total_hours / days if days else 0.00

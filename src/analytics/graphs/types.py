@@ -4,6 +4,9 @@ from typing import Literal
 # グラフ種類
 GraphType = Literal['bar', 'pie', 'line']
 
+# 横軸表示形式
+HorizontalAxis = Literal['days', 'fields']
+
 # 縦軸表示形式
 VerticalAxis = Literal['time', 'percent']
 
