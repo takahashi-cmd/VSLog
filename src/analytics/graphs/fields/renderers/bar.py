@@ -1,7 +1,7 @@
 # 棒グラフの描画
 from __future__ import annotations
 import matplotlib.pyplot as plt
-from ..data import PlotData
+from ..plot_data import PlotData
 from ...types import VerticalAxis
 
 class BarRenderer:
