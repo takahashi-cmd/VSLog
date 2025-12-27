@@ -1,6 +1,6 @@
 # 円グラフの描画
 from __future__ import annotations
-from ..data import PlotData
+from ..plot_data import PlotData
 from ...types import VerticalAxis
 
 class PieRenderer:
