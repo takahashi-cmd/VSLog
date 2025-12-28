@@ -6,11 +6,11 @@ from typing import Sequence
 from ..mpl_config import configure_matplotlib
 from ..svg import fig_to_svg_base64
 from .plot_data import build_plot_data
-from ..title import TitleContext, make_fields_title
+from ..title import TitleContext, make_title
 from .renderers import get_renderer
 from ..types import GraphType, VerticalAxis
 
-def make_graph_br_fields(
+def make_graph_by_fields(
     *,
     logs: Sequence[tuple[str, str, float | None]],
     period: str,
@@ -44,7 +44,7 @@ def make_graph_br_fields(
     renderer.render(ax, plot_data, verticalAxis=verticalAxis)
 
     # 5.グラルタイトルの生成
-    title = make_fields_title(
+    title = make_title(
         TitleContext(
             period=period,
             first_day=first_day,
