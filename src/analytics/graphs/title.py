@@ -46,7 +46,7 @@ _BUILDER_BY_PERIOD: dict[Period, Callable[[TitleContext, str], str | None]] = {
     'all': _all_title,
 }
 
-def make_fields_title(ctx: TitleContext) -> str | None:
+def make_title(ctx: TitleContext) -> str | None:
     date_fmt = _date_format('%#m/%#d(%a)', '%-m/%-d(%a)')
     builder = _BUILDER_BY_PERIOD.get(ctx.period)
     if builder is None:
