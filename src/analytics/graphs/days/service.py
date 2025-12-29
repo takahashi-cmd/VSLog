@@ -5,6 +5,7 @@ from typing import Sequence
 
 from ..mpl_config import configure_matplotlib
 from .plot_data import build_plot_data
+from ..types import VerticalAxis, GraphType
 from ..title import TitleContext, make_title
 from ..svg import fig_to_svg_base64
 
