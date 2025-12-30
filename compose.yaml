@@ -14,7 +14,7 @@ services:
     platform: linux/x86_64
     # ホストとコンテナのポート番号を指定
     ports:
-      - "${MYSQL_PORT}:3306"
+      - "3306:3306"
     # ボリュームmysql_dataをコンテナの/var/lib/mysqlにボリュームマウントする
     volumes:
       - mysql_data:/var/lib/mysql
@@ -30,7 +30,7 @@ services:
       - .env
     healthcheck:
       # mysqladmin(MySQLの管理を行うクライアントを使ってDBコンテナ自身（localhost:127.0.0.1)にpingを送ってヘルスチェックを行う)
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u${MYSQL_USER} -p${MYSQL_PASSWORD}"]
       # ヘルスチェックのインターバルは10秒
       interval: 10s
       # タイムアウト時間は10秒
@@ -48,9 +48,10 @@ services:
     build:
       context: .
       dockerfile: docker/Flask/Dockerfile
-    # ローカルのカレントディレクトリのデータをコンテナの/codeにバインドマウントする
+    # ローカルのsrc, migrationsをコンテナにバインドマウントする
     volumes:
-      - .:/code
+      - ./src:/app/src
+      - ./migrations:/app/migrations
     # ホストとコンテナのポート番号を指定
     ports:
       - "${FLASK_PORT}:5000"
