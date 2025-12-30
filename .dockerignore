@@ -5,3 +5,5 @@
 # README.mdを除外
 README.md
 
+# .env.exampleを除外
+.env.example

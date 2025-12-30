@@ -148,17 +148,17 @@
           </div>
           {% else %}
           <div class="header-logo">
-            <a href="{{ url_for('login_view') }}"
+            <a href="{{ url_for('auth.login_view') }}"
               ><img
                 src="{{ url_for('static', filename='image/logo.png') }}"
                 alt="ロゴ画像"
             /></a>
-            <a href="{{ url_for('login_view') }}">VSLog</a>
+            <a href="{{ url_for('auth.login_view') }}">VSLog</a>
           </div>
           <div class="header-nav">
-            <a href="{{ url_for('login_view') }}">ログイン画面はこちら</a>
-            <a href="{{ url_for('signup_view') }}">新規登録はこちら</a>
-            <a href="{{ url_for('password_reset_view') }}"
+            <a href="{{ url_for('auth.login_view') }}">ログイン画面はこちら</a>
+            <a href="{{ url_for('auth.signup_view') }}">新規登録はこちら</a>
+            <a href="{{ url_for('auth.password_reset_view') }}"
               >パスワードをお忘れの方はこちら</a
             >
           </div>
@@ -174,13 +174,13 @@
             <div class="modal-header-nav">
               <ul class="modal-header-content">
                 <li class="is-hover">
-                  <a href="{{ url_for('login_view') }}">ログイン画面はこちら</a>
+                  <a href="{{ url_for('auth.login_view') }}">ログイン画面はこちら</a>
                 </li>
                 <li class="is-hover">
-                  <a href="{{ url_for('signup_view') }}">新規登録はこちら</a>
+                  <a href="{{ url_for('auth.signup_view') }}">新規登録はこちら</a>
                 </li>
                 <li class="is-hover">
-                  <a href="{{ url_for('password_reset_view') }}"
+                  <a href="{{ url_for('auth.password_reset_view') }}"
                     >パスワードをお忘れの方はこちら</a
                   >
                 </li>

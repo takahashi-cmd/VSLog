@@ -1,12 +1,10 @@
 FROM python:3.13.5
 
-# pycファイルおよび__pycache__の生成は行わない
-ENV PYTHONDONTWRITEBYTECODE=1
 # Pythonの出力をバッファリングしないように設定（ログが見やすくなる）
 ENV PYTHONUNBUFFERED=1
 
 # コンテナ内のワーキングディレクトリを指定
-WORKDIR /code
+WORKDIR /app
 
 # matplotlibの日本語対応のフォントパッケージを先にインストール
 RUN apt-get update && \
@@ -23,11 +21,5 @@ COPY requirements.txt .
 RUN pip install -U pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# entrypoint.shをコンテナ内にコピー
-COPY entrypoint.sh .
-
-# 実行権限付与
-RUN chmod +x /code/entrypoint.sh
-
-# Flaskのアプリケーションをentrypoint.shで起動
-ENTRYPOINT [ "/code/entrypoint.sh" ]
+# Flaskコンテナの起動時コマンド
+ENTRYPOINT ["/bin/sh", "-c", "flask db upgrade && flask run --host=0.0.0.0 --debug"]

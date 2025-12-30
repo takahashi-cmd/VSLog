@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from ...extensions import db
 from ...models.studyLogs import StudyLog
 from ...models.fields import Field
-from .. import study_bp
+from . import study_bp
 
 # ホーム画面表示
 @study_bp.route('/index/<user_id>', methods=['GET'])
