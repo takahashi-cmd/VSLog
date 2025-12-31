@@ -21,10 +21,10 @@ def last_week(today: date | None = None) -> PeriodRange:
     last = first + timedelta(days=6)
     return PeriodRange(first, last)
 
-def month_range(year: int, month: int) -> tuple[PeriodRange, int]:
-    first = date(year, month, 1)
-    month_num = calendar.monthrange(year, month)[1]
-    last = date(year, month, month_num)
+def month_range(month_year: int, month: int) -> tuple[PeriodRange, int]:
+    first = date(month_year, month, 1)
+    month_num = calendar.monthrange(month_year, month)[1]
+    last = date(month_year, month, month_num)
     return PeriodRange(first, last), month_num # 月日数は期間ではないので、PeriodRangeに混ぜない
 
 def year_range(year: int) -> PeriodRange:
