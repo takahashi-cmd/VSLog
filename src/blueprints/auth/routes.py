@@ -41,7 +41,7 @@ def login_process():
             if check_password_hash(user.password, password):
                 login_user(user)
                 flash('ログインしました', '正常')
-                return redirect(url_for('study.index_view', user_id=user.user_id))
+                return redirect(url_for('study.dashboard_view', user_id=user.user_id))
             else:
                 flash('パスワードが違います', 'エラー')
                 return redirect(url_for('auth.login_view'))

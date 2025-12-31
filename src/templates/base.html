@@ -64,17 +64,17 @@
         <div class="header-inner">
           {% if current_user.user_id %}
           <div class="header-logo">
-            <a href="{{ url_for('study.index_view', user_id=current_user.user_id) }}"
+            <a href="{{ url_for('study.dashboard_view', user_id=current_user.user_id) }}"
               ><img
                 src="{{ url_for('static', filename='image/logo.png') }}"
                 alt="ロゴ画像"
             /></a>
-            <a href="{{ url_for('study.index_view', user_id=current_user.user_id) }}"
+            <a href="{{ url_for('study.dashboard_view', user_id=current_user.user_id) }}"
               >VSLog</a
             >
           </div>
           <div class="header-nav">
-            <a href="{{ url_for('study.index_view', user_id=current_user.user_id) }}"
+            <a href="{{ url_for('study.dashboard_view', user_id=current_user.user_id) }}"
               >ホーム</a
             >
             <a
@@ -110,7 +110,7 @@
               <ul class="modal-header-content">
                 <li class="is-hover">
                   <a
-                    href="{{ url_for('study.index_view', user_id=current_user.user_id) }}"
+                    href="{{ url_for('study.dashboard_view', user_id=current_user.user_id) }}"
                     >ホーム</a
                   >
                 </li>

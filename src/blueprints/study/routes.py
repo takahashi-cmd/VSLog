@@ -10,94 +10,57 @@ from ...models.studyLogs import StudyLog
 from ...models.fields import Field
 from . import study_bp
 
+# from ...analytics.db import aggregate, metrics, read
+from ...analytics.graphs.days import service
+from ...analytics.graphs.fields import service
+
+from ...analytics.periods import study_periods
+from ...analytics.stats import study_stats
+
 # ホーム画面表示
-@study_bp.route('/index/<user_id>', methods=['GET'])
+@study_bp.route('/dashboard/<user_id>', methods=['GET'])
 @login_required
-def index_view(user_id):
+def dashboard_view(user_id):
     this_year = datetime.now().year
     this_month = datetime.now().month
 
     return render_template(
-        'study/index.html',
+        'study/dashboard.html',
         this_year=this_year,
         this_month=this_month
         )
 
+# 統計値、グラフの取得
 @study_bp.route('/graph/<user_id>', methods=['POST'])
 def get_graph_stats(user_id):
     data = request.get_json(silent=True) or {}
     period = data.get('period')
-    year_str = data.get('year')
-    month_year_str = data.get('month-year')
-    month_str = data.get('month')
+    year = data.get('year')
+    month_year = data.get('month-year')
+    month = data.get('month')
     horizontalAxis = data.get('horizontalAxis')
     verticalAxis = data.get('verticalAxis')
     graphType = data.get('graphType')
 
-    # print(data, period, year_str, month_year_str, month_str, horizontalAxis, verticalAxis, graphType)
-
-    svg = None
-    total_day = 0
-    total_hour = 0.00
-    avg_hour = 0.00
-
-    # 今週の学習グラフ、学習日数、時間の取得
+    # ①first_day, last_dayの取得
+    # ②logsの取得
+    # ③graph svgの取得
     if period == 'this_week':
-        svg = StudyLog.get_this_week_graph(user_id, period, horizontalAxis, verticalAxis, graphType)
-        this_week_stats = StudyLog.get_this_week_stats(user_id)
-        total_day = this_week_stats['study_days']
-        total_hour = this_week_stats['total_hours']
-        avg_hour = this_week_stats['average_per_day']
-
-    # 先週の学習グラフ、学習日数、時間の取得
+        today = date.today()
+        first_day, last_day = study_periods.this_week(today)
+    
     elif period == 'last_week':
-        svg = StudyLog.get_last_week_graph(user_id, period, horizontalAxis, verticalAxis, graphType)
-        last_week_stats = StudyLog.get_last_week_stats(user_id)
-        total_day = last_week_stats['study_days']
-        total_hour = last_week_stats['total_hours']
-        avg_hour = last_week_stats['average_per_day']
-
-    # 月間の学習グラフ、学習日数、時間の取得
-    elif period == 'month' and month_year_str and month_str:
-        svg = StudyLog.get_month_graph(user_id, period, horizontalAxis, verticalAxis, graphType, month_year_str, month_str)
-        month_stats = StudyLog.get_month_stats(user_id, month_year_str, month_str)
-        total_day = month_stats['study_days']
-        total_hour = month_stats['total_hours']
-        avg_hour = month_stats['average_per_day']
-
-    # 年間の学習グラフ、学習日数、時間の取得
-    elif period == 'year' and year_str:
-        svg = StudyLog.get_year_graph(user_id, period, horizontalAxis, verticalAxis, graphType, year_str)
-        year_stats = StudyLog.get_year_stats(user_id, year_str)
-        total_day = year_stats['study_days']
-        total_hour = year_stats['total_hours']
-        avg_hour = year_stats['average_per_day']
-
-    # 全期間の学習グラフ、学習日数、時間の取得
+        today = date.today()
+        first_day, last_day = study_periods.last_week(today)
+    
+    elif period == 'month':
+        first_day, last_day = study_periods.month_range(month_year, month)
+    
+    elif period == 'year':
+        first_day, last_day = study_periods.year_range(year)
+    
     elif period == 'all':
-        svg = StudyLog.get_all_time_graph(user_id, period, horizontalAxis, verticalAxis, graphType)
-        total_day = StudyLog.get_total_day(user_id)
-        total_hour = StudyLog.get_total_hour(user_id)
-        avg_hour = round(total_hour / total_day, 1) if total_day else 0.0
-
-    if svg:
-        # print('svgあり')
-        return jsonify({
-        "svg": svg,
-        "total_day": total_day,
-        "total_hour": total_hour,
-        "avg_hour": avg_hour
-        })
-    else:
-        # print('svg無し')
-        return jsonify({
-        "svg": svg,
-        "total_day": total_day,
-        "total_hour": total_hour,
-        "avg_hour": avg_hour
-        })
-
-
+        pass
 
 # 学習登録画面表示、日付に応じて学習履歴変更
 @study_bp.route('/study-logs/<user_id>', methods=['GET', 'POST'])
