@@ -2,4 +2,4 @@ from flask import Blueprint
 
 study_bp = Blueprint('study', __name__)
 
-from . import routes
+from .routes import dashboard, fields, graph, logs_list, logs
